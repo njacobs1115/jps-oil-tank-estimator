@@ -1033,21 +1033,26 @@
 <div class="progress-steps">
   <div class="progress-step active" id="dot-1">
     <div class="step-dot" id="dot-num-1">1</div>
-    <div class="step-label">Location</div>
+    <div class="step-label">Tank Size</div>
   </div>
   <div class="step-connector" id="con-12"></div>
   <div class="progress-step" id="dot-2">
     <div class="step-dot" id="dot-num-2">2</div>
-    <div class="step-label">Access</div>
+    <div class="step-label">Location</div>
   </div>
   <div class="step-connector" id="con-23"></div>
   <div class="progress-step" id="dot-3">
     <div class="step-dot" id="dot-num-3">3</div>
-    <div class="step-label">Oil</div>
+    <div class="step-label">Access</div>
   </div>
   <div class="step-connector" id="con-34"></div>
   <div class="progress-step" id="dot-4">
     <div class="step-dot" id="dot-num-4">4</div>
+    <div class="step-label">Oil Level</div>
+  </div>
+  <div class="step-connector" id="con-45"></div>
+  <div class="progress-step" id="dot-5">
+    <div class="step-dot" id="dot-num-5">5</div>
     <div class="step-label">Location</div>
   </div>
 </div>
@@ -1055,9 +1060,49 @@
 <div class="shell">
 
   <!-- ══════════════════════════════════════
-       STEP 1 — TANK LOCATION + EXIT TYPE
+       STEP 1 — TANK SIZE
   ══════════════════════════════════════ -->
   <div class="screen active" id="screen-1" data-step="1">
+    <div class="step-heading">
+      <h1>What size is your oil tank?</h1>
+      <p>Most residential tanks are 275 gallons. Check the nameplate on the side if you're not sure.</p>
+    </div>
+    <div class="cards" id="size-cards">
+      <button class="card" data-value="275" onclick="selectCard(this,'size')">
+        <span class="card-icon">🛢️</span>
+        <div class="card-body">
+          <div class="card-label">275 Gallon</div>
+          <div class="card-sub">Most common residential tank — standard flat rate</div>
+        </div>
+        <span class="card-badge">Most Common</span>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="330" onclick="selectCard(this,'size')">
+        <span class="card-icon">🛢️</span>
+        <div class="card-body">
+          <div class="card-label">330 Gallon</div>
+          <div class="card-sub">Slightly larger, same flat rate removal</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="unsure" onclick="selectCard(this,'size')">
+        <span class="card-icon">❓</span>
+        <div class="card-body">
+          <div class="card-label">I'm not sure</div>
+          <div class="card-sub">We'll confirm on-site. Estimate based on 275 gallon.</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-next" id="next-1" onclick="goToStep(2)" disabled>Continue →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STEP 2 — TANK LOCATION + EXIT TYPE
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen-2" data-step="2">
     <div class="step-heading">
       <h1>Where is your oil tank?</h1>
       <p>Tank location affects how we access and remove it.</p>
@@ -1121,81 +1166,41 @@
     </div>
 
     <div class="nav-row">
-      <button class="btn-next" id="next-1" onclick="goToStep(2)" disabled>Continue →</button>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════
-       STEP 2 — TANK ACCESS
-  ══════════════════════════════════════ -->
-  <div class="screen" id="screen-2" data-step="2">
-    <div class="step-heading">
-      <h1>Can we get to the tank easily?</h1>
-      <p>Access difficulty is the biggest pricing variable. Be specific — it protects you from surprises on job day.</p>
-    </div>
-    <div class="cards-2col" id="access-cards">
-      <button class="card" data-value="open" onclick="selectCard(this,'access')">
-        <span class="card-icon">✅</span>
-        <div class="card-body">
-          <div class="card-label">Open access</div>
-          <div class="card-sub">Visible, reachable — clear path in and out</div>
-        </div>
-        <span class="card-check"></span>
-      </button>
-      <button class="card" data-value="restricted" onclick="selectCard(this,'access')">
-        <span class="card-icon">⚠️</span>
-        <div class="card-body">
-          <div class="card-label">Tight or restricted</div>
-          <div class="card-sub">Behind furnace, cubbyhole, or crawlspace</div>
-        </div>
-        <span class="card-check"></span>
-      </button>
-    </div>
-    <div class="nav-row">
       <button class="btn-back" onclick="goToStep(1)">← Back</button>
       <button class="btn-next" id="next-2" onclick="goToStep(3)" disabled>Continue →</button>
     </div>
   </div>
 
   <!-- ══════════════════════════════════════
-       STEP 3 — OIL IN THE TANK
+       STEP 3 — TANK ACCESS
   ══════════════════════════════════════ -->
   <div class="screen" id="screen-3" data-step="3">
     <div class="step-heading">
-      <h1>How much oil is in the tank?</h1>
-      <p>We include disposal of up to 50 gallons at no extra charge. Anything over may affect your total.</p>
+      <h1>Is the tank accessible to our technicians?</h1>
+      <p>Access and difficulty of removal significantly impact pricing. Be as accurate as you can — it protects you from surprises on job day.</p>
     </div>
-    <div class="cards" id="oil-cards">
-      <button class="card" data-value="empty" onclick="selectCard(this,'oil')">
-        <span class="card-icon">💨</span>
+    <div class="cards" id="access-cards">
+      <button class="card" data-value="open" onclick="selectCard(this,'access')">
+        <span class="card-icon">✅</span>
         <div class="card-body">
-          <div class="card-label">Empty or nearly empty</div>
-          <div class="card-sub">Dry or just residual sludge</div>
+          <div class="card-label">Yes — accessible and in the open</div>
+          <div class="card-sub">Clear path to the tank, no major obstacles</div>
         </div>
         <span class="card-check"></span>
       </button>
-      <button class="card" data-value="under50" onclick="selectCard(this,'oil')">
-        <span class="card-icon">🟡</span>
+      <button class="card" data-value="unsure" onclick="selectCard(this,'access')">
+        <span class="card-icon">🤔</span>
         <div class="card-body">
-          <div class="card-label">Some oil — under 50 gallons</div>
-          <div class="card-sub">Disposal included at no extra charge</div>
-        </div>
-        <span class="card-badge">Included</span>
-        <span class="card-check"></span>
-      </button>
-      <button class="card" data-value="over50" onclick="selectCard(this,'oil')">
-        <span class="card-icon">🔴</span>
-        <div class="card-body">
-          <div class="card-label">Significant oil — 50+ gallons</div>
-          <div class="card-sub">May affect disposal cost — confirmed at site visit</div>
+          <div class="card-label">I'm unsure</div>
+          <div class="card-sub">We'll assess access during your free site verification — no commitment required</div>
         </div>
         <span class="card-check"></span>
       </button>
-      <button class="card" data-value="leaking" onclick="selectCard(this,'oil')">
-        <span class="card-icon">🚨</span>
+      <button class="card" data-value="restricted" onclick="selectCard(this,'access')">
+        <span class="card-icon">⚠️</span>
         <div class="card-body">
-          <div class="card-label">Leaking or suspected contamination</div>
-          <div class="card-sub">Visible rust, oil smell, or known leak history</div>
+          <div class="card-label">The tank is: behind a wall, cubbyhole, crawl space, etc.</div>
+          <div class="card-sub">Obstructed access — surcharge may apply, confirmed on-site</div>
         </div>
         <span class="card-check"></span>
       </button>
@@ -1207,12 +1212,62 @@
   </div>
 
   <!-- ══════════════════════════════════════
-       STEP 4 — STATE & CITY
+       STEP 4 — OIL LEVEL
   ══════════════════════════════════════ -->
   <div class="screen" id="screen-4" data-step="4">
     <div class="step-heading">
+      <h1>What does the gauge on top of the tank read?</h1>
+      <p>Up to 50 gallons of oil disposal is included in your flat rate. If the tank is more than half full, a flat $150 excess disposal fee applies — we never charge by the gallon.</p>
+    </div>
+    <div class="cards" id="oil-cards">
+      <button class="card" data-value="empty" onclick="selectCard(this,'oil')">
+        <span class="card-icon">💨</span>
+        <div class="card-body">
+          <div class="card-label">Empty</div>
+          <div class="card-sub">Gauge reads empty — disposal included</div>
+        </div>
+        <span class="card-badge">Included</span>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="quarter" onclick="selectCard(this,'oil')">
+        <span class="card-icon">🟡</span>
+        <div class="card-body">
+          <div class="card-label">¼ or less</div>
+          <div class="card-sub">Low level — disposal included in flat rate</div>
+        </div>
+        <span class="card-badge">Included</span>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="half_plus" onclick="selectCard(this,'oil')">
+        <span class="card-icon">🔴</span>
+        <div class="card-body">
+          <div class="card-label">More than ½</div>
+          <div class="card-sub">Flat $150 excess disposal fee — never charged by the gallon</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="no_gauge" onclick="selectCard(this,'oil')">
+        <span class="card-icon">❓</span>
+        <div class="card-body">
+          <div class="card-label">There is no gauge on the tank</div>
+          <div class="card-sub">We'll assess the oil level on-site during your free verification</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goToStep(3)">← Back</button>
+      <button class="btn-next" id="next-4" onclick="goToStep(5)" disabled>Continue →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STEP 5 — STATE & CITY
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen-5" data-step="5">
+    <div class="step-heading">
       <h1>Where is the property?</h1>
-      <p>Permit fees vary by city and state — we need this to give you an accurate total.</p>
+      <p>We serve RI, MA, and CT. Your state determines permit requirements.</p>
     </div>
 
     <div class="state-grid">
@@ -1232,7 +1287,12 @@
 
     <div class="ri-note" id="ri-note">
       <span class="ri-note-icon">✅</span>
-      <span><strong>Good news — RI requires no permit.</strong> No permit fee, no waiting. We handle everything same week in most cases.</span>
+      <span><strong>Rhode Island requires no permit.</strong> No permit fee, no waiting — most RI jobs are scheduled within the same week.</span>
+    </div>
+
+    <div class="ri-note" id="ct-note" style="display:none;">
+      <span class="ri-note-icon">✅</span>
+      <span><strong>Connecticut requires no permit for oil tank removal.</strong> No permit fee added to your estimate.</span>
     </div>
 
     <div class="city-wrap" id="city-wrap" style="display:none;">
@@ -1252,8 +1312,8 @@
     </div>
 
     <div class="nav-row">
-      <button class="btn-back" onclick="goToStep(3)">← Back</button>
-      <button class="btn-next" id="next-4" onclick="showResults()" disabled>See My Estimate →</button>
+      <button class="btn-back" onclick="goToStep(4)">← Back</button>
+      <button class="btn-next" id="next-5" onclick="showResults()" disabled>See My Estimate →</button>
     </div>
   </div>
 
@@ -1275,7 +1335,7 @@
     <!-- Trust note -->
     <div class="trust-banner">
       <span class="trust-banner-icon">🛡️</span>
-      <span>Unlike most removal companies, we include oil disposal up to 50 gallons and pull your permits — no surprise charges on job day.</span>
+      <span>Flat rate pricing. No upsells. What you see is what you pay — and you don't pay a dime until the job is complete.</span>
     </div>
 
     <!-- Stairs warning (conditional) -->
@@ -1316,9 +1376,17 @@
       <div class="invoice-row">
         <div class="invoice-row-desc">
           <div class="invoice-row-name">Oil &amp; Sludge Disposal</div>
-          <div class="invoice-row-sub">Up to 50 gallons — included, no extra charge</div>
+          <div class="invoice-row-sub">Up to 50 gallons included in your flat rate. Excess oil: flat $150 — never by the gallon.</div>
         </div>
         <div class="invoice-row-amount included">Included ✓</div>
+      </div>
+
+      <div class="invoice-row" id="oil-excess-line" style="display:none;">
+        <div class="invoice-row-desc">
+          <div class="invoice-row-name">Excess Oil Disposal</div>
+          <div class="invoice-row-sub">Tank is more than half full — flat fee, never by the gallon</div>
+        </div>
+        <div class="invoice-row-amount">+$150</div>
       </div>
 
       <div class="invoice-row" id="permit-line">
@@ -1342,7 +1410,7 @@
         <i class="chevron">▼</i>
       </button>
       <div class="why-body" id="why-body">
-        Our flat rate covers everything: labor, equipment, transportation, cutting fees, and oil disposal. Competitors often quote a lower number and add disposal, permit fees, or "access fees" on job day. We build it all in upfront so you know exactly what you're paying before we arrive.
+        Every job is quoted at a flat rate — no hourly billing, no per-gallon disposal charges, no permit markups. We pull your permits, handle the oil, and haul everything away. What you see in this estimate is what you pay on job day. Nothing more.
       </div>
     </div>
 
@@ -1354,7 +1422,7 @@
       </div>
       <div class="proof-item">
         <span class="proof-number">Since 2013</span>
-        <span class="proof-label">Serving RI &amp; MA</span>
+        <span class="proof-label">Serving RI, MA &amp; CT</span>
       </div>
       <div class="proof-item">
         <span class="proof-number">Licensed</span>
@@ -1367,7 +1435,7 @@
     <!-- CTA Form -->
     <div class="cta-section">
       <div class="cta-heading">Lock In This Estimate — Free Site Verification</div>
-      <div class="cta-sub">No obligation. We confirm access and conditions, then your price is locked. Most verifications take under 10 minutes by phone or photo.</div>
+      <div class="cta-sub">No payment until the job is complete. We confirm access and conditions, then your price is locked.</div>
 
       <div class="form-field">
         <label for="cta-name">Your Name *</label>
@@ -1435,10 +1503,11 @@ const GHL_WEBHOOK_URL = 'PASTE_GHL_WEBHOOK_URL_HERE';
 // STATE
 // ──────────────────────────────────────────────
 const answers = {
+  size: null,        // 275 | 330 | unsure
   location: null,    // basement | garage | outside
   exit: null,        // walkout | bulkhead | stairs (basement only)
-  access: null,      // open | restricted
-  oil: null,         // empty | under50 | over50 | leaking
+  access: null,      // open | unsure | restricted
+  oil: null,         // empty | quarter | half_plus | no_gauge
   state: null,
   city: null,
   permitFee: null,
@@ -1753,6 +1822,107 @@ let cityData = [
   {city:"Reading",state:"MA",permit_fee:null},
   {city:"Randolph",state:"MA",permit_fee:50},
   {city:"Quincy",state:"MA",permit_fee:50},
+  // Connecticut cities — no permit required for oil tank removal in CT
+  {city:"Hartford",state:"CT",permit_fee:0},
+  {city:"New Haven",state:"CT",permit_fee:0},
+  {city:"Bridgeport",state:"CT",permit_fee:0},
+  {city:"Stamford",state:"CT",permit_fee:0},
+  {city:"Waterbury",state:"CT",permit_fee:0},
+  {city:"Norwalk",state:"CT",permit_fee:0},
+  {city:"Danbury",state:"CT",permit_fee:0},
+  {city:"New Britain",state:"CT",permit_fee:0},
+  {city:"West Hartford",state:"CT",permit_fee:0},
+  {city:"Greenwich",state:"CT",permit_fee:0},
+  {city:"Hamden",state:"CT",permit_fee:0},
+  {city:"Bristol",state:"CT",permit_fee:0},
+  {city:"Meriden",state:"CT",permit_fee:0},
+  {city:"Manchester",state:"CT",permit_fee:0},
+  {city:"West Haven",state:"CT",permit_fee:0},
+  {city:"Milford",state:"CT",permit_fee:0},
+  {city:"Middletown",state:"CT",permit_fee:0},
+  {city:"Stratford",state:"CT",permit_fee:0},
+  {city:"East Hartford",state:"CT",permit_fee:0},
+  {city:"Southington",state:"CT",permit_fee:0},
+  {city:"Enfield",state:"CT",permit_fee:0},
+  {city:"Fairfield",state:"CT",permit_fee:0},
+  {city:"Shelton",state:"CT",permit_fee:0},
+  {city:"Norwich",state:"CT",permit_fee:0},
+  {city:"Torrington",state:"CT",permit_fee:0},
+  {city:"Trumbull",state:"CT",permit_fee:0},
+  {city:"Cheshire",state:"CT",permit_fee:0},
+  {city:"Newington",state:"CT",permit_fee:0},
+  {city:"Glastonbury",state:"CT",permit_fee:0},
+  {city:"Naugatuck",state:"CT",permit_fee:0},
+  {city:"North Haven",state:"CT",permit_fee:0},
+  {city:"Wallingford",state:"CT",permit_fee:0},
+  {city:"Vernon",state:"CT",permit_fee:0},
+  {city:"Windsor",state:"CT",permit_fee:0},
+  {city:"South Windsor",state:"CT",permit_fee:0},
+  {city:"Simsbury",state:"CT",permit_fee:0},
+  {city:"Groton",state:"CT",permit_fee:0},
+  {city:"New London",state:"CT",permit_fee:0},
+  {city:"Ansonia",state:"CT",permit_fee:0},
+  {city:"Derby",state:"CT",permit_fee:0},
+  {city:"Branford",state:"CT",permit_fee:0},
+  {city:"Guilford",state:"CT",permit_fee:0},
+  {city:"Madison",state:"CT",permit_fee:0},
+  {city:"Clinton",state:"CT",permit_fee:0},
+  {city:"Old Saybrook",state:"CT",permit_fee:0},
+  {city:"Westport",state:"CT",permit_fee:0},
+  {city:"Darien",state:"CT",permit_fee:0},
+  {city:"New Canaan",state:"CT",permit_fee:0},
+  {city:"Ridgefield",state:"CT",permit_fee:0},
+  {city:"Wilton",state:"CT",permit_fee:0},
+  {city:"Monroe",state:"CT",permit_fee:0},
+  {city:"Easton",state:"CT",permit_fee:0},
+  {city:"Weston",state:"CT",permit_fee:0},
+  {city:"Woodbridge",state:"CT",permit_fee:0},
+  {city:"Orange",state:"CT",permit_fee:0},
+  {city:"Seymour",state:"CT",permit_fee:0},
+  {city:"Beacon Falls",state:"CT",permit_fee:0},
+  {city:"Oxford",state:"CT",permit_fee:0},
+  {city:"Wolcott",state:"CT",permit_fee:0},
+  {city:"Farmington",state:"CT",permit_fee:0},
+  {city:"Avon",state:"CT",permit_fee:0},
+  {city:"Canton",state:"CT",permit_fee:0},
+  {city:"Burlington",state:"CT",permit_fee:0},
+  {city:"Bloomfield",state:"CT",permit_fee:0},
+  {city:"Windsor Locks",state:"CT",permit_fee:0},
+  {city:"East Windsor",state:"CT",permit_fee:0},
+  {city:"Suffield",state:"CT",permit_fee:0},
+  {city:"Granby",state:"CT",permit_fee:0},
+  {city:"Tolland",state:"CT",permit_fee:0},
+  {city:"Coventry",state:"CT",permit_fee:0},
+  {city:"Ellington",state:"CT",permit_fee:0},
+  {city:"Somers",state:"CT",permit_fee:0},
+  {city:"Hebron",state:"CT",permit_fee:0},
+  {city:"Columbia",state:"CT",permit_fee:0},
+  {city:"Willimantic",state:"CT",permit_fee:0},
+  {city:"Mansfield",state:"CT",permit_fee:0},
+  {city:"Storrs",state:"CT",permit_fee:0},
+  {city:"Killingly",state:"CT",permit_fee:0},
+  {city:"Danielson",state:"CT",permit_fee:0},
+  {city:"Putnam",state:"CT",permit_fee:0},
+  {city:"Plainfield",state:"CT",permit_fee:0},
+  {city:"Brooklyn",state:"CT",permit_fee:0},
+  {city:"Woodstock",state:"CT",permit_fee:0},
+  {city:"East Haddam",state:"CT",permit_fee:0},
+  {city:"Haddam",state:"CT",permit_fee:0},
+  {city:"Durham",state:"CT",permit_fee:0},
+  {city:"Portland",state:"CT",permit_fee:0},
+  {city:"Cromwell",state:"CT",permit_fee:0},
+  {city:"Rocky Hill",state:"CT",permit_fee:0},
+  {city:"Wethersfield",state:"CT",permit_fee:0},
+  {city:"Berlin",state:"CT",permit_fee:0},
+  {city:"New Milford",state:"CT",permit_fee:0},
+  {city:"Brookfield",state:"CT",permit_fee:0},
+  {city:"Newtown",state:"CT",permit_fee:0},
+  {city:"Bethel",state:"CT",permit_fee:0},
+  {city:"Redding",state:"CT",permit_fee:0},
+  {city:"Litchfield",state:"CT",permit_fee:0},
+  {city:"Thomaston",state:"CT",permit_fee:0},
+  {city:"Winsted",state:"CT",permit_fee:0},
+  {city:"Plymouth",state:"CT",permit_fee:0},
 ];
 
 // Try to load real Airtable data — replace with your fetch endpoint if available
@@ -1766,21 +1936,22 @@ loadAirtableData();
 // ──────────────────────────────────────────────
 // NAVIGATION
 // ──────────────────────────────────────────────
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 5;
 
 function updateProgressSteps(step) {
   const n = typeof step === 'number' ? step : 99;
-  for (let i = 1; i <= 4; i++) {
+  for (let i = 1; i <= 5; i++) {
     const dot = document.getElementById('dot-' + i);
     if (!dot) continue;
     dot.classList.remove('active', 'done');
     if (n === 99 || i < n) dot.classList.add('done');
     else if (i === n) dot.classList.add('active');
-    // update dot label to checkmark
+    // update dot label to checkmark when done
     const num = document.getElementById('dot-num-' + i);
     if (num) num.textContent = (n === 99 || i < n) ? '✓' : i;
   }
-  for (let i = 1; i <= 3; i++) {
+  // connectors: con-12, con-23, con-34, con-45
+  for (let i = 1; i <= 4; i++) {
     const con = document.getElementById('con-' + i + '' + (i + 1));
     if (con) con.classList.toggle('done', n === 99 || n > i);
   }
@@ -1795,7 +1966,7 @@ function goToStep(n) {
 
 function showResults() {
   if (!answers.state) return;
-  if ((answers.state === 'MA' || answers.state === 'CT') && !answers.city) return;
+  if (answers.state === 'MA' && !answers.city) return;
   computePricing();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-results').classList.add('active');
@@ -1805,16 +1976,19 @@ function showResults() {
 }
 
 function startOver() {
-  Object.assign(answers, { location: null, exit: null, access: null, oil: null, state: null, city: null, permitFee: null, permitSource: 'none' });
+  Object.assign(answers, { size: null, location: null, exit: null, access: null, oil: null, state: null, city: null, permitFee: null, permitSource: 'none' });
   document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
   document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('selected'));
   const ci = document.getElementById('city-input');
   if (ci) { ci.value = ''; ci.classList.remove('has-value'); }
   document.getElementById('exit-reveal').classList.remove('visible');
-  document.getElementById('next-1').disabled = true;
-  document.getElementById('next-2').disabled = true;
-  document.getElementById('next-3').disabled = true;
-  document.getElementById('next-4').disabled = true;
+  document.getElementById('ri-note').classList.remove('visible');
+  document.getElementById('ct-note').style.display = 'none';
+  document.getElementById('city-wrap').style.display = 'none';
+  ['next-1','next-2','next-3','next-4','next-5'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = true;
+  });
   document.getElementById('estimate-bar').classList.remove('visible');
   goToStep(1);
 }
@@ -1838,7 +2012,7 @@ function selectLocation(el) {
     exitReveal.classList.remove('visible');
     answers.exit = null;
   }
-  checkStep1Ready();
+  checkStep2Ready();
   updateEstimateBar();
 }
 
@@ -1847,13 +2021,13 @@ function selectExit(el) {
   document.querySelectorAll('#exit-cards .card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   answers.exit = el.dataset.value;
-  checkStep1Ready();
+  checkStep2Ready();
 }
 
-function checkStep1Ready() {
+function checkStep2Ready() {
   const ready = answers.location !== null &&
     (answers.location !== 'basement' || answers.exit !== null);
-  document.getElementById('next-1').disabled = !ready;
+  document.getElementById('next-2').disabled = !ready;
 }
 
 // Generic card select for access + oil steps
@@ -1878,23 +2052,34 @@ function selectState(el) {
   answers.permitFee = null;
 
   const riNote = document.getElementById('ri-note');
+  const ctNote = document.getElementById('ct-note');
   const cityWrap = document.getElementById('city-wrap');
-  const next4 = document.getElementById('next-4');
+  const next5 = document.getElementById('next-5');
+
+  // Reset all conditional UI first
+  riNote.classList.remove('visible');
+  ctNote.style.display = 'none';
+  cityWrap.style.display = 'none';
 
   if (answers.state === 'RI') {
     riNote.classList.add('visible');
-    cityWrap.style.display = 'none';
     answers.permitFee = 0;
     answers.permitSource = 'none';
     answers.city = 'Rhode Island';
-    next4.disabled = false;
+    next5.disabled = false;
+  } else if (answers.state === 'CT') {
+    ctNote.style.display = 'flex';
+    answers.permitFee = 0;
+    answers.permitSource = 'none';
+    answers.city = null; // city optional for CT
+    next5.disabled = false;
   } else {
-    riNote.classList.remove('visible');
+    // MA
     cityWrap.style.display = 'block';
     const cityInput = document.getElementById('city-input');
     cityInput.value = '';
     cityInput.classList.remove('has-value');
-    next4.disabled = true;
+    next5.disabled = true;
   }
   updateEstimateBar();
 }
@@ -1907,7 +2092,7 @@ function onCityInput(input) {
   const list = document.getElementById('autocomplete-list');
   answers.city = null;
   answers.permitFee = null;
-  document.getElementById('next-4').disabled = true;
+  document.getElementById('next-5').disabled = true;
   input.classList.remove('has-value');
 
   if (val.length < 2) { list.classList.remove('open'); return; }
@@ -1915,11 +2100,26 @@ function onCityInput(input) {
   const filtered = cityData.filter(c =>
     c.state === answers.state &&
     c.city.toLowerCase().startsWith(val.toLowerCase())
-  );
+  ).slice(0, 8);
 
   if (filtered.length === 0) {
-    list.innerHTML = `<div class="autocomplete-item" onclick="selectCityManual('${val}')">
-      <span>${val}</span><span class="fee-hint">Permit fee TBD at site</span>
+    // For CT, still allow any city typed (no permit needed)
+    if (answers.state === 'CT') {
+      answers.city = val;
+      answers.permitFee = 0;
+      answers.permitSource = 'none';
+      input.classList.add('has-value');
+      document.getElementById('next-5').disabled = false;
+      list.classList.remove('open');
+      // Track unknown CT city in localStorage for future data
+      try {
+        const unknown = JSON.parse(localStorage.getItem('jps_unknown_cities') || '[]');
+        if (!unknown.includes(val)) { unknown.push(val); localStorage.setItem('jps_unknown_cities', JSON.stringify(unknown)); }
+      } catch(e) {}
+      return;
+    }
+    list.innerHTML = `<div class="autocomplete-item" onclick="selectCityManual('${val.replace(/'/g,"\\'")}')">
+      <span>${val}</span><span class="fee-hint">Permit fee confirmed at site</span>
     </div>`;
     list.classList.add('open');
     return;
@@ -1928,7 +2128,7 @@ function onCityInput(input) {
   list.innerHTML = filtered.map(c => `
     <div class="autocomplete-item" onclick="selectCity('${c.city.replace(/'/g,"\\'")}', ${c.permit_fee})">
       <span>${c.city}, ${c.state}</span>
-      <span class="fee-hint">${c.permit_fee !== null ? 'Permit: $' + c.permit_fee : 'Permit: TBD'}</span>
+      <span class="fee-hint">${c.permit_fee !== null && c.permit_fee > 0 ? 'Permit: $' + c.permit_fee : 'No permit fee'}</span>
     </div>
   `).join('');
   list.classList.add('open');
@@ -1942,7 +2142,7 @@ function selectCity(city, fee) {
   input.value = city;
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
-  document.getElementById('next-4').disabled = false;
+  document.getElementById('next-5').disabled = false;
   updateEstimateBar();
 }
 
@@ -1954,7 +2154,7 @@ function selectCityManual(city) {
   input.value = city;
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
-  document.getElementById('next-4').disabled = false;
+  document.getElementById('next-5').disabled = false;
   updateEstimateBar();
 }
 
@@ -1974,9 +2174,11 @@ function updateEstimateBar() {
 
   const BASE = 600;
   const isRestricted = answers.access === 'restricted';
-  const permitFee = answers.permitFee ?? 0;
-  const low = BASE + permitFee;
-  const high = BASE + 600 + permitFee;
+  const oilFee = answers.oil === 'half_plus' ? 150 : 0;
+  // CT and RI have no permit fee
+  const permitFee = (answers.state === 'CT' || answers.state === 'RI') ? 0 : (answers.permitFee ?? 0);
+  const low = BASE + oilFee + permitFee;
+  const high = BASE + 600 + oilFee + permitFee;
 
   const amountEl = document.getElementById('estimate-bar-amount');
   const noteEl = document.getElementById('estimate-bar-note');
@@ -1984,12 +2186,12 @@ function updateEstimateBar() {
   if (isRestricted) {
     amountEl.textContent = '$' + low.toLocaleString() + '–$' + high.toLocaleString() + '+';
     noteEl.textContent = 'Restricted access — confirmed on-site';
-  } else if (answers.state && answers.state !== 'RI' && answers.permitFee === null) {
-    amountEl.textContent = '$' + BASE + ' + permit';
-    noteEl.textContent = 'Permit fee added once city confirmed';
+  } else if (answers.state === 'MA' && !answers.permitFee) {
+    amountEl.textContent = '$' + (BASE + oilFee) + ' + permit';
+    noteEl.textContent = 'MA permit fee added once city confirmed';
   } else {
     amountEl.textContent = 'from $' + low.toLocaleString();
-    noteEl.textContent = answers.state ? answers.state + ' · ' + (answers.city || 'city pending') : 'Based on your answers';
+    noteEl.textContent = answers.state ? answers.state + (answers.city && answers.city !== 'Rhode Island' ? ' · ' + answers.city : '') : 'Based on your answers';
   }
 }
 
@@ -1999,15 +2201,16 @@ function updateEstimateBar() {
 function computePricing() {
   const BASE = 600;
   const isRestricted = answers.access === 'restricted';
-  const isLeaking = answers.oil === 'leaking';
-  const permitFee = (answers.state === 'RI') ? 0 : (answers.permitFee ?? null);
+  const hasExcessOil = answers.oil === 'half_plus';
+  const oilFee = hasExcessOil ? 150 : 0;
+  const permitFee = (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee ?? null);
 
-  // Base + access
+  // Totals
   const accessFee = isRestricted ? 600 : 0;
-  const lowTotal = BASE + (permitFee ?? 0);
+  const lowTotal = BASE + oilFee + (permitFee ?? 0);
   const highTotal = isRestricted
-    ? BASE + accessFee + (permitFee ?? 0)
-    : BASE + (permitFee ?? 0);
+    ? BASE + accessFee + oilFee + (permitFee ?? 0)
+    : BASE + oilFee + (permitFee ?? 0);
 
   // --- Update UI ---
 
@@ -2019,8 +2222,8 @@ function computePricing() {
     totalEl.textContent = '$' + lowTotal.toLocaleString();
     rangeEl.textContent = 'Up to $' + highTotal.toLocaleString() + ' depending on access — confirmed on-site';
   } else if (permitFee === null) {
-    totalEl.textContent = '$' + BASE;
-    rangeEl.textContent = '+ permit fee (TBD at site verification)';
+    totalEl.textContent = '$' + (BASE + oilFee);
+    rangeEl.textContent = '+ permit fee (confirmed at site verification)';
   } else {
     totalEl.textContent = '$' + lowTotal.toLocaleString();
     rangeEl.textContent = '';
@@ -2042,34 +2245,51 @@ function computePricing() {
     accessLine.style.display = 'none';
   }
 
+  // Excess oil line
+  const oilExcessLine = document.getElementById('oil-excess-line');
+  if (hasExcessOil) {
+    oilExcessLine.style.display = 'flex';
+  } else {
+    oilExcessLine.style.display = 'none';
+  }
+
   // Permit line
+  const permitLine = document.getElementById('permit-line');
   const permitSub = document.getElementById('permit-sub');
   const permitDisplay = document.getElementById('permit-fee-display');
+
   if (answers.state === 'RI') {
+    permitLine.style.display = 'flex';
     permitDisplay.textContent = '$0';
-    permitSub.textContent = 'No permit required in Rhode Island — zero cost';
+    permitSub.textContent = 'No permit required in Rhode Island';
     permitDisplay.classList.add('included');
+  } else if (answers.state === 'CT') {
+    // CT: no permit row at all
+    permitLine.style.display = 'none';
   } else if (permitFee === null) {
+    permitLine.style.display = 'flex';
     permitDisplay.textContent = 'TBD';
-    permitSub.textContent = 'We\'ll confirm the ' + answers.city + ' permit fee at site verification';
+    permitSub.textContent = 'Permit fee for ' + (answers.city || 'your city') + ' confirmed at site verification';
     permitDisplay.classList.remove('included');
   } else {
+    permitLine.style.display = 'flex';
     permitDisplay.textContent = '$' + permitFee;
     permitSub.textContent = 'We pull and pay the ' + answers.city + ' permit on your behalf';
     permitDisplay.classList.remove('included');
   }
 
   // Total line
-  document.getElementById('total-display').textContent = isRestricted
-    ? '$' + lowTotal + '–$' + highTotal + '+'
-    : permitFee !== null
-      ? '$' + lowTotal
-      : '$' + BASE + ' + permit';
+  const totalLineEl = document.getElementById('total-display');
+  if (isRestricted) {
+    totalLineEl.textContent = '$' + lowTotal + '–$' + highTotal + '+';
+  } else if (permitFee !== null) {
+    totalLineEl.textContent = '$' + lowTotal;
+  } else {
+    totalLineEl.textContent = '$' + (BASE + oilFee) + ' + permit';
+  }
 
-  // Leak note
-  document.getElementById('leak-note').classList.toggle('visible', isLeaking);
-
-  // Stairs note
+  // Conditional notes
+  document.getElementById('leak-note').classList.remove('visible');
   document.getElementById('stairs-note').classList.toggle('visible', answers.exit === 'stairs');
 }
 
@@ -2110,24 +2330,26 @@ function submitCTA() {
   // Compute totals for payload
   const BASE = 600;
   const isRestricted = answers.access === 'restricted';
-  const permitFee = answers.permitFee;
-  const lowTotal = BASE + (permitFee ?? 0);
-  const highTotal = isRestricted ? BASE + 600 + (permitFee ?? 0) : BASE + (permitFee ?? 0);
+  const oilFee = answers.oil === 'half_plus' ? 150 : 0;
+  const permitFee = (answers.state === 'RI' || answers.state === 'CT') ? 0 : answers.permitFee;
+  const lowTotal = BASE + oilFee + (permitFee ?? 0);
+  const highTotal = isRestricted ? BASE + 600 + oilFee + (permitFee ?? 0) : BASE + oilFee + (permitFee ?? 0);
 
   const payload = {
     name, phone, email, note,
+    tank_size: answers.size,
     location_type: answers.location,
     exit_type: answers.exit,
     access_type: answers.access,
-    oil_amount: answers.oil,
+    oil_level: answers.oil,
+    excess_oil_fee: answers.oil === 'half_plus' ? '150' : '0',
     state: answers.state,
     city: answers.city,
     estimated_total_low: lowTotal,
     estimated_total_high: highTotal,
-    permit_fee: permitFee ?? 'TBD',
+    permit_fee: (answers.state === 'RI' || answers.state === 'CT') ? '0' : (permitFee ?? 'TBD'),
     restricted_access: isRestricted ? 'true' : 'false',
     stair_removal: answers.exit === 'stairs' ? 'true' : 'false',
-    leaking: answers.oil === 'leaking' ? 'true' : 'false',
     source: 'estimator_tool'
   };
 
@@ -2164,7 +2386,7 @@ function showSuccess(name) {
   document.getElementById('success-name').textContent = name.split(' ')[0];
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-success').classList.add('active');
-  updateProgressBar('success');
+  updateProgressSteps(99);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
