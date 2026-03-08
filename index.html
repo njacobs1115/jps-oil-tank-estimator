@@ -11,34 +11,42 @@
   <meta property="og:description" content="Instant itemized estimate. No email required. See exactly what you'll pay — and why." />
   <meta property="og:url" content="https://removemyoiltank.com/estimate" />
 
-  <!-- Open Sans — matches removemyoiltank.com -->
+  <!-- Open Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
 
   <style>
-    /* ─── BRAND TOKENS — matched from removemyoiltank.com ─── */
+    /* ─── DESIGN TOKENS ─── */
     :root {
-      --brand:       #32CD32;   /* limegreen — primary button/CTA color */
-      --brand-dark:  #28A428;
-      --brand-light: #F0FFF0;
-      --text:        #1A1A1A;
-      --muted:       #6B7280;
-      --border:      #E5E7EB;
-      --bg:          #FFFFFF;
-      --surface:     #F9FAFB;
-      --radius:      12px;
-      --radius-sm:   8px;
-      --shadow:      0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.06);
-      --transition:  0.18s ease;
+      --navy:         #1a1f2e;   /* primary dark — header, CTA button */
+      --navy-light:   #252b3b;   /* hover state on dark surfaces */
+      --brand:        #16a34a;   /* rich green accent — progress bar, checkmarks, selected borders */
+      --brand-light:  #f0fdf4;   /* very light green tint for selected card bg */
+      --brand-mid:    #dcfce7;   /* slightly deeper tint for borders */
+      --text:         #111827;
+      --text-mid:     #374151;
+      --muted:        #6b7280;
+      --border:       #e5e7eb;
+      --border-focus: #d1d5db;
+      --bg:           #ffffff;
+      --surface:      #f9fafb;
+      --surface-2:    #f3f4f6;
+      --radius:       16px;
+      --radius-sm:    10px;
+      --radius-xs:    6px;
+      --shadow-sm:    0 1px 2px rgba(0,0,0,.06);
+      --shadow:       0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.07);
+      --shadow-md:    0 4px 6px rgba(0,0,0,.05), 0 10px 30px rgba(0,0,0,.08);
+      --transition:   0.16s ease;
     }
 
     /* ─── RESET ─── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+    html { font-size: 16px; -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
     body {
       font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: var(--bg);
+      background: var(--surface);
       color: var(--text);
       min-height: 100vh;
       display: flex;
@@ -46,79 +54,121 @@
       align-items: center;
     }
 
-    /* ─── LAYOUT ─── */
-    .shell {
-      width: 100%;
-      max-width: 540px;
-      padding: 0 16px 48px;
-    }
-
-    /* ─── HEADER ─── */
+    /* ─── SITE HEADER — dark top bar ─── */
     .site-header {
       width: 100%;
-      max-width: 540px;
-      padding: 20px 16px 0;
+      background: var(--navy);
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 24px;
+      justify-content: space-between;
+      padding: 14px 20px;
+      margin-bottom: 0;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
     .site-header img {
-      height: 36px;
+      height: 38px;
       width: auto;
+      display: block;
     }
-    .site-header .wordmark {
-      font-size: 14px;
+    .header-divider {
+      width: 1px;
+      height: 28px;
+      background: rgba(255,255,255,.15);
+    }
+    .header-wordmark {
+      font-size: 13px;
       font-weight: 600;
-      color: var(--text);
-      line-height: 1.2;
+      color: rgba(255,255,255,.9);
+      line-height: 1.25;
     }
-    .site-header .wordmark span {
+    .header-wordmark span {
       display: block;
       font-size: 11px;
       font-weight: 400;
-      color: var(--muted);
+      color: rgba(255,255,255,.45);
+    }
+    .header-trust {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 99px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,.85);
+      white-space: nowrap;
+    }
+    .header-trust .star-icon {
+      color: #fbbf24;
+      font-size: 12px;
     }
 
-    /* ─── PROGRESS BAR ─── */
-    .progress-wrap {
-      margin-bottom: 28px;
+    /* ─── PROGRESS TRACK — thin bar below header ─── */
+    .progress-bar-global {
+      width: 100%;
+      height: 3px;
+      background: rgba(255,255,255,.1);
+      position: relative;
     }
-    .progress-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-    .progress-track {
-      height: 4px;
-      background: var(--border);
-      border-radius: 99px;
-      overflow: hidden;
-    }
-    .progress-fill {
+    .progress-bar-fill {
       height: 100%;
       background: var(--brand);
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ─── LAYOUT SHELL ─── */
+    .shell {
+      width: 100%;
+      max-width: 560px;
+      padding: 28px 16px 56px;
+    }
+
+    /* ─── STEP META ─── */
+    .step-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .step-badge {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--brand);
+      background: var(--brand-light);
+      border: 1px solid var(--brand-mid);
+      padding: 4px 10px;
       border-radius: 99px;
-      transition: width 0.35s ease;
+    }
+    .step-fraction {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
     }
 
     /* ─── STEP HEADING ─── */
     .step-heading {
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
     .step-heading h1 {
-      font-size: 22px;
-      font-weight: 700;
-      line-height: 1.25;
-      letter-spacing: -0.3px;
-      margin-bottom: 6px;
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      margin-bottom: 8px;
     }
     .step-heading p {
       font-size: 14px;
       color: var(--muted);
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
     /* ─── OPTION CARDS ─── */
@@ -131,55 +181,72 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      padding: 16px 18px;
-      border: 2px solid var(--border);
+      padding: 18px 20px;
+      border: 1.5px solid var(--border);
       border-radius: var(--radius);
       cursor: pointer;
       background: var(--bg);
-      transition: border-color var(--transition), background var(--transition), transform var(--transition);
+      transition: border-color var(--transition), background var(--transition), box-shadow var(--transition), transform var(--transition);
       text-align: left;
       width: 100%;
-      min-height: 64px;
+      min-height: 70px;
+      box-shadow: var(--shadow-sm);
     }
     .card:hover {
-      border-color: var(--brand);
+      border-color: #86efac;
       background: var(--brand-light);
+      box-shadow: 0 0 0 3px #bbf7d0;
+      transform: translateY(-1px);
     }
     .card.selected {
       border-color: var(--brand);
       background: var(--brand-light);
-      transform: scale(1.01);
+      box-shadow: 0 0 0 3px #bbf7d0;
     }
     .card-icon {
-      font-size: 26px;
+      font-size: 24px;
       flex-shrink: 0;
-      width: 36px;
-      text-align: center;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface);
+      border-radius: 10px;
+      border: 1px solid var(--border);
     }
-    .card-body { flex: 1; }
+    .card.selected .card-icon,
+    .card:hover .card-icon {
+      background: var(--brand-mid);
+      border-color: #86efac;
+    }
+    .card-body { flex: 1; min-width: 0; }
     .card-label {
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 15px;
+      font-weight: 700;
       line-height: 1.3;
+      color: var(--text);
     }
     .card-sub {
       font-size: 13px;
       color: var(--muted);
       margin-top: 2px;
-      line-height: 1.4;
+      line-height: 1.45;
     }
     .card-badge {
       font-size: 11px;
-      font-weight: 600;
-      background: var(--brand);
+      font-weight: 700;
+      background: var(--navy);
       color: #fff;
-      padding: 2px 8px;
+      padding: 3px 9px;
       border-radius: 99px;
       flex-shrink: 0;
+      letter-spacing: 0.2px;
     }
+    /* Check circle */
     .card-check {
-      width: 22px;
-      height: 22px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       border: 2px solid var(--border);
       display: flex;
@@ -187,23 +254,24 @@
       justify-content: center;
       flex-shrink: 0;
       transition: all var(--transition);
+      background: var(--bg);
     }
     .card.selected .card-check {
-      background: var(--brand-dark);
-      border-color: var(--brand-dark);
+      background: var(--brand);
+      border-color: var(--brand);
     }
     .card.selected .card-check::after {
       content: '';
       display: block;
       width: 6px;
       height: 10px;
-      border: 2px solid #fff;
+      border: 2.5px solid #fff;
       border-top: none;
       border-left: none;
       transform: rotate(45deg) translate(-1px, -1px);
     }
 
-    /* ─── STATE / CITY STEP ─── */
+    /* ─── STATE GRID ─── */
     .state-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -211,61 +279,83 @@
       margin-bottom: 20px;
     }
     .state-btn {
-      padding: 18px 8px;
-      border: 2px solid var(--border);
+      padding: 20px 10px;
+      border: 1.5px solid var(--border);
       border-radius: var(--radius);
       cursor: pointer;
       background: var(--bg);
       text-align: center;
       transition: all var(--transition);
       font-family: inherit;
+      box-shadow: var(--shadow-sm);
     }
-    .state-btn:hover { border-color: var(--brand); background: var(--brand-light); }
-    .state-btn.selected { border-color: var(--brand); background: var(--brand-light); }
+    .state-btn:hover {
+      border-color: #86efac;
+      background: var(--brand-light);
+      box-shadow: 0 0 0 3px #bbf7d0;
+      transform: translateY(-1px);
+    }
+    .state-btn.selected {
+      border-color: var(--brand);
+      background: var(--brand-light);
+      box-shadow: 0 0 0 3px #bbf7d0;
+    }
     .state-btn .state-abbr {
-      font-size: 22px;
+      font-size: 26px;
       font-weight: 800;
       letter-spacing: -0.5px;
       display: block;
+      color: var(--text);
     }
+    .state-btn.selected .state-abbr { color: var(--brand); }
     .state-btn .state-name {
       font-size: 11px;
       color: var(--muted);
-      margin-top: 3px;
+      margin-top: 4px;
+      font-weight: 600;
     }
 
+    /* ─── CITY INPUT ─── */
     .city-wrap { margin-top: 4px; }
     .city-wrap label {
       display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-mid);
       margin-bottom: 8px;
     }
     .city-input-wrap { position: relative; }
     .city-input {
       width: 100%;
-      padding: 14px 16px;
-      border: 2px solid var(--border);
+      padding: 15px 18px;
+      border: 1.5px solid var(--border);
       border-radius: var(--radius-sm);
-      font-size: 16px; /* prevents iOS zoom */
+      font-size: 16px; /* prevent iOS zoom */
       font-family: inherit;
       background: var(--bg);
       color: var(--text);
       outline: none;
-      transition: border-color var(--transition);
+      transition: border-color var(--transition), box-shadow var(--transition);
+      box-shadow: var(--shadow-sm);
     }
-    .city-input:focus { border-color: var(--brand); }
-    .city-input.has-value { border-color: var(--brand); }
+    .city-input:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px #bbf7d0;
+    }
+    .city-input.has-value {
+      border-color: var(--brand);
+    }
 
     .autocomplete-list {
       position: absolute;
-      top: calc(100% + 4px);
+      top: calc(100% + 6px);
       left: 0; right: 0;
       background: var(--bg);
-      border: 2px solid var(--border);
+      border: 1.5px solid var(--border);
       border-radius: var(--radius-sm);
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow-md);
       max-height: 220px;
       overflow-y: auto;
       z-index: 100;
@@ -273,29 +363,37 @@
     }
     .autocomplete-list.open { display: block; }
     .autocomplete-item {
-      padding: 12px 16px;
+      padding: 12px 18px;
       cursor: pointer;
-      font-size: 15px;
+      font-size: 14px;
+      font-weight: 500;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--border);
+      transition: background var(--transition);
     }
     .autocomplete-item:last-child { border-bottom: none; }
     .autocomplete-item:hover { background: var(--surface); }
-    .autocomplete-item .fee-hint { font-size: 12px; color: var(--muted); }
+    .autocomplete-item .fee-hint {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 400;
+    }
 
     .ri-note {
-      background: #ECFDF5;
-      border: 1px solid #A7F3D0;
+      background: var(--brand-light);
+      border: 1px solid #bbf7d0;
       border-radius: var(--radius-sm);
-      padding: 12px 16px;
+      padding: 14px 18px;
       font-size: 13px;
-      color: #065F46;
+      color: #15803d;
       margin-top: 12px;
+      line-height: 1.55;
       display: none;
     }
-    .ri-note.visible { display: block; }
+    .ri-note.visible { display: flex; gap: 10px; align-items: flex-start; }
+    .ri-note-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
 
     /* ─── NAV BUTTONS ─── */
     .nav-row {
@@ -305,19 +403,24 @@
     }
     .btn-back {
       flex: 0 0 auto;
-      padding: 0 20px;
+      padding: 0 22px;
       height: 52px;
-      border: 2px solid var(--border);
+      border: 1.5px solid var(--border);
       border-radius: var(--radius-sm);
       background: var(--bg);
-      color: var(--text);
-      font-size: 15px;
+      color: var(--text-mid);
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       font-family: inherit;
       transition: all var(--transition);
+      box-shadow: var(--shadow-sm);
     }
-    .btn-back:hover { border-color: var(--muted); }
+    .btn-back:hover {
+      border-color: var(--border-focus);
+      color: var(--text);
+      background: var(--surface);
+    }
     .btn-next {
       flex: 1;
       height: 52px;
@@ -325,121 +428,208 @@
       border-radius: var(--radius-sm);
       background: var(--brand);
       color: #fff;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       cursor: pointer;
       font-family: inherit;
       letter-spacing: 0.1px;
-      transition: background var(--transition), transform var(--transition);
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 2px 8px rgba(22,163,74,.3);
     }
-    .btn-next:hover { background: var(--brand-dark); }
+    .btn-next:hover {
+      background: #15803d;
+      box-shadow: 0 4px 14px rgba(22,163,74,.4);
+    }
     .btn-next:active { transform: scale(0.98); }
-    .btn-next:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; }
+    .btn-next:disabled {
+      background: var(--surface-2);
+      color: var(--muted);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
 
-    /* ─── RESULTS ─── */
+    /* ─── RESULTS: HERO AMOUNT ─── */
     .results-hero {
       text-align: center;
-      margin-bottom: 24px;
+      padding: 32px 24px 28px;
+      background: var(--navy);
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .results-hero::before {
+      /* subtle radial glow */
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(22,163,74,.18) 0%, transparent 65%);
+      pointer-events: none;
     }
     .results-hero .total-label {
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--muted);
-      margin-bottom: 6px;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,.5);
+      margin-bottom: 10px;
     }
     .results-hero .total-amount {
-      font-size: 48px;
+      font-size: 72px;
       font-weight: 800;
-      letter-spacing: -2px;
-      color: var(--text);
+      letter-spacing: -3px;
+      color: #ffffff;
       line-height: 1;
     }
     .results-hero .total-range {
-      font-size: 16px;
-      color: var(--muted);
-      margin-top: 4px;
+      font-size: 14px;
+      color: rgba(255,255,255,.55);
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+    .results-hero .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 16px;
+      background: rgba(22,163,74,.2);
+      border: 1px solid rgba(22,163,74,.35);
+      border-radius: 99px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #4ade80;
     }
 
-    .breakdown-card {
-      background: var(--surface);
+    /* ─── TRUST BANNER ─── */
+    .trust-banner {
+      background: var(--brand-light);
+      border: 1px solid #bbf7d0;
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      font-size: 13px;
+      color: #15803d;
+      line-height: 1.55;
+      margin-bottom: 16px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .trust-banner-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ─── LEAK WARNING ─── */
+    .leak-note {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      font-size: 13px;
+      color: #92400e;
+      line-height: 1.55;
+      margin-bottom: 16px;
+      display: none;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .leak-note.visible { display: flex; }
+    .leak-note-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ─── INVOICE BREAKDOWN ─── */
+    .invoice {
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
       margin-bottom: 16px;
+      background: var(--bg);
+      box-shadow: var(--shadow-sm);
     }
-    .breakdown-title {
+    .invoice-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .invoice-header-title {
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.8px;
       color: var(--muted);
-      padding: 14px 18px 10px;
-      border-bottom: 1px solid var(--border);
     }
-    .line-item {
+    .invoice-header-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .invoice-row {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      padding: 13px 18px;
+      padding: 14px 20px;
       border-bottom: 1px solid var(--border);
     }
-    .line-item:last-child { border-bottom: none; }
-    .line-label { font-size: 14px; line-height: 1.4; }
-    .line-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .line-amount {
+    .invoice-row:last-child { border-bottom: none; }
+    .invoice-row-desc { flex: 1; min-width: 0; padding-right: 16px; }
+    .invoice-row-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.35;
+    }
+    .invoice-row-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+    .invoice-row-amount {
       font-size: 14px;
       font-weight: 700;
       white-space: nowrap;
-      margin-left: 12px;
+      color: var(--text);
     }
-    .line-amount.included { color: #059669; }
-    .line-total {
+    .invoice-row-amount.included {
+      color: var(--brand);
+      font-size: 13px;
+    }
+    .invoice-total-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 18px;
-      background: var(--bg);
-      border-top: 2px solid var(--border);
+      padding: 16px 20px;
+      background: var(--navy);
+      border-top: 2px solid var(--navy);
     }
-    .line-total-label { font-size: 15px; font-weight: 700; }
-    .line-total-amount { font-size: 20px; font-weight: 800; color: var(--brand); }
-
-    .trust-line {
-      background: #ECFDF5;
-      border: 1px solid #A7F3D0;
-      border-radius: var(--radius-sm);
-      padding: 14px 16px;
-      font-size: 13px;
-      color: #065F46;
-      line-height: 1.5;
-      margin-bottom: 16px;
+    .invoice-total-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: rgba(255,255,255,.8);
+    }
+    .invoice-total-amount {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.5px;
     }
 
-    .leak-note {
-      background: #FFF7ED;
-      border: 1px solid #FED7AA;
-      border-radius: var(--radius-sm);
-      padding: 14px 16px;
-      font-size: 13px;
-      color: #92400E;
-      line-height: 1.5;
-      margin-bottom: 16px;
-      display: none;
-    }
-    .leak-note.visible { display: block; }
-
+    /* ─── WHY EXPAND ─── */
     .why-expand {
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
       margin-bottom: 20px;
       overflow: hidden;
+      background: var(--bg);
+      box-shadow: var(--shadow-sm);
     }
     .why-toggle {
       width: 100%;
-      padding: 14px 18px;
-      background: var(--surface);
+      padding: 15px 20px;
+      background: var(--bg);
       border: none;
       text-align: left;
       font-size: 13px;
@@ -449,126 +639,161 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      color: var(--text);
+      color: var(--text-mid);
+      transition: background var(--transition);
     }
-    .why-toggle .chevron { transition: transform 0.2s; font-style: normal; font-size: 10px; }
+    .why-toggle:hover { background: var(--surface); }
+    .why-toggle .chevron {
+      transition: transform 0.22s;
+      font-style: normal;
+      font-size: 10px;
+      color: var(--muted);
+    }
     .why-toggle.open .chevron { transform: rotate(180deg); }
     .why-body {
       display: none;
-      padding: 14px 18px;
+      padding: 0 20px 16px;
       font-size: 13px;
       color: var(--muted);
-      line-height: 1.6;
+      line-height: 1.65;
       border-top: 1px solid var(--border);
+      padding-top: 14px;
     }
     .why-body.open { display: block; }
 
+    /* ─── SOCIAL PROOF ─── */
     .social-proof {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 24px;
     }
     .proof-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 10px;
       text-align: center;
+      box-shadow: var(--shadow-sm);
     }
     .proof-number {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 800;
       color: var(--text);
       display: block;
+      letter-spacing: -0.3px;
     }
     .proof-label {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
+      margin-top: 3px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    /* ─── SECTION DIVIDER ─── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
     }
 
     /* ─── CTA FORM ─── */
-    .cta-section {
-      margin-top: 8px;
-    }
+    .cta-section { margin-top: 4px; }
     .cta-heading {
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: -0.2px;
-      margin-bottom: 6px;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      margin-bottom: 8px;
+      color: var(--text);
     }
     .cta-sub {
-      font-size: 13px;
+      font-size: 14px;
       color: var(--muted);
-      line-height: 1.5;
-      margin-bottom: 20px;
+      line-height: 1.55;
+      margin-bottom: 24px;
     }
-    .form-field {
-      margin-bottom: 14px;
-    }
+    .form-field { margin-bottom: 16px; }
     .form-field label {
       display: block;
       font-size: 12px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: var(--muted);
-      margin-bottom: 6px;
+      color: var(--text-mid);
+      margin-bottom: 7px;
     }
     .form-field input,
     .form-field textarea {
       width: 100%;
-      padding: 13px 16px;
-      border: 2px solid var(--border);
+      padding: 14px 18px;
+      border: 1.5px solid var(--border);
       border-radius: var(--radius-sm);
-      font-size: 16px;
+      font-size: 16px; /* prevent iOS zoom */
       font-family: inherit;
       background: var(--bg);
       color: var(--text);
       outline: none;
-      transition: border-color var(--transition);
+      transition: border-color var(--transition), box-shadow var(--transition);
       -webkit-appearance: none;
+      box-shadow: var(--shadow-sm);
     }
     .form-field input:focus,
-    .form-field textarea:focus { border-color: var(--brand); }
-    .form-field textarea { resize: none; min-height: 80px; }
+    .form-field textarea:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px #bbf7d0;
+    }
+    .form-field textarea { resize: none; min-height: 84px; }
     .field-error {
       font-size: 12px;
-      color: #DC2626;
-      margin-top: 5px;
+      color: #dc2626;
+      margin-top: 6px;
       display: none;
+      font-weight: 500;
     }
     .field-error.visible { display: block; }
 
+    /* ─── CTA BUTTON — dark navy for premium feel ─── */
     .btn-cta {
       width: 100%;
-      height: 56px;
+      height: 58px;
       border: none;
       border-radius: var(--radius-sm);
-      background: var(--brand);
+      background: var(--navy);
       color: #fff;
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 700;
       cursor: pointer;
       font-family: inherit;
-      letter-spacing: 0.1px;
+      letter-spacing: 0.2px;
       margin-top: 4px;
-      transition: background var(--transition), transform var(--transition);
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 2px 10px rgba(26,31,46,.25);
     }
-    .btn-cta:hover { background: var(--brand-dark); }
+    .btn-cta:hover {
+      background: var(--navy-light);
+      box-shadow: 0 4px 18px rgba(26,31,46,.3);
+    }
     .btn-cta:active { transform: scale(0.99); }
-    .btn-cta:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+    .btn-cta:disabled {
+      background: var(--surface-2);
+      color: var(--muted);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
     .btn-cta-sub {
       text-align: center;
       font-size: 12px;
       color: var(--muted);
       margin-top: 10px;
-      line-height: 1.4;
+      line-height: 1.45;
     }
-
     .btn-secondary {
       width: 100%;
       height: 48px;
-      border: 2px solid var(--border);
+      border: 1.5px solid var(--border);
       border-radius: var(--radius-sm);
       background: transparent;
       color: var(--muted);
@@ -576,7 +801,7 @@
       font-weight: 600;
       cursor: pointer;
       font-family: inherit;
-      margin-top: 10px;
+      margin-top: 12px;
       transition: all var(--transition);
     }
     .btn-secondary:hover { border-color: var(--text); color: var(--text); }
@@ -584,69 +809,95 @@
     /* ─── SUCCESS SCREEN ─── */
     .success-wrap {
       text-align: center;
-      padding: 20px 0;
+      padding: 28px 0 12px;
     }
     .success-icon {
-      width: 72px;
-      height: 72px;
-      background: #ECFDF5;
+      width: 76px;
+      height: 76px;
+      background: var(--brand-light);
+      border: 2px solid #bbf7d0;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 32px;
-      margin: 0 auto 20px;
+      font-size: 34px;
+      margin: 0 auto 24px;
     }
     .success-heading {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 800;
       margin-bottom: 10px;
-      letter-spacing: -0.3px;
+      letter-spacing: -0.4px;
     }
     .success-body {
       font-size: 15px;
       color: var(--muted);
       line-height: 1.6;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
     }
     .success-detail {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 16px 18px;
+      padding: 20px 22px;
       font-size: 13px;
       color: var(--muted);
-      line-height: 1.6;
+      line-height: 1.7;
       text-align: left;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
+    }
+    .success-detail strong { color: var(--text); }
+
+    /* ─── SCREENS — slide animation ─── */
+    .screen { display: none; }
+    .screen.active {
+      display: block;
+      animation: slideIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(16px); }
+      to   { opacity: 1; transform: translateX(0); }
     }
 
-    /* ─── SCREENS ─── */
-    .screen { display: none; animation: fadeIn 0.22s ease; }
-    .screen.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: translateX(0); } }
-
-    /* ─── DIVIDER ─── */
-    .divider {
-      height: 1px;
-      background: var(--border);
-      margin: 20px 0;
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 420px) {
+      .results-hero .total-amount { font-size: 56px; }
+      .site-header .header-wordmark { display: none; }
+      .header-divider { display: none; }
     }
-
     @media (max-width: 360px) {
-      .results-hero .total-amount { font-size: 40px; }
+      .results-hero .total-amount { font-size: 46px; }
+      .social-proof { grid-template-columns: 1fr 1fr; }
+      .proof-item:last-child { grid-column: span 2; }
     }
   </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<div class="site-header">
-  <img src="https://removemyoiltank.com/wp-content/uploads/2024/06/Oil-Tank-Removal-MA-Jacobs-Property-Solutions-Logo-2024.png" alt="Jacobs Property Solutions" style="height:44px;width:auto;" />
-  <div class="wordmark">
-    RemoveMyOilTank.com
-    <span>Jacobs Property Solutions</span>
+<!-- ══════════════════════════════════════
+     SITE HEADER — dark nav bar
+══════════════════════════════════════ -->
+<header class="site-header">
+  <div class="header-left">
+    <img
+      src="https://removemyoiltank.com/wp-content/uploads/2024/06/Oil-Tank-Removal-MA-Jacobs-Property-Solutions-Logo-2024.png"
+      alt="Jacobs Property Solutions"
+    />
+    <div class="header-divider"></div>
+    <div class="header-wordmark">
+      RemoveMyOilTank.com
+      <span>Jacobs Property Solutions</span>
+    </div>
   </div>
+  <div class="header-trust">
+    <span class="star-icon">★</span>
+    400+ Five-Star Reviews
+  </div>
+</header>
+
+<!-- Global progress bar (thin strip under header) -->
+<div class="progress-bar-global">
+  <div class="progress-bar-fill" id="global-progress" style="width:0%"></div>
 </div>
 
 <div class="shell">
@@ -655,9 +906,9 @@
        STEP 1 — TANK SIZE
   ══════════════════════════════════════ -->
   <div class="screen active" id="screen-1" data-step="1">
-    <div class="progress-wrap">
-      <div class="progress-label"><span>Step 1 of 4</span><span>Tank Size</span></div>
-      <div class="progress-track"><div class="progress-fill" style="width:25%"></div></div>
+    <div class="step-meta">
+      <span class="step-badge">Tank Size</span>
+      <span class="step-fraction">Step 1 of 4</span>
     </div>
     <div class="step-heading">
       <h1>What size is your oil tank?</h1>
@@ -707,9 +958,9 @@
        STEP 2 — TANK LOCATION
   ══════════════════════════════════════ -->
   <div class="screen" id="screen-2" data-step="2">
-    <div class="progress-wrap">
-      <div class="progress-label"><span>Step 2 of 4</span><span>Tank Location</span></div>
-      <div class="progress-track"><div class="progress-fill" style="width:50%"></div></div>
+    <div class="step-meta">
+      <span class="step-badge">Tank Location</span>
+      <span class="step-fraction">Step 2 of 4</span>
     </div>
     <div class="step-heading">
       <h1>Where is the tank located?</h1>
@@ -759,9 +1010,9 @@
        STEP 3 — TANK CONDITION
   ══════════════════════════════════════ -->
   <div class="screen" id="screen-3" data-step="3">
-    <div class="progress-wrap">
-      <div class="progress-label"><span>Step 3 of 4</span><span>Tank Condition</span></div>
-      <div class="progress-track"><div class="progress-fill" style="width:75%"></div></div>
+    <div class="step-meta">
+      <span class="step-badge">Tank Condition</span>
+      <span class="step-fraction">Step 3 of 4</span>
     </div>
     <div class="step-heading">
       <h1>What's the tank's condition?</h1>
@@ -795,9 +1046,9 @@
        STEP 4 — STATE & CITY
   ══════════════════════════════════════ -->
   <div class="screen" id="screen-4" data-step="4">
-    <div class="progress-wrap">
-      <div class="progress-label"><span>Step 4 of 4</span><span>Location</span></div>
-      <div class="progress-track"><div class="progress-fill" style="width:100%"></div></div>
+    <div class="step-meta">
+      <span class="step-badge">Location</span>
+      <span class="step-fraction">Step 4 of 4</span>
     </div>
     <div class="step-heading">
       <h1>Where is the property?</h1>
@@ -820,7 +1071,8 @@
     </div>
 
     <div class="ri-note" id="ri-note">
-      <strong>Good news — RI requires no permit.</strong> No permit fee, no waiting. We handle everything same week in most cases.
+      <span class="ri-note-icon">✅</span>
+      <span><strong>Good news — RI requires no permit.</strong> No permit fee, no waiting. We handle everything same week in most cases.</span>
     </div>
 
     <div class="city-wrap" id="city-wrap" style="display:none;">
@@ -850,56 +1102,74 @@
   ══════════════════════════════════════ -->
   <div class="screen" id="screen-results">
 
+    <!-- Hero total -->
     <div class="results-hero">
       <div class="total-label">Your Estimated Total</div>
       <div class="total-amount" id="results-total-display">$600</div>
       <div class="total-range" id="results-range-display"></div>
+      <div class="hero-badge">
+        <span>✓</span> Transparent, all-in pricing — no surprises on job day
+      </div>
     </div>
 
-    <div class="trust-line">
-      Unlike most removal companies, we include oil disposal up to 50 gallons and pull your permits — no surprise charges on job day.
+    <!-- Trust note -->
+    <div class="trust-banner">
+      <span class="trust-banner-icon">🛡️</span>
+      <span>Unlike most removal companies, we include oil disposal up to 50 gallons and pull your permits — no surprise charges on job day.</span>
     </div>
 
+    <!-- Leak warning (conditional) -->
     <div class="leak-note" id="leak-note">
-      🚨 <strong>Heads up:</strong> Contamination cleanup is separate and not included in this estimate. We'll assess on-site and connect you with certified remediation partners if needed — pricing depends on scope.
+      <span class="leak-note-icon">🚨</span>
+      <span><strong>Heads up:</strong> Contamination cleanup is separate and not included in this estimate. We'll assess on-site and connect you with certified remediation partners if needed — pricing depends on scope.</span>
     </div>
 
-    <div class="breakdown-card">
-      <div class="breakdown-title">Price Breakdown</div>
-      <div class="line-item">
-        <div>
-          <div class="line-label">Base Removal Fee</div>
-          <div class="line-sub" id="size-sub">Includes cutting, safe removal & haul-off</div>
-        </div>
-        <div class="line-amount" id="base-fee-display">$600</div>
+    <!-- Invoice-style breakdown -->
+    <div class="invoice">
+      <div class="invoice-header">
+        <span class="invoice-header-title">Price Breakdown</span>
+        <span class="invoice-header-label">Amount</span>
       </div>
-      <div class="line-item" id="access-line" style="display:none;">
-        <div>
-          <div class="line-label">Restricted Access Surcharge</div>
-          <div class="line-sub">Crawlspace / obstructed — confirmed at site visit</div>
+
+      <div class="invoice-row">
+        <div class="invoice-row-desc">
+          <div class="invoice-row-name">Base Removal Fee</div>
+          <div class="invoice-row-sub" id="size-sub">Includes cutting, safe removal &amp; haul-off</div>
         </div>
-        <div class="line-amount" id="access-fee-display">+$600</div>
+        <div class="invoice-row-amount" id="base-fee-display">$600</div>
       </div>
-      <div class="line-item">
-        <div>
-          <div class="line-label">Oil &amp; Sludge Disposal</div>
-          <div class="line-sub">Up to 50 gallons — included, no extra charge</div>
+
+      <div class="invoice-row" id="access-line" style="display:none;">
+        <div class="invoice-row-desc">
+          <div class="invoice-row-name">Restricted Access Surcharge</div>
+          <div class="invoice-row-sub">Crawlspace / obstructed — confirmed at site visit</div>
         </div>
-        <div class="line-amount included">Included</div>
+        <div class="invoice-row-amount" id="access-fee-display">+$600</div>
       </div>
-      <div class="line-item" id="permit-line">
-        <div>
-          <div class="line-label">Permit Fee</div>
-          <div class="line-sub" id="permit-sub">We pull and pay the permit on your behalf</div>
+
+      <div class="invoice-row">
+        <div class="invoice-row-desc">
+          <div class="invoice-row-name">Oil &amp; Sludge Disposal</div>
+          <div class="invoice-row-sub">Up to 50 gallons — included, no extra charge</div>
         </div>
-        <div class="line-amount" id="permit-fee-display">$0</div>
+        <div class="invoice-row-amount included">Included ✓</div>
       </div>
-      <div class="line-total">
-        <div class="line-total-label">Estimated Total</div>
-        <div class="line-total-amount" id="total-display">$600</div>
+
+      <div class="invoice-row" id="permit-line">
+        <div class="invoice-row-desc">
+          <div class="invoice-row-name">Permit Fee</div>
+          <div class="invoice-row-sub" id="permit-sub">We pull and pay the permit on your behalf</div>
+        </div>
+        <div class="invoice-row-amount" id="permit-fee-display">$0</div>
+      </div>
+
+      <div class="invoice-total-row">
+        <div class="invoice-total-label">Estimated Total</div>
+        <div class="invoice-total-amount" id="total-display">$600</div>
       </div>
     </div>
 
+    <!-- Why our prices -->
     <div class="why-expand">
       <button class="why-toggle" onclick="toggleWhy(this)">
         Why are our prices what they are?
@@ -910,24 +1180,25 @@
       </div>
     </div>
 
+    <!-- Social proof tiles -->
     <div class="social-proof">
-      <div class="proof-item">
-        <span class="proof-number">10,000+</span>
-        <span class="proof-label">Tanks Removed</span>
-      </div>
       <div class="proof-item">
         <span class="proof-number">400+</span>
         <span class="proof-label">Five-Star Reviews</span>
       </div>
       <div class="proof-item">
         <span class="proof-number">Since 2013</span>
-        <span class="proof-label">RI, MA, CT</span>
+        <span class="proof-label">Serving RI &amp; MA</span>
+      </div>
+      <div class="proof-item">
+        <span class="proof-number">Licensed</span>
+        <span class="proof-label">RI, MA &amp; CT</span>
       </div>
     </div>
 
     <div class="divider"></div>
 
-    <!-- CTA FORM -->
+    <!-- CTA Form -->
     <div class="cta-section">
       <div class="cta-heading">Lock In This Estimate — Free Site Verification</div>
       <div class="cta-sub">No obligation. We confirm access and conditions, then your price is locked. Most verifications take under 10 minutes by phone or photo.</div>
@@ -956,7 +1227,8 @@
 
       <button class="btn-secondary" onclick="startOver()">Start Over</button>
     </div>
-  </div>
+
+  </div><!-- /screen-results -->
 
   <!-- ══════════════════════════════════════
        SUCCESS SCREEN
@@ -1318,9 +1590,23 @@ loadAirtableData();
 // ──────────────────────────────────────────────
 // NAVIGATION
 // ──────────────────────────────────────────────
+const TOTAL_STEPS = 4;
+
+function updateProgressBar(step) {
+  // step = 1-4 for wizard steps, 'results' or 'success' for those screens
+  let pct = 0;
+  if (typeof step === 'number') {
+    pct = Math.round((step / TOTAL_STEPS) * 100);
+  } else if (step === 'results' || step === 'success') {
+    pct = 100;
+  }
+  document.getElementById('global-progress').style.width = pct + '%';
+}
+
 function goToStep(n) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + n).classList.add('active');
+  updateProgressBar(n);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1330,6 +1616,7 @@ function showResults() {
   computePricing();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-results').classList.add('active');
+  updateProgressBar('results');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1617,8 +1904,12 @@ function showSuccess(name) {
   document.getElementById('success-name').textContent = name.split(' ')[0];
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-success').classList.add('active');
+  updateProgressBar('success');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+// Initialize progress bar on load
+updateProgressBar(1);
 </script>
 </body>
 </html>
