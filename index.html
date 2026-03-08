@@ -39,6 +39,7 @@
       --shadow:       0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.07);
       --shadow-md:    0 4px 6px rgba(0,0,0,.05), 0 10px 30px rgba(0,0,0,.08);
       --transition:   0.16s ease;
+      --warm-bg:      #f5f4f0;
     }
 
     /* ─── RESET ─── */
@@ -46,7 +47,7 @@
     html { font-size: 16px; -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
     body {
       font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: var(--surface);
+      background: var(--warm-bg);
       color: var(--text);
       min-height: 100vh;
       display: flex;
@@ -869,6 +870,139 @@
       .results-hero .total-amount { font-size: 46px; }
       .social-proof { grid-template-columns: 1fr 1fr; }
       .proof-item:last-child { grid-column: span 2; }
+      .cards-2col { grid-template-columns: 1fr; }
+    }
+
+    /* ─── PROGRESS DOTS ─── */
+    .progress-steps {
+      width: 100%;
+      background: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 24px 14px;
+    }
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      flex: 0 0 auto;
+    }
+    .step-dot {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.1);
+      border: 2px solid rgba(255,255,255,.2);
+      color: rgba(255,255,255,.35);
+      font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .progress-step.active .step-dot {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #fff;
+      box-shadow: 0 0 0 3px rgba(22,163,74,.3);
+    }
+    .progress-step.done .step-dot {
+      background: rgba(22,163,74,.2);
+      border-color: var(--brand);
+      color: var(--brand);
+      font-size: 11px;
+    }
+    .step-label {
+      font-size: 9px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      color: rgba(255,255,255,.25);
+      text-align: center;
+    }
+    .progress-step.active .step-label { color: rgba(255,255,255,.75); }
+    .progress-step.done .step-label { color: rgba(22,163,74,.6); }
+    .step-connector {
+      flex: 1;
+      height: 2px;
+      background: rgba(255,255,255,.1);
+      margin-bottom: 14px;
+      min-width: 20px; max-width: 60px;
+      transition: background 0.3s;
+    }
+    .step-connector.done { background: rgba(22,163,74,.4); }
+
+    /* ─── EXIT REVEAL ─── */
+    .exit-reveal {
+      display: none;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1.5px dashed var(--border);
+      animation: fadeDown 0.2s ease;
+    }
+    .exit-reveal.visible { display: block; }
+    .exit-reveal-label {
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--muted); margin-bottom: 10px;
+    }
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── 2-COL CARDS ─── */
+    .cards-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .cards-2col .card {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      min-height: 100px;
+      position: relative;
+    }
+    .cards-2col .card .card-check {
+      position: absolute;
+      top: 12px; right: 12px;
+    }
+
+    /* ─── STAIRS WARNING ─── */
+    .stairs-note {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      font-size: 13px; color: #9a3412;
+      line-height: 1.55; margin-bottom: 16px;
+      display: none; gap: 10px; align-items: flex-start;
+    }
+    .stairs-note.visible { display: flex; }
+
+    /* ─── ESTIMATE BAR (fixed bottom) ─── */
+    body { padding-bottom: 70px; }
+    .estimate-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: var(--navy);
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding: 10px 24px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 200;
+      box-shadow: 0 -4px 20px rgba(0,0,0,.2);
+    }
+    .estimate-bar.visible { display: flex; }
+    .estimate-bar-left { display: flex; flex-direction: column; gap: 2px; }
+    .estimate-bar-label {
+      font-size: 10px; font-weight: 700;
+      color: rgba(255,255,255,.45);
+      text-transform: uppercase; letter-spacing: 0.6px;
+    }
+    .estimate-bar-note { font-size: 11px; color: rgba(255,255,255,.5); }
+    .estimate-bar-amount {
+      font-size: 20px; font-weight: 800;
+      color: #fff; letter-spacing: -0.3px;
     }
   </style>
 </head>
@@ -895,79 +1029,41 @@
   </div>
 </header>
 
-<!-- Global progress bar (thin strip under header) -->
-<div class="progress-bar-global">
-  <div class="progress-bar-fill" id="global-progress" style="width:0%"></div>
+<!-- Progress dot indicators -->
+<div class="progress-steps">
+  <div class="progress-step active" id="dot-1">
+    <div class="step-dot" id="dot-num-1">1</div>
+    <div class="step-label">Location</div>
+  </div>
+  <div class="step-connector" id="con-12"></div>
+  <div class="progress-step" id="dot-2">
+    <div class="step-dot" id="dot-num-2">2</div>
+    <div class="step-label">Access</div>
+  </div>
+  <div class="step-connector" id="con-23"></div>
+  <div class="progress-step" id="dot-3">
+    <div class="step-dot" id="dot-num-3">3</div>
+    <div class="step-label">Oil</div>
+  </div>
+  <div class="step-connector" id="con-34"></div>
+  <div class="progress-step" id="dot-4">
+    <div class="step-dot" id="dot-num-4">4</div>
+    <div class="step-label">Location</div>
+  </div>
 </div>
 
 <div class="shell">
 
   <!-- ══════════════════════════════════════
-       STEP 1 — TANK SIZE
+       STEP 1 — TANK LOCATION + EXIT TYPE
   ══════════════════════════════════════ -->
   <div class="screen active" id="screen-1" data-step="1">
-    <div class="step-meta">
-      <span class="step-badge">Tank Size</span>
-      <span class="step-fraction">Step 1 of 5</span>
-    </div>
     <div class="step-heading">
-      <h1>What size is your oil tank?</h1>
-      <p>Most home heating tanks are 275 gallons. Check the tag on the side or look for a nameplate.</p>
-    </div>
-    <div class="cards" id="size-cards">
-      <button class="card" data-value="275" onclick="selectCard(this,'size')">
-        <span class="card-icon">🛢️</span>
-        <div class="card-body">
-          <div class="card-label">275 Gallon</div>
-          <div class="card-sub">Most common residential tank</div>
-        </div>
-        <span class="card-badge">Most Common</span>
-        <span class="card-check"></span>
-      </button>
-      <button class="card" data-value="330" onclick="selectCard(this,'size')">
-        <span class="card-icon">🛢️</span>
-        <div class="card-body">
-          <div class="card-label">330 Gallon</div>
-          <div class="card-sub">Slightly larger — same flat-rate removal</div>
-        </div>
-        <span class="card-check"></span>
-      </button>
-      <button class="card" data-value="500" onclick="selectCard(this,'size')">
-        <span class="card-icon">🛢️</span>
-        <div class="card-body">
-          <div class="card-label">500 Gallon</div>
-          <div class="card-sub">Larger tanks may require assessment</div>
-        </div>
-        <span class="card-check"></span>
-      </button>
-      <button class="card" data-value="unknown" onclick="selectCard(this,'size')">
-        <span class="card-icon">❓</span>
-        <div class="card-body">
-          <div class="card-label">I'm not sure</div>
-          <div class="card-sub">We'll estimate as 275 — most common</div>
-        </div>
-        <span class="card-check"></span>
-      </button>
-    </div>
-    <div class="nav-row">
-      <button class="btn-next" id="next-1" onclick="goToStep(2)" disabled>Continue →</button>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════
-       STEP 2 — TANK LOCATION
-  ══════════════════════════════════════ -->
-  <div class="screen" id="screen-2" data-step="2">
-    <div class="step-meta">
-      <span class="step-badge">Tank Location</span>
-      <span class="step-fraction">Step 2 of 5</span>
-    </div>
-    <div class="step-heading">
-      <h1>Where is the tank located?</h1>
-      <p>Tell us where the tank physically sits — we'll ask about access on the next step.</p>
+      <h1>Where is your oil tank?</h1>
+      <p>Tank location affects how we access and remove it.</p>
     </div>
     <div class="cards" id="location-cards">
-      <button class="card" data-value="basement" onclick="selectCard(this,'location')">
+      <button class="card" data-value="basement" onclick="selectLocation(this)">
         <span class="card-icon">🏠</span>
         <div class="card-body">
           <div class="card-label">Basement</div>
@@ -975,7 +1071,7 @@
         </div>
         <span class="card-check"></span>
       </button>
-      <button class="card" data-value="garage" onclick="selectCard(this,'location')">
+      <button class="card" data-value="garage" onclick="selectLocation(this)">
         <span class="card-icon">🚗</span>
         <div class="card-body">
           <div class="card-label">Garage</div>
@@ -983,11 +1079,74 @@
         </div>
         <span class="card-check"></span>
       </button>
-      <button class="card" data-value="outside" onclick="selectCard(this,'location')">
+      <button class="card" data-value="outside" onclick="selectLocation(this)">
         <span class="card-icon">🌿</span>
         <div class="card-body">
           <div class="card-label">Outside</div>
           <div class="card-sub">Above ground, exterior of the home</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+    </div>
+
+    <!-- Exit type — only visible when basement is selected -->
+    <div class="exit-reveal" id="exit-reveal">
+      <div class="exit-reveal-label">How does the tank exit the basement?</div>
+      <div class="cards" id="exit-cards">
+        <button class="card" data-value="walkout" onclick="selectExit(this)">
+          <span class="card-icon">🚪</span>
+          <div class="card-body">
+            <div class="card-label">Walkout / Ground-level door</div>
+            <div class="card-sub">Door opens directly outside — no stairs</div>
+          </div>
+          <span class="card-check"></span>
+        </button>
+        <button class="card" data-value="bulkhead" onclick="selectExit(this)">
+          <span class="card-icon">🔲</span>
+          <div class="card-body">
+            <div class="card-label">Bulkhead</div>
+            <div class="card-sub">Up through an exterior hatch</div>
+          </div>
+          <span class="card-check"></span>
+        </button>
+        <button class="card" data-value="stairs" onclick="selectExit(this)">
+          <span class="card-icon">🪜</span>
+          <div class="card-body">
+            <div class="card-label">Up the stairs / through the house</div>
+            <div class="card-sub">Tank must navigate stairs and living space</div>
+          </div>
+          <span class="card-check"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-next" id="next-1" onclick="goToStep(2)" disabled>Continue →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STEP 2 — TANK ACCESS
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen-2" data-step="2">
+    <div class="step-heading">
+      <h1>Can we get to the tank easily?</h1>
+      <p>Access difficulty is the biggest pricing variable. Be specific — it protects you from surprises on job day.</p>
+    </div>
+    <div class="cards-2col" id="access-cards">
+      <button class="card" data-value="open" onclick="selectCard(this,'access')">
+        <span class="card-icon">✅</span>
+        <div class="card-body">
+          <div class="card-label">Open access</div>
+          <div class="card-sub">Visible, reachable — clear path in and out</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="restricted" onclick="selectCard(this,'access')">
+        <span class="card-icon">⚠️</span>
+        <div class="card-body">
+          <div class="card-label">Tight or restricted</div>
+          <div class="card-sub">Behind furnace, cubbyhole, or crawlspace</div>
         </div>
         <span class="card-check"></span>
       </button>
@@ -999,59 +1158,19 @@
   </div>
 
   <!-- ══════════════════════════════════════
-       STEP 3 — TANK ACCESS
+       STEP 3 — OIL IN THE TANK
   ══════════════════════════════════════ -->
   <div class="screen" id="screen-3" data-step="3">
-    <div class="step-meta">
-      <span class="step-badge">Tank Access</span>
-      <span class="step-fraction">Step 3 of 5</span>
-    </div>
-    <div class="step-heading">
-      <h1>Can we get to the tank easily?</h1>
-      <p>Access difficulty is the biggest variable in removal pricing. Be honest — it helps us give you the most accurate estimate.</p>
-    </div>
-    <div class="cards" id="access-cards">
-      <button class="card" data-value="open" onclick="selectCard(this,'access')">
-        <span class="card-icon">✅</span>
-        <div class="card-body">
-          <div class="card-label">Open access</div>
-          <div class="card-sub">Tank is visible and reachable — no obstacles, clear path in and out</div>
-        </div>
-        <span class="card-check"></span>
-      </button>
-      <button class="card" data-value="restricted" onclick="selectCard(this,'access')">
-        <span class="card-icon">⚠️</span>
-        <div class="card-body">
-          <div class="card-label">Tight or restricted access</div>
-          <div class="card-sub">Behind a furnace, in a cubbyhole, crawlspace, or not a clear line of sight</div>
-        </div>
-        <span class="card-check"></span>
-      </button>
-    </div>
-    <div class="nav-row">
-      <button class="btn-back" onclick="goToStep(2)">← Back</button>
-      <button class="btn-next" id="next-3" onclick="goToStep(4)" disabled>Continue →</button>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════
-       STEP 4 — OIL IN THE TANK
-  ══════════════════════════════════════ -->
-  <div class="screen" id="screen-4" data-step="4">
-    <div class="step-meta">
-      <span class="step-badge">Oil Amount</span>
-      <span class="step-fraction">Step 4 of 5</span>
-    </div>
     <div class="step-heading">
       <h1>How much oil is in the tank?</h1>
-      <p>We include disposal of up to 50 gallons at no extra charge. Anything over that may affect your total.</p>
+      <p>We include disposal of up to 50 gallons at no extra charge. Anything over may affect your total.</p>
     </div>
     <div class="cards" id="oil-cards">
       <button class="card" data-value="empty" onclick="selectCard(this,'oil')">
         <span class="card-icon">💨</span>
         <div class="card-body">
           <div class="card-label">Empty or nearly empty</div>
-          <div class="card-sub">Tank is dry or has just residual sludge</div>
+          <div class="card-sub">Dry or just residual sludge</div>
         </div>
         <span class="card-check"></span>
       </button>
@@ -1068,7 +1187,7 @@
         <span class="card-icon">🔴</span>
         <div class="card-body">
           <div class="card-label">Significant oil — 50+ gallons</div>
-          <div class="card-sub">May affect disposal cost — we'll confirm at site verification</div>
+          <div class="card-sub">May affect disposal cost — confirmed at site visit</div>
         </div>
         <span class="card-check"></span>
       </button>
@@ -1076,25 +1195,21 @@
         <span class="card-icon">🚨</span>
         <div class="card-body">
           <div class="card-label">Leaking or suspected contamination</div>
-          <div class="card-sub">Visible rust-through, oil smell, or known leak history</div>
+          <div class="card-sub">Visible rust, oil smell, or known leak history</div>
         </div>
         <span class="card-check"></span>
       </button>
     </div>
     <div class="nav-row">
-      <button class="btn-back" onclick="goToStep(3)">← Back</button>
-      <button class="btn-next" id="next-4" onclick="goToStep(5)" disabled>Continue →</button>
+      <button class="btn-back" onclick="goToStep(2)">← Back</button>
+      <button class="btn-next" id="next-3" onclick="goToStep(4)" disabled>Continue →</button>
     </div>
   </div>
 
   <!-- ══════════════════════════════════════
-       STEP 5 — STATE & CITY
+       STEP 4 — STATE & CITY
   ══════════════════════════════════════ -->
-  <div class="screen" id="screen-5" data-step="5">
-    <div class="step-meta">
-      <span class="step-badge">Location</span>
-      <span class="step-fraction">Step 5 of 5</span>
-    </div>
+  <div class="screen" id="screen-4" data-step="4">
     <div class="step-heading">
       <h1>Where is the property?</h1>
       <p>Permit fees vary by city and state — we need this to give you an accurate total.</p>
@@ -1137,8 +1252,8 @@
     </div>
 
     <div class="nav-row">
-      <button class="btn-back" onclick="goToStep(4)">← Back</button>
-      <button class="btn-next" id="next-5" onclick="showResults()" disabled>See My Estimate →</button>
+      <button class="btn-back" onclick="goToStep(3)">← Back</button>
+      <button class="btn-next" id="next-4" onclick="showResults()" disabled>See My Estimate →</button>
     </div>
   </div>
 
@@ -1163,6 +1278,12 @@
       <span>Unlike most removal companies, we include oil disposal up to 50 gallons and pull your permits — no surprise charges on job day.</span>
     </div>
 
+    <!-- Stairs warning (conditional) -->
+    <div class="stairs-note" id="stairs-note">
+      <span>🪜</span>
+      <span><strong>Stair removal noted.</strong> Navigating stairs and living space adds time. We'll confirm scope on-site — most stair jobs still fall within standard pricing.</span>
+    </div>
+
     <!-- Leak warning (conditional) -->
     <div class="leak-note" id="leak-note">
       <span class="leak-note-icon">🚨</span>
@@ -1179,7 +1300,7 @@
       <div class="invoice-row">
         <div class="invoice-row-desc">
           <div class="invoice-row-name">Base Removal Fee</div>
-          <div class="invoice-row-sub" id="size-sub">Includes cutting, safe removal &amp; haul-off</div>
+          <div class="invoice-row-sub" id="base-sub">Cutting, safe removal &amp; haul-off</div>
         </div>
         <div class="invoice-row-amount" id="base-fee-display">$600</div>
       </div>
@@ -1295,6 +1416,15 @@
 
 </div><!-- /shell -->
 
+<!-- Estimate bar — fixed bottom -->
+<div class="estimate-bar" id="estimate-bar">
+  <div class="estimate-bar-left">
+    <div class="estimate-bar-label">Your estimate so far</div>
+    <div class="estimate-bar-note" id="estimate-bar-note">Updates as you answer</div>
+  </div>
+  <div class="estimate-bar-amount" id="estimate-bar-amount">from $600</div>
+</div>
+
 <script>
 // ──────────────────────────────────────────────
 // GHL WEBHOOK — swap in real URL before launch
@@ -1305,14 +1435,14 @@ const GHL_WEBHOOK_URL = 'PASTE_GHL_WEBHOOK_URL_HERE';
 // STATE
 // ──────────────────────────────────────────────
 const answers = {
-  size: null,
-  location: null,
-  access: null,
-  oil: null,
+  location: null,    // basement | garage | outside
+  exit: null,        // walkout | bulkhead | stairs (basement only)
+  access: null,      // open | restricted
+  oil: null,         // empty | under50 | over50 | leaking
   state: null,
   city: null,
   permitFee: null,
-  permitSource: 'none'  // 'none' | 'airtable' | 'fallback' | 'tbd'
+  permitSource: 'none'
 };
 
 // ──────────────────────────────────────────────
@@ -1636,23 +1766,30 @@ loadAirtableData();
 // ──────────────────────────────────────────────
 // NAVIGATION
 // ──────────────────────────────────────────────
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 4;
 
-function updateProgressBar(step) {
-  // step = 1-4 for wizard steps, 'results' or 'success' for those screens
-  let pct = 0;
-  if (typeof step === 'number') {
-    pct = Math.round((step / TOTAL_STEPS) * 100);
-  } else if (step === 'results' || step === 'success') {
-    pct = 100;
+function updateProgressSteps(step) {
+  const n = typeof step === 'number' ? step : 99;
+  for (let i = 1; i <= 4; i++) {
+    const dot = document.getElementById('dot-' + i);
+    if (!dot) continue;
+    dot.classList.remove('active', 'done');
+    if (n === 99 || i < n) dot.classList.add('done');
+    else if (i === n) dot.classList.add('active');
+    // update dot label to checkmark
+    const num = document.getElementById('dot-num-' + i);
+    if (num) num.textContent = (n === 99 || i < n) ? '✓' : i;
   }
-  document.getElementById('global-progress').style.width = pct + '%';
+  for (let i = 1; i <= 3; i++) {
+    const con = document.getElementById('con-' + i + '' + (i + 1));
+    if (con) con.classList.toggle('done', n === 99 || n > i);
+  }
 }
 
 function goToStep(n) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + n).classList.add('active');
-  updateProgressBar(n);
+  updateProgressSteps(n);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1662,33 +1799,72 @@ function showResults() {
   computePricing();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-results').classList.add('active');
-  updateProgressBar('results');
+  updateProgressSteps(99);
+  document.getElementById('estimate-bar').classList.remove('visible');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function startOver() {
-  Object.assign(answers, { size: null, location: null, access: null, oil: null, state: null, city: null, permitFee: null, permitSource: 'none' });
+  Object.assign(answers, { location: null, exit: null, access: null, oil: null, state: null, city: null, permitFee: null, permitSource: 'none' });
   document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
   document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('selected'));
-  document.getElementById('city-input') && (document.getElementById('city-input').value = '');
+  const ci = document.getElementById('city-input');
+  if (ci) { ci.value = ''; ci.classList.remove('has-value'); }
+  document.getElementById('exit-reveal').classList.remove('visible');
   document.getElementById('next-1').disabled = true;
   document.getElementById('next-2').disabled = true;
   document.getElementById('next-3').disabled = true;
   document.getElementById('next-4').disabled = true;
-  document.getElementById('next-5').disabled = true;
+  document.getElementById('estimate-bar').classList.remove('visible');
   goToStep(1);
 }
 
 // ──────────────────────────────────────────────
 // CARD SELECTION
 // ──────────────────────────────────────────────
+
+// Location cards — special: may reveal exit sub-question
+function selectLocation(el) {
+  document.querySelectorAll('#location-cards .card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  answers.location = el.dataset.value;
+
+  const exitReveal = document.getElementById('exit-reveal');
+  if (answers.location === 'basement') {
+    exitReveal.classList.add('visible');
+    answers.exit = null;
+    document.querySelectorAll('#exit-cards .card').forEach(c => c.classList.remove('selected'));
+  } else {
+    exitReveal.classList.remove('visible');
+    answers.exit = null;
+  }
+  checkStep1Ready();
+  updateEstimateBar();
+}
+
+// Exit cards
+function selectExit(el) {
+  document.querySelectorAll('#exit-cards .card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  answers.exit = el.dataset.value;
+  checkStep1Ready();
+}
+
+function checkStep1Ready() {
+  const ready = answers.location !== null &&
+    (answers.location !== 'basement' || answers.exit !== null);
+  document.getElementById('next-1').disabled = !ready;
+}
+
+// Generic card select for access + oil steps
 function selectCard(el, type) {
-  const parent = el.closest('.cards');
+  const parent = el.closest('.cards, .cards-2col');
   parent.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   answers[type] = el.dataset.value;
   const stepNum = el.closest('.screen').dataset.step;
   document.getElementById('next-' + stepNum).disabled = false;
+  updateEstimateBar();
 }
 
 // ──────────────────────────────────────────────
@@ -1703,7 +1879,7 @@ function selectState(el) {
 
   const riNote = document.getElementById('ri-note');
   const cityWrap = document.getElementById('city-wrap');
-  const next5 = document.getElementById('next-5');
+  const next4 = document.getElementById('next-4');
 
   if (answers.state === 'RI') {
     riNote.classList.add('visible');
@@ -1711,15 +1887,16 @@ function selectState(el) {
     answers.permitFee = 0;
     answers.permitSource = 'none';
     answers.city = 'Rhode Island';
-    next5.disabled = false;
+    next4.disabled = false;
   } else {
     riNote.classList.remove('visible');
     cityWrap.style.display = 'block';
     const cityInput = document.getElementById('city-input');
     cityInput.value = '';
     cityInput.classList.remove('has-value');
-    next5.disabled = true;
+    next4.disabled = true;
   }
+  updateEstimateBar();
 }
 
 // ──────────────────────────────────────────────
@@ -1730,7 +1907,7 @@ function onCityInput(input) {
   const list = document.getElementById('autocomplete-list');
   answers.city = null;
   answers.permitFee = null;
-  document.getElementById('next-5').disabled = true;
+  document.getElementById('next-4').disabled = true;
   input.classList.remove('has-value');
 
   if (val.length < 2) { list.classList.remove('open'); return; }
@@ -1765,7 +1942,8 @@ function selectCity(city, fee) {
   input.value = city;
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
-  document.getElementById('next-5').disabled = false;
+  document.getElementById('next-4').disabled = false;
+  updateEstimateBar();
 }
 
 function selectCityManual(city) {
@@ -1776,13 +1954,43 @@ function selectCityManual(city) {
   input.value = city;
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
-  document.getElementById('next-5').disabled = false;
+  document.getElementById('next-4').disabled = false;
+  updateEstimateBar();
 }
 
 function hideAutocompleteSoon() {
   setTimeout(() => {
     document.getElementById('autocomplete-list').classList.remove('open');
   }, 200);
+}
+
+// ──────────────────────────────────────────────
+// ESTIMATE BAR
+// ──────────────────────────────────────────────
+function updateEstimateBar() {
+  const bar = document.getElementById('estimate-bar');
+  if (!answers.location) { bar.classList.remove('visible'); return; }
+  bar.classList.add('visible');
+
+  const BASE = 600;
+  const isRestricted = answers.access === 'restricted';
+  const permitFee = answers.permitFee ?? 0;
+  const low = BASE + permitFee;
+  const high = BASE + 600 + permitFee;
+
+  const amountEl = document.getElementById('estimate-bar-amount');
+  const noteEl = document.getElementById('estimate-bar-note');
+
+  if (isRestricted) {
+    amountEl.textContent = '$' + low.toLocaleString() + '–$' + high.toLocaleString() + '+';
+    noteEl.textContent = 'Restricted access — confirmed on-site';
+  } else if (answers.state && answers.state !== 'RI' && answers.permitFee === null) {
+    amountEl.textContent = '$' + BASE + ' + permit';
+    noteEl.textContent = 'Permit fee added once city confirmed';
+  } else {
+    amountEl.textContent = 'from $' + low.toLocaleString();
+    noteEl.textContent = answers.state ? answers.state + ' · ' + (answers.city || 'city pending') : 'Based on your answers';
+  }
 }
 
 // ──────────────────────────────────────────────
@@ -1820,10 +2028,10 @@ function computePricing() {
 
   // Base fee
   document.getElementById('base-fee-display').textContent = '$' + BASE;
-  document.getElementById('size-sub').textContent =
-    answers.size === 'unknown'
-      ? 'Estimated as 275 gallon (most common) — confirmed on-site'
-      : answers.size + ' gallon tank';
+  document.getElementById('base-sub').textContent =
+    answers.location === 'basement'
+      ? 'Basement removal — cutting, safe extraction & haul-off'
+      : 'Cutting, safe removal & haul-off';
 
   // Access surcharge line
   const accessLine = document.getElementById('access-line');
@@ -1860,6 +2068,9 @@ function computePricing() {
 
   // Leak note
   document.getElementById('leak-note').classList.toggle('visible', isLeaking);
+
+  // Stairs note
+  document.getElementById('stairs-note').classList.toggle('visible', answers.exit === 'stairs');
 }
 
 // ──────────────────────────────────────────────
@@ -1905,8 +2116,8 @@ function submitCTA() {
 
   const payload = {
     name, phone, email, note,
-    tank_size: answers.size,
     location_type: answers.location,
+    exit_type: answers.exit,
     access_type: answers.access,
     oil_amount: answers.oil,
     state: answers.state,
@@ -1915,6 +2126,7 @@ function submitCTA() {
     estimated_total_high: highTotal,
     permit_fee: permitFee ?? 'TBD',
     restricted_access: isRestricted ? 'true' : 'false',
+    stair_removal: answers.exit === 'stairs' ? 'true' : 'false',
     leaking: answers.oil === 'leaking' ? 'true' : 'false',
     source: 'estimator_tool'
   };
@@ -1956,8 +2168,8 @@ function showSuccess(name) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Initialize progress bar on load
-updateProgressBar(1);
+// Initialize
+updateProgressSteps(1);
 </script>
 </body>
 </html>
