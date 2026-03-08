@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oil Tank Removal Cost Estimator | RemoveMyOilTank.com</title>
+  <meta name="description" content="Get an instant, itemized estimate for oil tank removal in RI, MA, and CT. Transparent pricing with no hidden fees." />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Free Oil Tank Removal Estimator" />
+  <meta property="og:description" content="Instant itemized estimate. No email required. See exactly what you'll pay — and why." />
+  <meta property="og:url" content="https://removemyoiltank.com/estimate" />
+
+  <!-- Open Sans — matches removemyoiltank.com -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── BRAND TOKENS — matched from removemyoiltank.com ─── */
+    :root {
+      --brand:       #32CD32;   /* limegreen — primary button/CTA color */
+      --brand-dark:  #28A428;
+      --brand-light: #F0FFF0;
+      --text:        #1A1A1A;
+      --muted:       #6B7280;
+      --border:      #E5E7EB;
+      --bg:          #FFFFFF;
+      --surface:     #F9FAFB;
+      --radius:      12px;
+      --radius-sm:   8px;
+      --shadow:      0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.06);
+      --transition:  0.18s ease;
+    }
+
+    /* ─── RESET ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ─── LAYOUT ─── */
+    .shell {
+      width: 100%;
+      max-width: 540px;
+      padding: 0 16px 48px;
+    }
+
+    /* ─── HEADER ─── */
+    .site-header {
+      width: 100%;
+      max-width: 540px;
+      padding: 20px 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .site-header img {
+      height: 36px;
+      width: auto;
+    }
+    .site-header .wordmark {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .site-header .wordmark span {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--muted);
+    }
+
+    /* ─── PROGRESS BAR ─── */
+    .progress-wrap {
+      margin-bottom: 28px;
+    }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .progress-track {
+      height: 4px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--brand);
+      border-radius: 99px;
+      transition: width 0.35s ease;
+    }
+
+    /* ─── STEP HEADING ─── */
+    .step-heading {
+      margin-bottom: 20px;
+    }
+    .step-heading h1 {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: -0.3px;
+      margin-bottom: 6px;
+    }
+    .step-heading p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ─── OPTION CARDS ─── */
+    .cards {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      background: var(--bg);
+      transition: border-color var(--transition), background var(--transition), transform var(--transition);
+      text-align: left;
+      width: 100%;
+      min-height: 64px;
+    }
+    .card:hover {
+      border-color: var(--brand);
+      background: var(--brand-light);
+    }
+    .card.selected {
+      border-color: var(--brand);
+      background: var(--brand-light);
+      transform: scale(1.01);
+    }
+    .card-icon {
+      font-size: 26px;
+      flex-shrink: 0;
+      width: 36px;
+      text-align: center;
+    }
+    .card-body { flex: 1; }
+    .card-label {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    .card-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+    .card-badge {
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--brand);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 99px;
+      flex-shrink: 0;
+    }
+    .card-check {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all var(--transition);
+    }
+    .card.selected .card-check {
+      background: var(--brand-dark);
+      border-color: var(--brand-dark);
+    }
+    .card.selected .card-check::after {
+      content: '';
+      display: block;
+      width: 6px;
+      height: 10px;
+      border: 2px solid #fff;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg) translate(-1px, -1px);
+    }
+
+    /* ─── STATE / CITY STEP ─── */
+    .state-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .state-btn {
+      padding: 18px 8px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      background: var(--bg);
+      text-align: center;
+      transition: all var(--transition);
+      font-family: inherit;
+    }
+    .state-btn:hover { border-color: var(--brand); background: var(--brand-light); }
+    .state-btn.selected { border-color: var(--brand); background: var(--brand-light); }
+    .state-btn .state-abbr {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      display: block;
+    }
+    .state-btn .state-name {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .city-wrap { margin-top: 4px; }
+    .city-wrap label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .city-input-wrap { position: relative; }
+    .city-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 16px; /* prevents iOS zoom */
+      font-family: inherit;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .city-input:focus { border-color: var(--brand); }
+    .city-input.has-value { border-color: var(--brand); }
+
+    .autocomplete-list {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0; right: 0;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow);
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+    }
+    .autocomplete-list.open { display: block; }
+    .autocomplete-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .autocomplete-item:last-child { border-bottom: none; }
+    .autocomplete-item:hover { background: var(--surface); }
+    .autocomplete-item .fee-hint { font-size: 12px; color: var(--muted); }
+
+    .ri-note {
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #065F46;
+      margin-top: 12px;
+      display: none;
+    }
+    .ri-note.visible { display: block; }
+
+    /* ─── NAV BUTTONS ─── */
+    .nav-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 28px;
+    }
+    .btn-back {
+      flex: 0 0 auto;
+      padding: 0 20px;
+      height: 52px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all var(--transition);
+    }
+    .btn-back:hover { border-color: var(--muted); }
+    .btn-next {
+      flex: 1;
+      height: 52px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: var(--brand);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.1px;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .btn-next:hover { background: var(--brand-dark); }
+    .btn-next:active { transform: scale(0.98); }
+    .btn-next:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; }
+
+    /* ─── RESULTS ─── */
+    .results-hero {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .results-hero .total-label {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .results-hero .total-amount {
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      color: var(--text);
+      line-height: 1;
+    }
+    .results-hero .total-range {
+      font-size: 16px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .breakdown-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .breakdown-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+      padding: 14px 18px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .line-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .line-item:last-child { border-bottom: none; }
+    .line-label { font-size: 14px; line-height: 1.4; }
+    .line-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .line-amount {
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+      margin-left: 12px;
+    }
+    .line-amount.included { color: #059669; }
+    .line-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 18px;
+      background: var(--bg);
+      border-top: 2px solid var(--border);
+    }
+    .line-total-label { font-size: 15px; font-weight: 700; }
+    .line-total-amount { font-size: 20px; font-weight: 800; color: var(--brand); }
+
+    .trust-line {
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      font-size: 13px;
+      color: #065F46;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .leak-note {
+      background: #FFF7ED;
+      border: 1px solid #FED7AA;
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      font-size: 13px;
+      color: #92400E;
+      line-height: 1.5;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .leak-note.visible { display: block; }
+
+    .why-expand {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .why-toggle {
+      width: 100%;
+      padding: 14px 18px;
+      background: var(--surface);
+      border: none;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text);
+    }
+    .why-toggle .chevron { transition: transform 0.2s; font-style: normal; font-size: 10px; }
+    .why-toggle.open .chevron { transform: rotate(180deg); }
+    .why-body {
+      display: none;
+      padding: 14px 18px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      border-top: 1px solid var(--border);
+    }
+    .why-body.open { display: block; }
+
+    .social-proof {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .proof-item {
+      text-align: center;
+    }
+    .proof-number {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      display: block;
+    }
+    .proof-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ─── CTA FORM ─── */
+    .cta-section {
+      margin-top: 8px;
+    }
+    .cta-heading {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      margin-bottom: 6px;
+    }
+    .cta-sub {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+    .form-field {
+      margin-bottom: 14px;
+    }
+    .form-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .form-field input,
+    .form-field textarea {
+      width: 100%;
+      padding: 13px 16px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 16px;
+      font-family: inherit;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color var(--transition);
+      -webkit-appearance: none;
+    }
+    .form-field input:focus,
+    .form-field textarea:focus { border-color: var(--brand); }
+    .form-field textarea { resize: none; min-height: 80px; }
+    .field-error {
+      font-size: 12px;
+      color: #DC2626;
+      margin-top: 5px;
+      display: none;
+    }
+    .field-error.visible { display: block; }
+
+    .btn-cta {
+      width: 100%;
+      height: 56px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: var(--brand);
+      color: #fff;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.1px;
+      margin-top: 4px;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .btn-cta:hover { background: var(--brand-dark); }
+    .btn-cta:active { transform: scale(0.99); }
+    .btn-cta:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+    .btn-cta-sub {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 10px;
+      line-height: 1.4;
+    }
+
+    .btn-secondary {
+      width: 100%;
+      height: 48px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      margin-top: 10px;
+      transition: all var(--transition);
+    }
+    .btn-secondary:hover { border-color: var(--text); color: var(--text); }
+
+    /* ─── SUCCESS SCREEN ─── */
+    .success-wrap {
+      text-align: center;
+      padding: 20px 0;
+    }
+    .success-icon {
+      width: 72px;
+      height: 72px;
+      background: #ECFDF5;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 20px;
+    }
+    .success-heading {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+    .success-body {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .success-detail {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    /* ─── SCREENS ─── */
+    .screen { display: none; animation: fadeIn 0.22s ease; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: translateX(0); } }
+
+    /* ─── DIVIDER ─── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 20px 0;
+    }
+
+    @media (max-width: 360px) {
+      .results-hero .total-amount { font-size: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="site-header">
+  <img src="https://removemyoiltank.com/wp-content/uploads/2024/06/Oil-Tank-Removal-MA-Jacobs-Property-Solutions-Logo-2024.png" alt="Jacobs Property Solutions" style="height:44px;width:auto;" />
+  <div class="wordmark">
+    RemoveMyOilTank.com
+    <span>Jacobs Property Solutions</span>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- ══════════════════════════════════════
+       STEP 1 — TANK SIZE
+  ══════════════════════════════════════ -->
+  <div class="screen active" id="screen-1" data-step="1">
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Step 1 of 4</span><span>Tank Size</span></div>
+      <div class="progress-track"><div class="progress-fill" style="width:25%"></div></div>
+    </div>
+    <div class="step-heading">
+      <h1>What size is your oil tank?</h1>
+      <p>Most home heating tanks are 275 gallons. Check the tag on the side or look for a nameplate.</p>
+    </div>
+    <div class="cards" id="size-cards">
+      <button class="card" data-value="275" onclick="selectCard(this,'size')">
+        <span class="card-icon">🛢️</span>
+        <div class="card-body">
+          <div class="card-label">275 Gallon</div>
+          <div class="card-sub">Most common residential tank</div>
+        </div>
+        <span class="card-badge">Most Common</span>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="330" onclick="selectCard(this,'size')">
+        <span class="card-icon">🛢️</span>
+        <div class="card-body">
+          <div class="card-label">330 Gallon</div>
+          <div class="card-sub">Slightly larger — same flat-rate removal</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="500" onclick="selectCard(this,'size')">
+        <span class="card-icon">🛢️</span>
+        <div class="card-body">
+          <div class="card-label">500 Gallon</div>
+          <div class="card-sub">Larger tanks may require assessment</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="unknown" onclick="selectCard(this,'size')">
+        <span class="card-icon">❓</span>
+        <div class="card-body">
+          <div class="card-label">I'm not sure</div>
+          <div class="card-sub">We'll estimate as 275 — most common</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-next" id="next-1" onclick="goToStep(2)" disabled>Continue →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STEP 2 — TANK LOCATION
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen-2" data-step="2">
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Step 2 of 4</span><span>Tank Location</span></div>
+      <div class="progress-track"><div class="progress-fill" style="width:50%"></div></div>
+    </div>
+    <div class="step-heading">
+      <h1>Where is the tank located?</h1>
+      <p>Access difficulty is the biggest variable in removal pricing.</p>
+    </div>
+    <div class="cards" id="location-cards">
+      <button class="card" data-value="basement" onclick="selectCard(this,'location')">
+        <span class="card-icon">🏠</span>
+        <div class="card-body">
+          <div class="card-label">Basement</div>
+          <div class="card-sub">Standard access — door, stairs, open space</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="garage" onclick="selectCard(this,'location')">
+        <span class="card-icon">🚗</span>
+        <div class="card-body">
+          <div class="card-label">Garage</div>
+          <div class="card-sub">Standard access — level entry</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="outside" onclick="selectCard(this,'location')">
+        <span class="card-icon">🌿</span>
+        <div class="card-body">
+          <div class="card-label">Outside</div>
+          <div class="card-sub">Above ground, exterior of home</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="restricted" onclick="selectCard(this,'location')">
+        <span class="card-icon">⚠️</span>
+        <div class="card-body">
+          <div class="card-label">Tight or Restricted Access</div>
+          <div class="card-sub">Crawlspace, behind a wall, cubbyhole, or obstructed</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goToStep(1)">← Back</button>
+      <button class="btn-next" id="next-2" onclick="goToStep(3)" disabled>Continue →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STEP 3 — TANK CONDITION
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen-3" data-step="3">
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Step 3 of 4</span><span>Tank Condition</span></div>
+      <div class="progress-track"><div class="progress-fill" style="width:75%"></div></div>
+    </div>
+    <div class="step-heading">
+      <h1>What's the tank's condition?</h1>
+      <p>Be honest — it helps us bring the right crew and equipment.</p>
+    </div>
+    <div class="cards" id="condition-cards">
+      <button class="card" data-value="intact" onclick="selectCard(this,'condition')">
+        <span class="card-icon">✅</span>
+        <div class="card-body">
+          <div class="card-label">Intact — no known leaks</div>
+          <div class="card-sub">Standard removal, may have residual oil or sludge inside</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="leaking" onclick="selectCard(this,'condition')">
+        <span class="card-icon">🚨</span>
+        <div class="card-body">
+          <div class="card-label">Leaking or suspected contamination</div>
+          <div class="card-sub">Visible rust through, oil smell, or known leak history</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goToStep(2)">← Back</button>
+      <button class="btn-next" id="next-3" onclick="goToStep(4)" disabled>Continue →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STEP 4 — STATE & CITY
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen-4" data-step="4">
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Step 4 of 4</span><span>Location</span></div>
+      <div class="progress-track"><div class="progress-fill" style="width:100%"></div></div>
+    </div>
+    <div class="step-heading">
+      <h1>Where is the property?</h1>
+      <p>Permit fees vary by city and state — we need this to give you an accurate total.</p>
+    </div>
+
+    <div class="state-grid">
+      <button class="state-btn" data-value="RI" onclick="selectState(this)">
+        <span class="state-abbr">RI</span>
+        <div class="state-name">Rhode Island</div>
+      </button>
+      <button class="state-btn" data-value="MA" onclick="selectState(this)">
+        <span class="state-abbr">MA</span>
+        <div class="state-name">Massachusetts</div>
+      </button>
+      <button class="state-btn" data-value="CT" onclick="selectState(this)">
+        <span class="state-abbr">CT</span>
+        <div class="state-name">Connecticut</div>
+      </button>
+    </div>
+
+    <div class="ri-note" id="ri-note">
+      <strong>Good news — RI requires no permit.</strong> No permit fee, no waiting. We handle everything same week in most cases.
+    </div>
+
+    <div class="city-wrap" id="city-wrap" style="display:none;">
+      <label for="city-input">City / Town</label>
+      <div class="city-input-wrap">
+        <input
+          type="text"
+          id="city-input"
+          class="city-input"
+          placeholder="Start typing your city..."
+          autocomplete="off"
+          oninput="onCityInput(this)"
+          onblur="hideAutocompleteSoon()"
+        />
+        <div class="autocomplete-list" id="autocomplete-list"></div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goToStep(3)">← Back</button>
+      <button class="btn-next" id="next-4" onclick="showResults()" disabled>See My Estimate →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       RESULTS SCREEN
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen-results">
+
+    <div class="results-hero">
+      <div class="total-label">Your Estimated Total</div>
+      <div class="total-amount" id="results-total-display">$600</div>
+      <div class="total-range" id="results-range-display"></div>
+    </div>
+
+    <div class="trust-line">
+      Unlike most removal companies, we include oil disposal up to 50 gallons and pull your permits — no surprise charges on job day.
+    </div>
+
+    <div class="leak-note" id="leak-note">
+      🚨 <strong>Heads up:</strong> Contamination cleanup is separate and not included in this estimate. We'll assess on-site and connect you with certified remediation partners if needed — pricing depends on scope.
+    </div>
+
+    <div class="breakdown-card">
+      <div class="breakdown-title">Price Breakdown</div>
+      <div class="line-item">
+        <div>
+          <div class="line-label">Base Removal Fee</div>
+          <div class="line-sub" id="size-sub">Includes cutting, safe removal & haul-off</div>
+        </div>
+        <div class="line-amount" id="base-fee-display">$600</div>
+      </div>
+      <div class="line-item" id="access-line" style="display:none;">
+        <div>
+          <div class="line-label">Restricted Access Surcharge</div>
+          <div class="line-sub">Crawlspace / obstructed — confirmed at site visit</div>
+        </div>
+        <div class="line-amount" id="access-fee-display">+$600</div>
+      </div>
+      <div class="line-item">
+        <div>
+          <div class="line-label">Oil &amp; Sludge Disposal</div>
+          <div class="line-sub">Up to 50 gallons — included, no extra charge</div>
+        </div>
+        <div class="line-amount included">Included</div>
+      </div>
+      <div class="line-item" id="permit-line">
+        <div>
+          <div class="line-label">Permit Fee</div>
+          <div class="line-sub" id="permit-sub">We pull and pay the permit on your behalf</div>
+        </div>
+        <div class="line-amount" id="permit-fee-display">$0</div>
+      </div>
+      <div class="line-total">
+        <div class="line-total-label">Estimated Total</div>
+        <div class="line-total-amount" id="total-display">$600</div>
+      </div>
+    </div>
+
+    <div class="why-expand">
+      <button class="why-toggle" onclick="toggleWhy(this)">
+        Why are our prices what they are?
+        <i class="chevron">▼</i>
+      </button>
+      <div class="why-body" id="why-body">
+        Our flat rate covers everything: labor, equipment, transportation, cutting fees, and oil disposal. Competitors often quote a lower number and add disposal, permit fees, or "access fees" on job day. We build it all in upfront so you know exactly what you're paying before we arrive.
+      </div>
+    </div>
+
+    <div class="social-proof">
+      <div class="proof-item">
+        <span class="proof-number">10,000+</span>
+        <span class="proof-label">Tanks Removed</span>
+      </div>
+      <div class="proof-item">
+        <span class="proof-number">400+</span>
+        <span class="proof-label">Five-Star Reviews</span>
+      </div>
+      <div class="proof-item">
+        <span class="proof-number">Since 2013</span>
+        <span class="proof-label">RI, MA, CT</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- CTA FORM -->
+    <div class="cta-section">
+      <div class="cta-heading">Lock In This Estimate — Free Site Verification</div>
+      <div class="cta-sub">No obligation. We confirm access and conditions, then your price is locked. Most verifications take under 10 minutes by phone or photo.</div>
+
+      <div class="form-field">
+        <label for="cta-name">Your Name *</label>
+        <input type="text" id="cta-name" placeholder="First and last name" autocomplete="name" />
+        <div class="field-error" id="err-name">Please enter your name.</div>
+      </div>
+      <div class="form-field">
+        <label for="cta-phone">Phone Number *</label>
+        <input type="tel" id="cta-phone" placeholder="(401) 555-0100" inputmode="numeric" autocomplete="tel" />
+        <div class="field-error" id="err-phone">Please enter a valid phone number.</div>
+      </div>
+      <div class="form-field">
+        <label for="cta-email">Email <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <input type="email" id="cta-email" placeholder="you@example.com" autocomplete="email" />
+      </div>
+      <div class="form-field">
+        <label for="cta-note">Anything we should know? <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <textarea id="cta-note" placeholder="E.g. tank is behind a furnace, driveway access, tenant in unit..."></textarea>
+      </div>
+
+      <button class="btn-cta" onclick="submitCTA()">Lock In This Estimate →</button>
+      <div class="btn-cta-sub">We'll reach out within 2 hours during business hours (Mon–Fri, 7am–5pm).</div>
+
+      <button class="btn-secondary" onclick="startOver()">Start Over</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SUCCESS SCREEN
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen-success">
+    <div class="success-wrap">
+      <div class="success-icon">✅</div>
+      <div class="success-heading">You're all set, <span id="success-name">there</span>!</div>
+      <div class="success-body">We received your estimate request and will reach out within 2 hours during business hours to confirm your details and lock in your price.</div>
+      <div class="success-detail">
+        <strong>What happens next:</strong><br />
+        1. We review your tank details<br />
+        2. Quick call or text to confirm access (5–10 min)<br />
+        3. Your price is locked — no surprises on job day<br /><br />
+        Questions? Call or text us at <strong><a href="tel:+14013893200" style="color:var(--brand)">(401) 389-3200</a></strong>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /shell -->
+
+<script>
+// ──────────────────────────────────────────────
+// GHL WEBHOOK — swap in real URL before launch
+// ──────────────────────────────────────────────
+const GHL_WEBHOOK_URL = 'PASTE_GHL_WEBHOOK_URL_HERE';
+
+// ──────────────────────────────────────────────
+// STATE
+// ──────────────────────────────────────────────
+const answers = {
+  size: null,
+  location: null,
+  condition: null,
+  state: null,
+  city: null,
+  permitFee: null,
+  permitSource: 'none'  // 'none' | 'airtable' | 'fallback' | 'tbd'
+};
+
+// ──────────────────────────────────────────────
+// CITY/PERMIT DATA — loaded from Airtable at runtime
+// Hard-coded fallback for prototype testing
+// ──────────────────────────────────────────────
+let cityData = [
+  // Rhode Island — no permit needed
+  // Massachusetts
+  { city: 'Worcester', state: 'MA', permit_fee: 100 },
+  { city: 'Springfield', state: 'MA', permit_fee: 100 },
+  { city: 'Boston', state: 'MA', permit_fee: 150 },
+  { city: 'Cambridge', state: 'MA', permit_fee: 150 },
+  { city: 'New Bedford', state: 'MA', permit_fee: 100 },
+  { city: 'Fall River', state: 'MA', permit_fee: 100 },
+  { city: 'Lowell', state: 'MA', permit_fee: 100 },
+  { city: 'Brockton', state: 'MA', permit_fee: 100 },
+  { city: 'Quincy', state: 'MA', permit_fee: 100 },
+  { city: 'Lynn', state: 'MA', permit_fee: 100 },
+  { city: 'Newton', state: 'MA', permit_fee: 150 },
+  { city: 'Somerville', state: 'MA', permit_fee: 150 },
+  { city: 'Taunton', state: 'MA', permit_fee: 100 },
+  { city: 'Attleboro', state: 'MA', permit_fee: 100 },
+  { city: 'Dartmouth', state: 'MA', permit_fee: 100 },
+  { city: 'Fairhaven', state: 'MA', permit_fee: 100 },
+  { city: 'Westport', state: 'MA', permit_fee: 100 },
+  { city: 'Wareham', state: 'MA', permit_fee: 100 },
+  { city: 'Bridgewater', state: 'MA', permit_fee: 100 },
+  { city: 'Dighton', state: 'MA', permit_fee: 100 },
+  { city: 'Freetown', state: 'MA', permit_fee: 100 },
+  { city: 'Lakeville', state: 'MA', permit_fee: 100 },
+  { city: 'Middleborough', state: 'MA', permit_fee: 100 },
+  { city: 'Raynham', state: 'MA', permit_fee: 100 },
+  { city: 'Seekonk', state: 'MA', permit_fee: 100 },
+  { city: 'Swansea', state: 'MA', permit_fee: 100 },
+  // Connecticut
+  { city: 'Hartford', state: 'CT', permit_fee: 150 },
+  { city: 'Bridgeport', state: 'CT', permit_fee: 150 },
+  { city: 'New Haven', state: 'CT', permit_fee: 150 },
+  { city: 'Stamford', state: 'CT', permit_fee: 150 },
+  { city: 'Waterbury', state: 'CT', permit_fee: 100 },
+  { city: 'Norwalk', state: 'CT', permit_fee: 150 },
+  { city: 'Danbury', state: 'CT', permit_fee: 100 },
+  { city: 'New Britain', state: 'CT', permit_fee: 100 },
+];
+
+// Try to load real Airtable data — replace with your fetch endpoint if available
+async function loadAirtableData() {
+  // For prototype: uses hardcoded data above
+  // In production: fetch('/api/permit-data') or direct Airtable call
+  console.log('[Estimator] City permit data loaded. ' + cityData.length + ' cities available.');
+}
+loadAirtableData();
+
+// ──────────────────────────────────────────────
+// NAVIGATION
+// ──────────────────────────────────────────────
+function goToStep(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + n).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showResults() {
+  if (!answers.state) return;
+  if ((answers.state === 'MA' || answers.state === 'CT') && !answers.city) return;
+  computePricing();
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-results').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function startOver() {
+  Object.assign(answers, { size: null, location: null, condition: null, state: null, city: null, permitFee: null });
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('city-input') && (document.getElementById('city-input').value = '');
+  document.getElementById('next-1').disabled = true;
+  document.getElementById('next-2').disabled = true;
+  document.getElementById('next-3').disabled = true;
+  document.getElementById('next-4').disabled = true;
+  goToStep(1);
+}
+
+// ──────────────────────────────────────────────
+// CARD SELECTION
+// ──────────────────────────────────────────────
+function selectCard(el, type) {
+  const parent = el.closest('.cards');
+  parent.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[type] = el.dataset.value;
+  const stepNum = el.closest('.screen').dataset.step;
+  document.getElementById('next-' + stepNum).disabled = false;
+}
+
+// ──────────────────────────────────────────────
+// STATE SELECTION
+// ──────────────────────────────────────────────
+function selectState(el) {
+  document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  answers.state = el.dataset.value;
+  answers.city = null;
+  answers.permitFee = null;
+
+  const riNote = document.getElementById('ri-note');
+  const cityWrap = document.getElementById('city-wrap');
+  const next4 = document.getElementById('next-4');
+
+  if (answers.state === 'RI') {
+    riNote.classList.add('visible');
+    cityWrap.style.display = 'none';
+    answers.permitFee = 0;
+    answers.permitSource = 'none';
+    answers.city = 'Rhode Island';
+    next4.disabled = false;
+  } else {
+    riNote.classList.remove('visible');
+    cityWrap.style.display = 'block';
+    const cityInput = document.getElementById('city-input');
+    cityInput.value = '';
+    cityInput.classList.remove('has-value');
+    next4.disabled = true;
+  }
+}
+
+// ──────────────────────────────────────────────
+// CITY AUTOCOMPLETE
+// ──────────────────────────────────────────────
+function onCityInput(input) {
+  const val = input.value.trim();
+  const list = document.getElementById('autocomplete-list');
+  answers.city = null;
+  answers.permitFee = null;
+  document.getElementById('next-4').disabled = true;
+  input.classList.remove('has-value');
+
+  if (val.length < 2) { list.classList.remove('open'); return; }
+
+  const filtered = cityData.filter(c =>
+    c.state === answers.state &&
+    c.city.toLowerCase().startsWith(val.toLowerCase())
+  );
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="autocomplete-item" onclick="selectCityManual('${val}')">
+      <span>${val}</span><span class="fee-hint">Permit fee TBD at site</span>
+    </div>`;
+    list.classList.add('open');
+    return;
+  }
+
+  list.innerHTML = filtered.map(c => `
+    <div class="autocomplete-item" onclick="selectCity('${c.city}', ${c.permit_fee})">
+      <span>${c.city}, ${c.state}</span>
+      <span class="fee-hint">Permit: $${c.permit_fee}</span>
+    </div>
+  `).join('');
+  list.classList.add('open');
+}
+
+function selectCity(city, fee) {
+  answers.city = city;
+  answers.permitFee = fee;
+  answers.permitSource = 'airtable';
+  const input = document.getElementById('city-input');
+  input.value = city;
+  input.classList.add('has-value');
+  document.getElementById('autocomplete-list').classList.remove('open');
+  document.getElementById('next-4').disabled = false;
+}
+
+function selectCityManual(city) {
+  answers.city = city;
+  answers.permitFee = null;
+  answers.permitSource = 'tbd';
+  const input = document.getElementById('city-input');
+  input.value = city;
+  input.classList.add('has-value');
+  document.getElementById('autocomplete-list').classList.remove('open');
+  document.getElementById('next-4').disabled = false;
+}
+
+function hideAutocompleteSoon() {
+  setTimeout(() => {
+    document.getElementById('autocomplete-list').classList.remove('open');
+  }, 200);
+}
+
+// ──────────────────────────────────────────────
+// PRICING LOGIC
+// ──────────────────────────────────────────────
+function computePricing() {
+  const BASE = 600;
+  const isRestricted = answers.location === 'restricted';
+  const isLeaking = answers.condition === 'leaking';
+  const permitFee = (answers.state === 'RI') ? 0 : (answers.permitFee ?? null);
+
+  // Base + access
+  const accessFee = isRestricted ? 600 : 0;
+  const lowTotal = BASE + (permitFee ?? 0);
+  const highTotal = isRestricted
+    ? BASE + accessFee + (permitFee ?? 0)
+    : BASE + (permitFee ?? 0);
+
+  // --- Update UI ---
+
+  // Total hero
+  const totalEl = document.getElementById('results-total-display');
+  const rangeEl = document.getElementById('results-range-display');
+
+  if (isRestricted) {
+    totalEl.textContent = '$' + lowTotal.toLocaleString();
+    rangeEl.textContent = 'Up to $' + highTotal.toLocaleString() + ' depending on access — confirmed on-site';
+  } else if (permitFee === null) {
+    totalEl.textContent = '$' + BASE;
+    rangeEl.textContent = '+ permit fee (TBD at site verification)';
+  } else {
+    totalEl.textContent = '$' + lowTotal.toLocaleString();
+    rangeEl.textContent = '';
+  }
+
+  // Base fee
+  document.getElementById('base-fee-display').textContent = '$' + BASE;
+  document.getElementById('size-sub').textContent =
+    answers.size === 'unknown'
+      ? 'Estimated as 275 gallon (most common) — confirmed on-site'
+      : answers.size + ' gallon tank';
+
+  // Access surcharge line
+  const accessLine = document.getElementById('access-line');
+  if (isRestricted) {
+    accessLine.style.display = 'flex';
+    document.getElementById('access-fee-display').textContent = '+$600+';
+  } else {
+    accessLine.style.display = 'none';
+  }
+
+  // Permit line
+  const permitSub = document.getElementById('permit-sub');
+  const permitDisplay = document.getElementById('permit-fee-display');
+  if (answers.state === 'RI') {
+    permitDisplay.textContent = '$0';
+    permitSub.textContent = 'No permit required in Rhode Island — zero cost';
+    permitDisplay.classList.add('included');
+  } else if (permitFee === null) {
+    permitDisplay.textContent = 'TBD';
+    permitSub.textContent = 'We\'ll confirm the ' + answers.city + ' permit fee at site verification';
+    permitDisplay.classList.remove('included');
+  } else {
+    permitDisplay.textContent = '$' + permitFee;
+    permitSub.textContent = 'We pull and pay the ' + answers.city + ' permit on your behalf';
+    permitDisplay.classList.remove('included');
+  }
+
+  // Total line
+  document.getElementById('total-display').textContent = isRestricted
+    ? '$' + lowTotal + '–$' + highTotal + '+'
+    : permitFee !== null
+      ? '$' + lowTotal
+      : '$' + BASE + ' + permit';
+
+  // Leak note
+  document.getElementById('leak-note').classList.toggle('visible', isLeaking);
+}
+
+// ──────────────────────────────────────────────
+// WHY EXPAND
+// ──────────────────────────────────────────────
+function toggleWhy(btn) {
+  btn.classList.toggle('open');
+  document.getElementById('why-body').classList.toggle('open');
+}
+
+// ──────────────────────────────────────────────
+// CTA SUBMIT
+// ──────────────────────────────────────────────
+function submitCTA() {
+  const name = document.getElementById('cta-name').value.trim();
+  const phone = document.getElementById('cta-phone').value.trim();
+  const email = document.getElementById('cta-email').value.trim();
+  const note = document.getElementById('cta-note').value.trim();
+  let valid = true;
+
+  // Validate
+  if (!name) {
+    document.getElementById('err-name').classList.add('visible');
+    valid = false;
+  } else {
+    document.getElementById('err-name').classList.remove('visible');
+  }
+  const phoneClean = phone.replace(/\D/g,'');
+  if (phoneClean.length < 10) {
+    document.getElementById('err-phone').classList.add('visible');
+    valid = false;
+  } else {
+    document.getElementById('err-phone').classList.remove('visible');
+  }
+  if (!valid) return;
+
+  // Compute totals for payload
+  const BASE = 600;
+  const isRestricted = answers.location === 'restricted';
+  const permitFee = answers.permitFee;
+  const lowTotal = BASE + (isRestricted ? 0 : 0) + (permitFee ?? 0);
+  const highTotal = isRestricted ? BASE + 600 + (permitFee ?? 0) : BASE + (permitFee ?? 0);
+
+  const payload = {
+    name, phone, email, note,
+    tank_size: answers.size,
+    location_type: answers.location,
+    condition: answers.condition,
+    state: answers.state,
+    city: answers.city,
+    estimated_total_low: lowTotal,
+    estimated_total_high: highTotal,
+    permit_fee: permitFee ?? 'TBD',
+    restricted_access: isRestricted ? 'true' : 'false',
+    leaking: answers.condition === 'leaking' ? 'true' : 'false',
+    source: 'estimator_tool'
+  };
+
+  console.log('[Estimator] Submitting to GHL:', payload);
+
+  // Disable button during send
+  const btn = document.querySelector('.btn-cta');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  // Fire GHL webhook
+  const webhookUrl = GHL_WEBHOOK_URL;
+  if (webhookUrl && webhookUrl !== 'PASTE_GHL_WEBHOOK_URL_HERE') {
+    fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(() => showSuccess(name))
+    .catch(err => {
+      console.error('[Estimator] Webhook failed:', err);
+      // Still show success to user — don't punish them for backend issues
+      showSuccess(name);
+    });
+  } else {
+    // Dev mode — skip webhook, show success
+    console.warn('[Estimator] No GHL webhook URL set. Showing success screen in dev mode.');
+    console.log('[Estimator] Payload that would have been sent:', JSON.stringify(payload, null, 2));
+    showSuccess(name);
+  }
+}
+
+function showSuccess(name) {
+  document.getElementById('success-name').textContent = name.split(' ')[0];
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-success').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
