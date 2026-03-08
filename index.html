@@ -127,7 +127,9 @@
     .shell {
       width: 100%;
       max-width: 560px;
-      padding: 28px 16px 56px;
+      padding: 28px 16px 100px;
+      /* Safety net: if content overflows on very small screens, scroll rather than hide */
+      overflow-y: auto;
     }
 
     /* ─── STEP META ─── */
@@ -156,7 +158,7 @@
 
     /* ─── STEP HEADING ─── */
     .step-heading {
-      margin-bottom: 24px;
+      margin-bottom: 16px;
     }
     .step-heading h1 {
       font-size: 24px;
@@ -182,7 +184,7 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      padding: 18px 20px;
+      padding: 14px 18px;
       border: 1.5px solid var(--border);
       border-radius: var(--radius);
       cursor: pointer;
@@ -190,7 +192,7 @@
       transition: border-color var(--transition), background var(--transition), box-shadow var(--transition), transform var(--transition);
       text-align: left;
       width: 100%;
-      min-height: 70px;
+      min-height: 62px;
       box-shadow: var(--shadow-sm);
     }
     .card:hover {
@@ -932,8 +934,8 @@
     /* ─── EXIT REVEAL ─── */
     .exit-reveal {
       display: none;
-      margin-top: 14px;
-      padding-top: 14px;
+      margin-top: 12px;
+      padding-top: 12px;
       border-top: 1.5px dashed var(--border);
       animation: fadeDown 0.2s ease;
     }
@@ -941,8 +943,30 @@
     .exit-reveal-label {
       font-size: 11px; font-weight: 700;
       text-transform: uppercase; letter-spacing: 0.5px;
-      color: var(--muted); margin-bottom: 10px;
+      color: var(--muted); margin-bottom: 8px;
     }
+    /* Compact 3-col layout for exit type — keeps everything in viewport */
+    #exit-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    #exit-cards .card {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 10px 6px;
+      min-height: unset;
+      gap: 4px;
+    }
+    #exit-cards .card .card-icon {
+      font-size: 20px;
+      width: auto; height: auto;
+      background: none;
+    }
+    #exit-cards .card .card-label { font-size: 12px; font-weight: 600; }
+    #exit-cards .card .card-sub { font-size: 11px; }
+    #exit-cards .card .card-check { display: none; }
     @keyframes fadeDown {
       from { opacity: 0; transform: translateY(-6px); }
       to   { opacity: 1; transform: translateY(0); }
