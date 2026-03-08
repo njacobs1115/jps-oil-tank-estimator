@@ -2164,13 +2164,13 @@ function onCityInput(input) {
   ).slice(0, 8);
 
   if (filtered.length === 0) {
-    // City not found — show error, block submission
-    list.innerHTML = `<div class="autocomplete-item autocomplete-error">
-      <span>We didn't find that town.</span>
-      <span class="fee-hint">Call <a href="tel:+14013893200" onclick="event.stopPropagation()">(401) 389-3200</a> for a quote</span>
+    // City not in our table — soft fallback: let them proceed, confirm price on-site
+    const stateName = answers.state === 'CT' ? 'Connecticut' : 'Massachusetts';
+    list.innerHTML = `<div class="autocomplete-item" onclick="selectCityFallback('${val.replace(/'/g,"\\'")}')">
+      <span>${val}, ${answers.state}</span>
+      <span class="fee-hint">We serve most of ${stateName} — price confirmed at site visit</span>
     </div>`;
     list.classList.add('open');
-    document.getElementById('next-2').disabled = true;
     return;
   }
 
@@ -2206,6 +2206,27 @@ function selectCityManual(city) {
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
   document.getElementById('next-2').disabled = false;
+  updateEstimateBar();
+}
+
+// City typed but not found in Airtable — use state-level fallback, still allow submission
+function selectCityFallback(city) {
+  answers.city = city;
+  answers.permitFee = null;
+  // State-level fallback pricing: CT base $700, MA base $600
+  answers.cityRemovalFee = answers.state === 'CT' ? 700 : 600;
+  answers.permitSource = 'tbd';
+  const input = document.getElementById('city-input');
+  input.value = city;
+  input.classList.add('has-value');
+  document.getElementById('autocomplete-list').classList.remove('open');
+  document.getElementById('next-2').disabled = false;
+  // Log for Norman to review unknown cities
+  try {
+    const unknown = JSON.parse(localStorage.getItem('jps_unknown_cities') || '[]');
+    const entry = answers.state + ':' + city;
+    if (!unknown.includes(entry)) { unknown.push(entry); localStorage.setItem('jps_unknown_cities', JSON.stringify(unknown)); }
+  } catch(e) {}
   updateEstimateBar();
 }
 
@@ -2269,9 +2290,16 @@ function computePricing() {
   const totalEl = document.getElementById('results-total-display');
   const rangeEl = document.getElementById('results-range-display');
 
+  const isFallbackCity = answers.permitSource === 'tbd';
   if (isRestricted) {
     totalEl.textContent = '$' + lowTotal.toLocaleString();
     rangeEl.textContent = 'Up to $' + highTotal.toLocaleString() + ' depending on access — confirmed on-site';
+  } else if (isFallbackCity && answers.state === 'MA') {
+    totalEl.textContent = '$' + (BASE + oilFee);
+    rangeEl.textContent = '+ permit fee — confirmed at your free site visit';
+  } else if (isFallbackCity) {
+    totalEl.textContent = 'from $' + lowTotal.toLocaleString();
+    rangeEl.textContent = 'Final price confirmed at your free site visit';
   } else if (permitFee === null) {
     totalEl.textContent = '$' + (BASE + oilFee);
     rangeEl.textContent = '+ permit fee (confirmed at site verification)';
@@ -2281,11 +2309,13 @@ function computePricing() {
   }
 
   // Base fee
-  document.getElementById('base-fee-display').textContent = '$' + BASE;
+  document.getElementById('base-fee-display').textContent = isFallbackCity ? 'from $' + BASE : '$' + BASE;
   document.getElementById('base-sub').textContent =
-    answers.location === 'basement'
-      ? 'Basement removal — cutting, safe extraction & haul-off'
-      : 'Cutting, safe removal & haul-off';
+    isFallbackCity
+      ? 'Starting price for ' + answers.city + ' — confirmed at site visit'
+      : answers.location === 'basement'
+        ? 'Basement removal — cutting, safe extraction & haul-off'
+        : 'Cutting, safe removal & haul-off';
 
   // Access surcharge line
   const accessLine = document.getElementById('access-line');
