@@ -908,7 +908,7 @@
   <div class="screen active" id="screen-1" data-step="1">
     <div class="step-meta">
       <span class="step-badge">Tank Size</span>
-      <span class="step-fraction">Step 1 of 4</span>
+      <span class="step-fraction">Step 1 of 5</span>
     </div>
     <div class="step-heading">
       <h1>What size is your oil tank?</h1>
@@ -960,18 +960,18 @@
   <div class="screen" id="screen-2" data-step="2">
     <div class="step-meta">
       <span class="step-badge">Tank Location</span>
-      <span class="step-fraction">Step 2 of 4</span>
+      <span class="step-fraction">Step 2 of 5</span>
     </div>
     <div class="step-heading">
       <h1>Where is the tank located?</h1>
-      <p>Access difficulty is the biggest variable in removal pricing.</p>
+      <p>Tell us where the tank physically sits — we'll ask about access on the next step.</p>
     </div>
     <div class="cards" id="location-cards">
       <button class="card" data-value="basement" onclick="selectCard(this,'location')">
         <span class="card-icon">🏠</span>
         <div class="card-body">
           <div class="card-label">Basement</div>
-          <div class="card-sub">Standard access — door, stairs, open space</div>
+          <div class="card-sub">Inside the home, below ground level</div>
         </div>
         <span class="card-check"></span>
       </button>
@@ -979,7 +979,7 @@
         <span class="card-icon">🚗</span>
         <div class="card-body">
           <div class="card-label">Garage</div>
-          <div class="card-sub">Standard access — level entry</div>
+          <div class="card-sub">Attached or detached garage</div>
         </div>
         <span class="card-check"></span>
       </button>
@@ -987,15 +987,7 @@
         <span class="card-icon">🌿</span>
         <div class="card-body">
           <div class="card-label">Outside</div>
-          <div class="card-sub">Above ground, exterior of home</div>
-        </div>
-        <span class="card-check"></span>
-      </button>
-      <button class="card" data-value="restricted" onclick="selectCard(this,'location')">
-        <span class="card-icon">⚠️</span>
-        <div class="card-body">
-          <div class="card-label">Tight or Restricted Access</div>
-          <div class="card-sub">Crawlspace, behind a wall, cubbyhole, or obstructed</div>
+          <div class="card-sub">Above ground, exterior of the home</div>
         </div>
         <span class="card-check"></span>
       </button>
@@ -1007,31 +999,31 @@
   </div>
 
   <!-- ══════════════════════════════════════
-       STEP 3 — TANK CONDITION
+       STEP 3 — TANK ACCESS
   ══════════════════════════════════════ -->
   <div class="screen" id="screen-3" data-step="3">
     <div class="step-meta">
-      <span class="step-badge">Tank Condition</span>
-      <span class="step-fraction">Step 3 of 4</span>
+      <span class="step-badge">Tank Access</span>
+      <span class="step-fraction">Step 3 of 5</span>
     </div>
     <div class="step-heading">
-      <h1>What's the tank's condition?</h1>
-      <p>Be honest — it helps us bring the right crew and equipment.</p>
+      <h1>Can we get to the tank easily?</h1>
+      <p>Access difficulty is the biggest variable in removal pricing. Be honest — it helps us give you the most accurate estimate.</p>
     </div>
-    <div class="cards" id="condition-cards">
-      <button class="card" data-value="intact" onclick="selectCard(this,'condition')">
+    <div class="cards" id="access-cards">
+      <button class="card" data-value="open" onclick="selectCard(this,'access')">
         <span class="card-icon">✅</span>
         <div class="card-body">
-          <div class="card-label">Intact — no known leaks</div>
-          <div class="card-sub">Standard removal, may have residual oil or sludge inside</div>
+          <div class="card-label">Open access</div>
+          <div class="card-sub">Tank is visible and reachable — no obstacles, clear path in and out</div>
         </div>
         <span class="card-check"></span>
       </button>
-      <button class="card" data-value="leaking" onclick="selectCard(this,'condition')">
-        <span class="card-icon">🚨</span>
+      <button class="card" data-value="restricted" onclick="selectCard(this,'access')">
+        <span class="card-icon">⚠️</span>
         <div class="card-body">
-          <div class="card-label">Leaking or suspected contamination</div>
-          <div class="card-sub">Visible rust through, oil smell, or known leak history</div>
+          <div class="card-label">Tight or restricted access</div>
+          <div class="card-sub">Behind a furnace, in a cubbyhole, crawlspace, or not a clear line of sight</div>
         </div>
         <span class="card-check"></span>
       </button>
@@ -1043,12 +1035,65 @@
   </div>
 
   <!-- ══════════════════════════════════════
-       STEP 4 — STATE & CITY
+       STEP 4 — OIL IN THE TANK
   ══════════════════════════════════════ -->
   <div class="screen" id="screen-4" data-step="4">
     <div class="step-meta">
+      <span class="step-badge">Oil Amount</span>
+      <span class="step-fraction">Step 4 of 5</span>
+    </div>
+    <div class="step-heading">
+      <h1>How much oil is in the tank?</h1>
+      <p>We include disposal of up to 50 gallons at no extra charge. Anything over that may affect your total.</p>
+    </div>
+    <div class="cards" id="oil-cards">
+      <button class="card" data-value="empty" onclick="selectCard(this,'oil')">
+        <span class="card-icon">💨</span>
+        <div class="card-body">
+          <div class="card-label">Empty or nearly empty</div>
+          <div class="card-sub">Tank is dry or has just residual sludge</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="under50" onclick="selectCard(this,'oil')">
+        <span class="card-icon">🟡</span>
+        <div class="card-body">
+          <div class="card-label">Some oil — under 50 gallons</div>
+          <div class="card-sub">Disposal included at no extra charge</div>
+        </div>
+        <span class="card-badge">Included</span>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="over50" onclick="selectCard(this,'oil')">
+        <span class="card-icon">🔴</span>
+        <div class="card-body">
+          <div class="card-label">Significant oil — 50+ gallons</div>
+          <div class="card-sub">May affect disposal cost — we'll confirm at site verification</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="leaking" onclick="selectCard(this,'oil')">
+        <span class="card-icon">🚨</span>
+        <div class="card-body">
+          <div class="card-label">Leaking or suspected contamination</div>
+          <div class="card-sub">Visible rust-through, oil smell, or known leak history</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goToStep(3)">← Back</button>
+      <button class="btn-next" id="next-4" onclick="goToStep(5)" disabled>Continue →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STEP 5 — STATE & CITY
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen-5" data-step="5">
+    <div class="step-meta">
       <span class="step-badge">Location</span>
-      <span class="step-fraction">Step 4 of 4</span>
+      <span class="step-fraction">Step 5 of 5</span>
     </div>
     <div class="step-heading">
       <h1>Where is the property?</h1>
@@ -1092,8 +1137,8 @@
     </div>
 
     <div class="nav-row">
-      <button class="btn-back" onclick="goToStep(3)">← Back</button>
-      <button class="btn-next" id="next-4" onclick="showResults()" disabled>See My Estimate →</button>
+      <button class="btn-back" onclick="goToStep(4)">← Back</button>
+      <button class="btn-next" id="next-5" onclick="showResults()" disabled>See My Estimate →</button>
     </div>
   </div>
 
@@ -1262,7 +1307,8 @@ const GHL_WEBHOOK_URL = 'PASTE_GHL_WEBHOOK_URL_HERE';
 const answers = {
   size: null,
   location: null,
-  condition: null,
+  access: null,
+  oil: null,
   state: null,
   city: null,
   permitFee: null,
@@ -1590,7 +1636,7 @@ loadAirtableData();
 // ──────────────────────────────────────────────
 // NAVIGATION
 // ──────────────────────────────────────────────
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 5;
 
 function updateProgressBar(step) {
   // step = 1-4 for wizard steps, 'results' or 'success' for those screens
@@ -1621,7 +1667,7 @@ function showResults() {
 }
 
 function startOver() {
-  Object.assign(answers, { size: null, location: null, condition: null, state: null, city: null, permitFee: null });
+  Object.assign(answers, { size: null, location: null, access: null, oil: null, state: null, city: null, permitFee: null, permitSource: 'none' });
   document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
   document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('selected'));
   document.getElementById('city-input') && (document.getElementById('city-input').value = '');
@@ -1629,6 +1675,7 @@ function startOver() {
   document.getElementById('next-2').disabled = true;
   document.getElementById('next-3').disabled = true;
   document.getElementById('next-4').disabled = true;
+  document.getElementById('next-5').disabled = true;
   goToStep(1);
 }
 
@@ -1656,7 +1703,7 @@ function selectState(el) {
 
   const riNote = document.getElementById('ri-note');
   const cityWrap = document.getElementById('city-wrap');
-  const next4 = document.getElementById('next-4');
+  const next5 = document.getElementById('next-5');
 
   if (answers.state === 'RI') {
     riNote.classList.add('visible');
@@ -1664,14 +1711,14 @@ function selectState(el) {
     answers.permitFee = 0;
     answers.permitSource = 'none';
     answers.city = 'Rhode Island';
-    next4.disabled = false;
+    next5.disabled = false;
   } else {
     riNote.classList.remove('visible');
     cityWrap.style.display = 'block';
     const cityInput = document.getElementById('city-input');
     cityInput.value = '';
     cityInput.classList.remove('has-value');
-    next4.disabled = true;
+    next5.disabled = true;
   }
 }
 
@@ -1683,7 +1730,7 @@ function onCityInput(input) {
   const list = document.getElementById('autocomplete-list');
   answers.city = null;
   answers.permitFee = null;
-  document.getElementById('next-4').disabled = true;
+  document.getElementById('next-5').disabled = true;
   input.classList.remove('has-value');
 
   if (val.length < 2) { list.classList.remove('open'); return; }
@@ -1702,9 +1749,9 @@ function onCityInput(input) {
   }
 
   list.innerHTML = filtered.map(c => `
-    <div class="autocomplete-item" onclick="selectCity('${c.city}', ${c.permit_fee})">
+    <div class="autocomplete-item" onclick="selectCity('${c.city.replace(/'/g,"\\'")}', ${c.permit_fee})">
       <span>${c.city}, ${c.state}</span>
-      <span class="fee-hint">Permit: $${c.permit_fee}</span>
+      <span class="fee-hint">${c.permit_fee !== null ? 'Permit: $' + c.permit_fee : 'Permit: TBD'}</span>
     </div>
   `).join('');
   list.classList.add('open');
@@ -1718,7 +1765,7 @@ function selectCity(city, fee) {
   input.value = city;
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
-  document.getElementById('next-4').disabled = false;
+  document.getElementById('next-5').disabled = false;
 }
 
 function selectCityManual(city) {
@@ -1729,7 +1776,7 @@ function selectCityManual(city) {
   input.value = city;
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
-  document.getElementById('next-4').disabled = false;
+  document.getElementById('next-5').disabled = false;
 }
 
 function hideAutocompleteSoon() {
@@ -1743,8 +1790,8 @@ function hideAutocompleteSoon() {
 // ──────────────────────────────────────────────
 function computePricing() {
   const BASE = 600;
-  const isRestricted = answers.location === 'restricted';
-  const isLeaking = answers.condition === 'leaking';
+  const isRestricted = answers.access === 'restricted';
+  const isLeaking = answers.oil === 'leaking';
   const permitFee = (answers.state === 'RI') ? 0 : (answers.permitFee ?? null);
 
   // Base + access
@@ -1851,23 +1898,24 @@ function submitCTA() {
 
   // Compute totals for payload
   const BASE = 600;
-  const isRestricted = answers.location === 'restricted';
+  const isRestricted = answers.access === 'restricted';
   const permitFee = answers.permitFee;
-  const lowTotal = BASE + (isRestricted ? 0 : 0) + (permitFee ?? 0);
+  const lowTotal = BASE + (permitFee ?? 0);
   const highTotal = isRestricted ? BASE + 600 + (permitFee ?? 0) : BASE + (permitFee ?? 0);
 
   const payload = {
     name, phone, email, note,
     tank_size: answers.size,
     location_type: answers.location,
-    condition: answers.condition,
+    access_type: answers.access,
+    oil_amount: answers.oil,
     state: answers.state,
     city: answers.city,
     estimated_total_low: lowTotal,
     estimated_total_high: highTotal,
     permit_fee: permitFee ?? 'TBD',
     restricted_access: isRestricted ? 'true' : 'false',
-    leaking: answers.condition === 'leaking' ? 'true' : 'false',
+    leaking: answers.oil === 'leaking' ? 'true' : 'false',
     source: 'estimator_tool'
   };
 
