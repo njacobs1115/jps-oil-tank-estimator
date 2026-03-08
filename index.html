@@ -1004,6 +1004,76 @@
       font-size: 20px; font-weight: 800;
       color: #fff; letter-spacing: -0.3px;
     }
+  
+    /* ─── SINGLE-SCREEN QUESTION GROUPS ─── */
+    .q-group {
+      margin-bottom: 28px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+    }
+    .q-group:last-of-type {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    .q-label {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .q-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    /* 3-column compact cards */
+    .cards-3col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .cards-3col .card {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 14px 8px;
+      gap: 4px;
+    }
+    .cards-3col .card .card-icon { font-size: 22px; }
+    .cards-3col .card .card-label { font-size: 13px; font-weight: 600; }
+    .cards-3col .card .card-check { display: none; }
+    .cards-3col .card .card-body { width: 100%; }
+    .cards-3col .card .card-badge { font-size: 10px; margin-top: 2px; }
+    /* 2-column cards */
+    .cards-2col {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .cards-2col .card { padding: 14px 12px; min-height: 80px; }
+    .cards-2col .card .card-icon { font-size: 20px; }
+    .cards-2col .card .card-check { display: none; }
+    .cards-2col .card .card-label { font-size: 14px; }
+    .cards-2col .card .card-sub { font-size: 12px; }
+    /* Override: selected state for compact grids */
+    .cards-3col .card.selected,
+    .cards-2col .card.selected {
+      border-color: var(--brand);
+      background: var(--brand-light);
+      box-shadow: 0 0 0 2px var(--brand);
+    }
+    /* autocomplete error */
+    .autocomplete-error {
+      cursor: default;
+      color: #dc2626;
+    }
+    .autocomplete-error a {
+      color: var(--brand);
+      text-decoration: none;
+    }
+
   </style>
 </head>
 <body>
@@ -1033,26 +1103,11 @@
 <div class="progress-steps">
   <div class="progress-step active" id="dot-1">
     <div class="step-dot" id="dot-num-1">1</div>
-    <div class="step-label">Tank Size</div>
+    <div class="step-label">Your Tank</div>
   </div>
   <div class="step-connector" id="con-12"></div>
   <div class="progress-step" id="dot-2">
     <div class="step-dot" id="dot-num-2">2</div>
-    <div class="step-label">Location</div>
-  </div>
-  <div class="step-connector" id="con-23"></div>
-  <div class="progress-step" id="dot-3">
-    <div class="step-dot" id="dot-num-3">3</div>
-    <div class="step-label">Access</div>
-  </div>
-  <div class="step-connector" id="con-34"></div>
-  <div class="progress-step" id="dot-4">
-    <div class="step-dot" id="dot-num-4">4</div>
-    <div class="step-label">Oil Level</div>
-  </div>
-  <div class="step-connector" id="con-45"></div>
-  <div class="progress-step" id="dot-5">
-    <div class="step-dot" id="dot-num-5">5</div>
     <div class="step-label">Location</div>
   </div>
 </div>
@@ -1060,105 +1115,154 @@
 <div class="shell">
 
   <!-- ══════════════════════════════════════
-       STEP 1 — TANK SIZE
+       STEP 1 — ALL TANK QUESTIONS
   ══════════════════════════════════════ -->
   <div class="screen active" id="screen-1" data-step="1">
-    <div class="step-heading">
-      <h1>What size is your oil tank?</h1>
-      <p>Most residential tanks are 275 gallons. Check the nameplate on the side if you're not sure.</p>
-    </div>
-    <div class="cards" id="size-cards">
-      <button class="card" data-value="275" onclick="selectCard(this,'size')">
-        <span class="card-icon">🛢️</span>
-        <div class="card-body">
-          <div class="card-label">275 Gallon</div>
-          <div class="card-sub">Most common residential tank — standard flat rate</div>
-        </div>
-        <span class="card-badge">Most Common</span>
-        <span class="card-check"></span>
-      </button>
-      <button class="card" data-value="330" onclick="selectCard(this,'size')">
-        <span class="card-icon">🛢️</span>
-        <div class="card-body">
-          <div class="card-label">330 Gallon</div>
-          <div class="card-sub">Slightly larger, same flat rate removal</div>
-        </div>
-        <span class="card-check"></span>
-      </button>
-      <button class="card" data-value="unsure" onclick="selectCard(this,'size')">
-        <span class="card-icon">❓</span>
-        <div class="card-body">
-          <div class="card-label">I'm not sure</div>
-          <div class="card-sub">We'll confirm on-site. Estimate based on 275 gallon.</div>
-        </div>
-        <span class="card-check"></span>
-      </button>
-    </div>
-    <div class="nav-row">
-      <button class="btn-next" id="next-1" onclick="goToStep(2)" disabled>Continue →</button>
-    </div>
-  </div>
 
-  <!-- ══════════════════════════════════════
-       STEP 2 — TANK LOCATION + EXIT TYPE
-  ══════════════════════════════════════ -->
-  <div class="screen" id="screen-2" data-step="2">
-    <div class="step-heading">
-      <h1>Where is your oil tank?</h1>
-      <p>Tank location affects how we access and remove it.</p>
-    </div>
-    <div class="cards" id="location-cards">
-      <button class="card" data-value="basement" onclick="selectLocation(this)">
-        <span class="card-icon">🏠</span>
-        <div class="card-body">
-          <div class="card-label">Basement</div>
-          <div class="card-sub">Inside the home, below ground level</div>
-        </div>
-        <span class="card-check"></span>
-      </button>
-      <button class="card" data-value="garage" onclick="selectLocation(this)">
-        <span class="card-icon">🚗</span>
-        <div class="card-body">
-          <div class="card-label">Garage</div>
-          <div class="card-sub">Attached or detached garage</div>
-        </div>
-        <span class="card-check"></span>
-      </button>
-      <button class="card" data-value="outside" onclick="selectLocation(this)">
-        <span class="card-icon">🌿</span>
-        <div class="card-body">
-          <div class="card-label">Outside</div>
-          <div class="card-sub">Above ground, exterior of the home</div>
-        </div>
-        <span class="card-check"></span>
-      </button>
+    <!-- Tank Size -->
+    <div class="q-group">
+      <div class="q-label">What size is your oil tank?</div>
+      <div class="q-sub">Most residential tanks are 275 gallons. Unsure? Select that — we'll confirm on-site.</div>
+      <div class="cards cards-3col" id="size-cards">
+        <button class="card" data-value="275" onclick="selectCard(this,'size')">
+          <span class="card-icon">🛢️</span>
+          <div class="card-body"><div class="card-label">275 gal</div></div>
+          <span class="card-badge">Most Common</span>
+          <span class="card-check"></span>
+        </button>
+        <button class="card" data-value="330" onclick="selectCard(this,'size')">
+          <span class="card-icon">🛢️</span>
+          <div class="card-body"><div class="card-label">330 gal</div></div>
+          <span class="card-check"></span>
+        </button>
+        <button class="card" data-value="unsure" onclick="selectCard(this,'size')">
+          <span class="card-icon">❓</span>
+          <div class="card-body"><div class="card-label">Not sure</div></div>
+          <span class="card-check"></span>
+        </button>
+      </div>
     </div>
 
-    <!-- Exit type — only visible when basement is selected -->
-    <div class="exit-reveal" id="exit-reveal">
-      <div class="exit-reveal-label">How does the tank exit the basement?</div>
-      <div class="cards" id="exit-cards">
-        <button class="card" data-value="walkout" onclick="selectExit(this)">
-          <span class="card-icon">🚪</span>
+    <!-- Tank Location -->
+    <div class="q-group">
+      <div class="q-label">Where is the tank located?</div>
+      <div class="cards cards-3col" id="location-cards">
+        <button class="card" data-value="basement" onclick="selectLocation(this)">
+          <span class="card-icon">🏠</span>
+          <div class="card-body"><div class="card-label">Basement</div></div>
+          <span class="card-check"></span>
+        </button>
+        <button class="card" data-value="garage" onclick="selectLocation(this)">
+          <span class="card-icon">🚗</span>
+          <div class="card-body"><div class="card-label">Garage</div></div>
+          <span class="card-check"></span>
+        </button>
+        <button class="card" data-value="outside" onclick="selectLocation(this)">
+          <span class="card-icon">🌿</span>
+          <div class="card-body"><div class="card-label">Outside</div></div>
+          <span class="card-check"></span>
+        </button>
+      </div>
+      <!-- Exit type — reveals when basement selected -->
+      <div class="exit-reveal" id="exit-reveal">
+        <div class="exit-reveal-label">How does the tank exit the basement?</div>
+        <div class="cards" id="exit-cards">
+          <button class="card" data-value="walkout" onclick="selectExit(this)">
+            <span class="card-icon">🚪</span>
+            <div class="card-body">
+              <div class="card-label">Walkout / Ground-level door</div>
+              <div class="card-sub">Door opens directly outside</div>
+            </div>
+            <span class="card-check"></span>
+          </button>
+          <button class="card" data-value="bulkhead" onclick="selectExit(this)">
+            <span class="card-icon">🔲</span>
+            <div class="card-body">
+              <div class="card-label">Bulkhead</div>
+              <div class="card-sub">Up through an exterior hatch</div>
+            </div>
+            <span class="card-check"></span>
+          </button>
+          <button class="card" data-value="stairs" onclick="selectExit(this)">
+            <span class="card-icon">🪜</span>
+            <div class="card-body">
+              <div class="card-label">Up stairs / through house</div>
+              <div class="card-sub">Tank navigates stairs and living space</div>
+            </div>
+            <span class="card-check"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Access -->
+    <div class="q-group">
+      <div class="q-label">Is the tank accessible?</div>
+      <div class="q-sub">Access and difficulty of removal significantly impact pricing.</div>
+      <div class="cards" id="access-cards">
+        <button class="card" data-value="open" onclick="selectCard(this,'access')">
+          <span class="card-icon">✅</span>
           <div class="card-body">
-            <div class="card-label">Walkout / Ground-level door</div>
-            <div class="card-sub">Door opens directly outside — no stairs</div>
+            <div class="card-label">Yes — clear access</div>
+            <div class="card-sub">Open area, no major obstacles</div>
           </div>
           <span class="card-check"></span>
         </button>
-        <button class="card" data-value="bulkhead" onclick="selectExit(this)">
-          <span class="card-icon">🔲</span>
+        <button class="card" data-value="unsure" onclick="selectCard(this,'access')">
+          <span class="card-icon">🤔</span>
           <div class="card-body">
-            <div class="card-label">Bulkhead</div>
-            <div class="card-sub">Up through an exterior hatch</div>
+            <div class="card-label">Not sure</div>
+            <div class="card-sub">We'll assess during your free site verification</div>
           </div>
           <span class="card-check"></span>
         </button>
-        <button class="card" data-value="stairs" onclick="selectExit(this)">
-          <span class="card-icon">🪜</span>
+        <button class="card" data-value="restricted" onclick="selectCard(this,'access')">
+          <span class="card-icon">⚠️</span>
           <div class="card-body">
-            <div class="card-label">Up the stairs / through the house</div>
-            <div class="card-sub">Tank must navigate stairs and living space</div>
+            <div class="card-label">Restricted — behind wall, crawl space, cubby</div>
+            <div class="card-sub">Obstructed access — surcharge may apply</div>
+          </div>
+          <span class="card-check"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Oil Level -->
+    <div class="q-group">
+      <div class="q-label">What does the gauge on top of the tank read?</div>
+      <div class="q-sub">Up to 50 gallons included in your flat rate. More than half full? Flat $150 excess fee — never by the gallon.</div>
+      <div class="cards cards-2col" id="oil-cards">
+        <button class="card" data-value="empty" onclick="selectCard(this,'oil')">
+          <span class="card-icon">💨</span>
+          <div class="card-body">
+            <div class="card-label">Empty</div>
+            <div class="card-sub">Disposal included</div>
+          </div>
+          <span class="card-badge">Included</span>
+          <span class="card-check"></span>
+        </button>
+        <button class="card" data-value="quarter" onclick="selectCard(this,'oil')">
+          <span class="card-icon">🟡</span>
+          <div class="card-body">
+            <div class="card-label">¼ or less</div>
+            <div class="card-sub">Disposal included</div>
+          </div>
+          <span class="card-badge">Included</span>
+          <span class="card-check"></span>
+        </button>
+        <button class="card" data-value="half_plus" onclick="selectCard(this,'oil')">
+          <span class="card-icon">🔴</span>
+          <div class="card-body">
+            <div class="card-label">More than ½</div>
+            <div class="card-sub">+$150 flat disposal fee</div>
+          </div>
+          <span class="card-check"></span>
+        </button>
+        <button class="card" data-value="no_gauge" onclick="selectCard(this,'oil')">
+          <span class="card-icon">❓</span>
+          <div class="card-body">
+            <div class="card-label">No gauge</div>
+            <div class="card-sub">We'll assess on-site</div>
           </div>
           <span class="card-check"></span>
         </button>
@@ -1166,105 +1270,15 @@
     </div>
 
     <div class="nav-row">
-      <button class="btn-back" onclick="goToStep(1)">← Back</button>
-      <button class="btn-next" id="next-2" onclick="goToStep(3)" disabled>Continue →</button>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════
-       STEP 3 — TANK ACCESS
-  ══════════════════════════════════════ -->
-  <div class="screen" id="screen-3" data-step="3">
-    <div class="step-heading">
-      <h1>Is the tank accessible to our technicians?</h1>
-      <p>Access and difficulty of removal significantly impact pricing. Be as accurate as you can — it protects you from surprises on job day.</p>
-    </div>
-    <div class="cards" id="access-cards">
-      <button class="card" data-value="open" onclick="selectCard(this,'access')">
-        <span class="card-icon">✅</span>
-        <div class="card-body">
-          <div class="card-label">Yes — accessible and in the open</div>
-          <div class="card-sub">Clear path to the tank, no major obstacles</div>
-        </div>
-        <span class="card-check"></span>
-      </button>
-      <button class="card" data-value="unsure" onclick="selectCard(this,'access')">
-        <span class="card-icon">🤔</span>
-        <div class="card-body">
-          <div class="card-label">I'm unsure</div>
-          <div class="card-sub">We'll assess access during your free site verification — no commitment required</div>
-        </div>
-        <span class="card-check"></span>
-      </button>
-      <button class="card" data-value="restricted" onclick="selectCard(this,'access')">
-        <span class="card-icon">⚠️</span>
-        <div class="card-body">
-          <div class="card-label">The tank is: behind a wall, cubbyhole, crawl space, etc.</div>
-          <div class="card-sub">Obstructed access — surcharge may apply, confirmed on-site</div>
-        </div>
-        <span class="card-check"></span>
-      </button>
-    </div>
-    <div class="nav-row">
-      <button class="btn-back" onclick="goToStep(2)">← Back</button>
-      <button class="btn-next" id="next-3" onclick="goToStep(4)" disabled>Continue →</button>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════
-       STEP 4 — OIL LEVEL
-  ══════════════════════════════════════ -->
-  <div class="screen" id="screen-4" data-step="4">
-    <div class="step-heading">
-      <h1>What does the gauge on top of the tank read?</h1>
-      <p>Up to 50 gallons of oil disposal is included in your flat rate. If the tank is more than half full, a flat $150 excess disposal fee applies — we never charge by the gallon.</p>
-    </div>
-    <div class="cards" id="oil-cards">
-      <button class="card" data-value="empty" onclick="selectCard(this,'oil')">
-        <span class="card-icon">💨</span>
-        <div class="card-body">
-          <div class="card-label">Empty</div>
-          <div class="card-sub">Gauge reads empty — disposal included</div>
-        </div>
-        <span class="card-badge">Included</span>
-        <span class="card-check"></span>
-      </button>
-      <button class="card" data-value="quarter" onclick="selectCard(this,'oil')">
-        <span class="card-icon">🟡</span>
-        <div class="card-body">
-          <div class="card-label">¼ or less</div>
-          <div class="card-sub">Low level — disposal included in flat rate</div>
-        </div>
-        <span class="card-badge">Included</span>
-        <span class="card-check"></span>
-      </button>
-      <button class="card" data-value="half_plus" onclick="selectCard(this,'oil')">
-        <span class="card-icon">🔴</span>
-        <div class="card-body">
-          <div class="card-label">More than ½</div>
-          <div class="card-sub">Flat $150 excess disposal fee — never charged by the gallon</div>
-        </div>
-        <span class="card-check"></span>
-      </button>
-      <button class="card" data-value="no_gauge" onclick="selectCard(this,'oil')">
-        <span class="card-icon">❓</span>
-        <div class="card-body">
-          <div class="card-label">There is no gauge on the tank</div>
-          <div class="card-sub">We'll assess the oil level on-site during your free verification</div>
-        </div>
-        <span class="card-check"></span>
-      </button>
-    </div>
-    <div class="nav-row">
-      <button class="btn-back" onclick="goToStep(3)">← Back</button>
-      <button class="btn-next" id="next-4" onclick="goToStep(5)" disabled>Continue →</button>
+      <div></div>
+      <button class="btn-next" id="next-1" onclick="goToStep(2)" disabled>Continue →</button>
     </div>
   </div>
 
   <!-- ══════════════════════════════════════
        STEP 5 — STATE & CITY
   ══════════════════════════════════════ -->
-  <div class="screen" id="screen-5" data-step="5">
+  <div class="screen" id="screen-2" data-step="2">
     <div class="step-heading">
       <h1>Where is the property?</h1>
       <p>We serve RI, MA, and CT. Your state determines permit requirements.</p>
@@ -1312,8 +1326,8 @@
     </div>
 
     <div class="nav-row">
-      <button class="btn-back" onclick="goToStep(4)">← Back</button>
-      <button class="btn-next" id="next-5" onclick="showResults()" disabled>See My Estimate →</button>
+      <button class="btn-back" onclick="goToStep(1)">← Back</button>
+      <button class="btn-next" id="next-2" onclick="showResults()" disabled>See My Estimate →</button>
     </div>
   </div>
 
@@ -1457,7 +1471,7 @@
       </div>
 
       <button class="btn-cta" onclick="submitCTA()">Lock In This Estimate →</button>
-      <div class="btn-cta-sub">We'll reach out within 2 hours during business hours (Mon–Fri, 7am–5pm).</div>
+      <div class="btn-cta-sub">Mon–Fri 7am–5pm: we call within minutes. After hours: we'll call first thing next business morning.</div>
 
       <button class="btn-secondary" onclick="startOver()">Start Over</button>
     </div>
@@ -1471,7 +1485,7 @@
     <div class="success-wrap">
       <div class="success-icon">✅</div>
       <div class="success-heading">You're all set, <span id="success-name">there</span>!</div>
-      <div class="success-body">We received your estimate request and will reach out within 2 hours during business hours to confirm your details and lock in your price.</div>
+      <div class="success-body" id="success-body">We received your estimate request and will reach out within 2 hours during business hours to confirm your details and lock in your price.</div>
       <div class="success-detail">
         <strong>What happens next:</strong><br />
         1. We review your tank details<br />
@@ -1978,25 +1992,21 @@ loadAirtableData();
 // ──────────────────────────────────────────────
 // NAVIGATION
 // ──────────────────────────────────────────────
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 2;
 
 function updateProgressSteps(step) {
   const n = typeof step === 'number' ? step : 99;
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 2; i++) {
     const dot = document.getElementById('dot-' + i);
     if (!dot) continue;
     dot.classList.remove('active', 'done');
     if (n === 99 || i < n) dot.classList.add('done');
     else if (i === n) dot.classList.add('active');
-    // update dot label to checkmark when done
     const num = document.getElementById('dot-num-' + i);
     if (num) num.textContent = (n === 99 || i < n) ? '✓' : i;
   }
-  // connectors: con-12, con-23, con-34, con-45
-  for (let i = 1; i <= 4; i++) {
-    const con = document.getElementById('con-' + i + '' + (i + 1));
-    if (con) con.classList.toggle('done', n === 99 || n > i);
-  }
+  const con12 = document.getElementById('con-12');
+  if (con12) con12.classList.toggle('done', n === 99 || n > 1);
 }
 
 function goToStep(n) {
@@ -2027,7 +2037,7 @@ function startOver() {
   document.getElementById('ri-note').classList.remove('visible');
   document.getElementById('ct-note').style.display = 'none';
   document.getElementById('city-wrap').style.display = 'none';
-  ['next-1','next-2','next-3','next-4','next-5'].forEach(id => {
+  ['next-1','next-2'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.disabled = true;
   });
@@ -2054,7 +2064,7 @@ function selectLocation(el) {
     exitReveal.classList.remove('visible');
     answers.exit = null;
   }
-  checkStep2Ready();
+  checkStep1Ready();
   updateEstimateBar();
 }
 
@@ -2063,23 +2073,25 @@ function selectExit(el) {
   document.querySelectorAll('#exit-cards .card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   answers.exit = el.dataset.value;
-  checkStep2Ready();
+  checkStep1Ready();
 }
 
-function checkStep2Ready() {
-  const ready = answers.location !== null &&
-    (answers.location !== 'basement' || answers.exit !== null);
-  document.getElementById('next-2').disabled = !ready;
+function checkStep1Ready() {
+  const ready = answers.size !== null &&
+    answers.location !== null &&
+    (answers.location !== 'basement' || answers.exit !== null) &&
+    answers.access !== null &&
+    answers.oil !== null;
+  document.getElementById('next-1').disabled = !ready;
 }
 
-// Generic card select for access + oil steps
+// Generic card select — all cards now live in screen-1
 function selectCard(el, type) {
-  const parent = el.closest('.cards, .cards-2col');
+  const parent = el.closest('.cards, .cards-2col, .cards-3col');
   parent.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   answers[type] = el.dataset.value;
-  const stepNum = el.closest('.screen').dataset.step;
-  document.getElementById('next-' + stepNum).disabled = false;
+  checkStep1Ready();
   updateEstimateBar();
 }
 
@@ -2096,7 +2108,7 @@ function selectState(el) {
   const riNote = document.getElementById('ri-note');
   const ctNote = document.getElementById('ct-note');
   const cityWrap = document.getElementById('city-wrap');
-  const next5 = document.getElementById('next-5');
+  const nextBtn = document.getElementById('next-2');
 
   // Reset all conditional UI first
   riNote.classList.remove('visible');
@@ -2108,20 +2120,26 @@ function selectState(el) {
     answers.permitFee = 0;
     answers.permitSource = 'none';
     answers.city = 'Rhode Island';
-    next5.disabled = false;
+    nextBtn.disabled = false;
   } else if (answers.state === 'CT') {
     ctNote.style.display = 'flex';
     answers.permitFee = 0;
     answers.permitSource = 'none';
-    answers.city = null; // city optional for CT
-    next5.disabled = false;
+    answers.city = null;
+    answers.cityRemovalFee = null;
+    // CT needs city for accurate pricing
+    cityWrap.style.display = 'block';
+    const cityInputCT = document.getElementById('city-input');
+    cityInputCT.value = '';
+    cityInputCT.classList.remove('has-value');
+    nextBtn.disabled = true;
   } else {
     // MA
     cityWrap.style.display = 'block';
     const cityInput = document.getElementById('city-input');
     cityInput.value = '';
     cityInput.classList.remove('has-value');
-    next5.disabled = true;
+    nextBtn.disabled = true;
   }
   updateEstimateBar();
 }
@@ -2135,7 +2153,7 @@ function onCityInput(input) {
   answers.city = null;
   answers.permitFee = null;
   answers.cityRemovalFee = null;
-  document.getElementById('next-5').disabled = true;
+  document.getElementById('next-2').disabled = true;
   input.classList.remove('has-value');
 
   if (val.length < 2) { list.classList.remove('open'); return; }
@@ -2146,26 +2164,13 @@ function onCityInput(input) {
   ).slice(0, 8);
 
   if (filtered.length === 0) {
-    // For CT, still allow any city typed (no permit needed)
-    if (answers.state === 'CT') {
-      answers.city = val;
-      answers.permitFee = 0;
-      answers.cityRemovalFee = null; // unknown CT city, no data
-      answers.permitSource = 'none';
-      input.classList.add('has-value');
-      document.getElementById('next-5').disabled = false;
-      list.classList.remove('open');
-      // Track unknown CT city in localStorage for future data
-      try {
-        const unknown = JSON.parse(localStorage.getItem('jps_unknown_cities') || '[]');
-        if (!unknown.includes(val)) { unknown.push(val); localStorage.setItem('jps_unknown_cities', JSON.stringify(unknown)); }
-      } catch(e) {}
-      return;
-    }
-    list.innerHTML = `<div class="autocomplete-item" onclick="selectCityManual('${val.replace(/'/g,"\\'")}')">
-      <span>${val}</span><span class="fee-hint">Permit fee confirmed at site</span>
+    // City not found — show error, block submission
+    list.innerHTML = `<div class="autocomplete-item autocomplete-error">
+      <span>We didn't find that town.</span>
+      <span class="fee-hint">Call <a href="tel:+14013893200" onclick="event.stopPropagation()">(401) 389-3200</a> for a quote</span>
     </div>`;
     list.classList.add('open');
+    document.getElementById('next-2').disabled = true;
     return;
   }
 
@@ -2187,7 +2192,7 @@ function selectCity(city, fee, removalFee) {
   input.value = city;
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
-  document.getElementById('next-5').disabled = false;
+  document.getElementById('next-2').disabled = false;
   updateEstimateBar();
 }
 
@@ -2200,7 +2205,7 @@ function selectCityManual(city) {
   input.value = city;
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
-  document.getElementById('next-5').disabled = false;
+  document.getElementById('next-2').disabled = false;
   updateEstimateBar();
 }
 
