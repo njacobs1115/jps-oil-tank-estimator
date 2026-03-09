@@ -1097,11 +1097,24 @@
       color: var(--muted); margin-bottom: 8px;
     }
     /* Compact 3-col layout for exit type — keeps everything in viewport */
+    /* Location cards minimize when basement selected */
+    #location-cards { transition: gap 0.2s ease; }
+    #location-cards.location-minimized { gap: 4px; }
+    #location-cards.location-minimized .card {
+      padding: 6px 14px;
+      min-height: 0;
+      transition: padding 0.2s ease, min-height 0.2s ease;
+    }
+    #location-cards.location-minimized .card-sub { display: none; }
+    #location-cards.location-minimized .card-icon { display: none; }
+    #location-cards.location-minimized .card-label { font-size: 13px; }
+
     #exit-cards {
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
+    #exit-cards .card { padding: 9px 14px; min-height: 48px; }
     #oil-cards { gap: 7px; }
     #oil-cards .card { padding: 9px 14px; min-height: 48px; }
     @keyframes fadeDown {
@@ -2263,14 +2276,14 @@ function selectLocation(el) {
   answers.location = el.dataset.value;
 
   const exitReveal = document.getElementById('exit-reveal');
-  const garageCard = document.getElementById('garage-card');
+  const locationCards = document.getElementById('location-cards');
   if (answers.location === 'basement') {
-    garageCard.style.display = 'none';
+    locationCards.classList.add('location-minimized');
     exitReveal.classList.add('visible');
     answers.exit = null;
     document.querySelectorAll('#exit-cards .card').forEach(c => c.classList.remove('selected'));
   } else {
-    garageCard.style.display = '';
+    locationCards.classList.remove('location-minimized');
     exitReveal.classList.remove('visible');
     answers.exit = null;
   }
