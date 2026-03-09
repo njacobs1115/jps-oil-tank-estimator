@@ -6,7 +6,42 @@
 
 ---
 
-## What This Is
+## The Vision — Read This First
+
+**The goal: eliminate the callback entirely.**
+
+Right now a homeowner finds JPS, calls or fills out a form, and waits. Someone calls them back, walks through the job, quotes a price, and tries to schedule. That's 2–3 touchpoints before a job is confirmed. Every touchpoint is a conversion risk — they shop around, don't pick up, lose interest.
+
+The vision is a fully self-serve funnel:
+
+```
+Customer answers 5 questions
+    ↓
+They see their exact price — itemized, transparent, no surprises
+    ↓
+They enter their contact info
+    ↓
+They see 3 available appointment dates and pick one
+    ↓
+Job confirmed. No callback needed.
+```
+
+The estimator (this repo) handles steps 1–3. The Route Optimizer (separate repo) handles step 4. Together they form one seamless funnel. **These two tools are designed to work as a unit — do not build one without understanding the other.**
+
+### Why It Works
+- Customers are most likely to book at the moment they see a price they can live with. In-session booking captures that moment. A callback 20 minutes later does not.
+- All job variables (tank size, oil level, access difficulty, city) are captured upfront — no surprises at the job site, no upsell awkwardness.
+- The Route Optimizer already knows capacity (3 jobs/day max) and geography. With oil constraints added, it can filter slots automatically — no human has to eyeball the calendar.
+- High-ticket service = high-anxiety customer. A clean, transparent, self-serve experience signals professionalism and builds trust before anyone picks up the phone.
+
+### Related Repo
+**Route Optimizer:** https://github.com/njacobs1115/Route-Optimizer-JPS
+Live at: `route-optimizer-jps.onrender.com`
+This is the slot-finding and booking engine. Phase 2 requires both repos to talk to each other.
+
+---
+
+## What This Is (Technical)
 
 A single-file HTML/CSS/JS lead capture and pricing tool for residential oil tank removal in RI, MA, and CT. Homeowners answer 5 questions, get an itemized price estimate, and submit their contact info. No backend, no framework, no build step — just one `index.html` deployed via GitHub Pages.
 
