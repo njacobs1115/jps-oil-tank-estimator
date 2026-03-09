@@ -1115,8 +1115,83 @@
       gap: 8px;
     }
     #exit-cards .card { padding: 9px 14px; min-height: 48px; }
-    #oil-cards { gap: 7px; }
-    #oil-cards .card { padding: 9px 14px; min-height: 48px; }
+    /* Oil level — 2x2 tile grid */
+    .oil-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .oil-tile {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 22px 12px 18px;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      text-align: center;
+      transition: border-color var(--transition), background var(--transition), box-shadow var(--transition), transform var(--transition);
+      box-shadow: var(--shadow-sm);
+      gap: 8px;
+      min-height: 90px;
+    }
+    .oil-tile:hover {
+      border-color: #86efac;
+      background: var(--brand-light);
+      box-shadow: 0 0 0 3px #bbf7d0;
+      transform: translateY(-1px);
+    }
+    .oil-tile.selected {
+      border-color: var(--brand);
+      background: var(--brand-light);
+      box-shadow: 0 0 0 3px #bbf7d0;
+    }
+    .oil-tile-label {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .oil-tile.selected .oil-tile-label { color: var(--brand); }
+    .oil-tile-badge {
+      font-size: 10px;
+      font-weight: 700;
+      background: var(--navy);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 99px;
+      letter-spacing: 0.3px;
+    }
+    .oil-tile.selected .oil-tile-badge { background: var(--brand); }
+    .oil-tile-check {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--bg);
+      transition: all var(--transition);
+    }
+    .oil-tile.selected .oil-tile-check {
+      background: var(--brand);
+      border-color: var(--brand);
+    }
+    .oil-tile.selected .oil-tile-check::after {
+      content: '';
+      display: block;
+      width: 4px;
+      height: 8px;
+      border: 2px solid #fff;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg) translate(2px, -1px);
+      margin: auto;
+    }
     @keyframes fadeDown {
       from { opacity: 0; transform: translateY(-6px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -1445,40 +1520,24 @@
       <h1>How much oil is in the tank?</h1>
       <p>Up to 50 gallons is covered in your flat rate. More than half full? We add a flat $150 — that's it. We never charge by the gallon.</p>
     </div>
-    <div class="cards" id="oil-cards">
-      <button class="card" data-value="empty" onclick="selectCard(this,'oil')">
-        <span class="card-icon">💨</span>
-        <div class="card-body">
-          <div class="card-label">Empty</div>
-          <div class="card-sub">Disposal fully covered — nothing extra</div>
-        </div>
-        <span class="card-badge">Included</span>
-        <span class="card-check"></span>
+    <div class="oil-grid" id="oil-cards">
+      <button class="oil-tile" data-value="empty" onclick="selectCard(this,'oil')">
+        <span class="oil-tile-check"></span>
+        <div class="oil-tile-label">Empty</div>
+        <span class="oil-tile-badge">Included</span>
       </button>
-      <button class="card" data-value="quarter" onclick="selectCard(this,'oil')">
-        <span class="card-icon">🟡</span>
-        <div class="card-body">
-          <div class="card-label">¼ or less</div>
-          <div class="card-sub">Covered in your flat rate — no extra charge</div>
-        </div>
-        <span class="card-badge">Included</span>
-        <span class="card-check"></span>
+      <button class="oil-tile" data-value="quarter" onclick="selectCard(this,'oil')">
+        <span class="oil-tile-check"></span>
+        <div class="oil-tile-label">¼ or less</div>
+        <span class="oil-tile-badge">Included</span>
       </button>
-      <button class="card" data-value="half_plus" onclick="selectCard(this,'oil')">
-        <span class="card-icon">🔴</span>
-        <div class="card-body">
-          <div class="card-label">More than ½</div>
-          <div class="card-sub">Flat $150 excess disposal fee — never charged by the gallon</div>
-        </div>
-        <span class="card-check"></span>
+      <button class="oil-tile" data-value="half_plus" onclick="selectCard(this,'oil')">
+        <span class="oil-tile-check"></span>
+        <div class="oil-tile-label">More than ½</div>
       </button>
-      <button class="card" data-value="no_gauge" onclick="selectCard(this,'oil')">
-        <span class="card-icon">❓</span>
-        <div class="card-body">
-          <div class="card-label">I don't know</div>
-          <div class="card-sub">A photo is all we need</div>
-        </div>
-        <span class="card-check"></span>
+      <button class="oil-tile" data-value="no_gauge" onclick="selectCard(this,'oil')">
+        <span class="oil-tile-check"></span>
+        <div class="oil-tile-label">I don't know</div>
       </button>
     </div>
     <div class="nav-row">
@@ -2308,7 +2367,7 @@ function checkStep1Ready() {
 // Generic card select — enables the next button for the current step
 function selectCard(el, type) {
   const screen = el.closest('.screen');
-  screen.querySelectorAll('.cards .card').forEach(c => c.classList.remove('selected'));
+  screen.querySelectorAll('.cards .card, .oil-tile').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   answers[type] = el.dataset.value;
   const stepNum = screen.dataset.step;
