@@ -2332,8 +2332,8 @@ function updateEstimateBar() {
   const noteEl = document.getElementById('estimate-bar-note');
 
   if (isRestricted) {
-    amountEl.textContent = '$' + low.toLocaleString() + '–$' + high.toLocaleString() + '+';
-    noteEl.textContent = 'Restricted access — confirmed on-site';
+    amountEl.textContent = 'from $' + low.toLocaleString();
+    noteEl.textContent = 'Access surcharge confirmed when we connect';
   } else if (answers.state === 'MA' && !answers.city) {
     amountEl.textContent = 'from $600+';
     noteEl.textContent = 'Select your city for exact price';
@@ -2368,8 +2368,8 @@ function computePricing() {
 
   const isFallbackCity = answers.permitSource === 'tbd';
   if (isRestricted) {
-    totalEl.textContent = '$' + lowTotal.toLocaleString();
-    rangeEl.textContent = 'Up to $' + highTotal.toLocaleString() + ' depending on access — confirmed when we connect';
+    totalEl.textContent = 'from $' + lowTotal.toLocaleString();
+    rangeEl.textContent = 'Access surcharge confirmed when we connect — photo helps';
   } else if (isFallbackCity && answers.state === 'MA') {
     totalEl.textContent = '$' + (BASE + oilFee);
     rangeEl.textContent = '+ permit fee — confirmed when we connect';
@@ -2397,7 +2397,8 @@ function computePricing() {
   const accessLine = document.getElementById('access-line');
   if (isRestricted) {
     accessLine.style.display = 'flex';
-    document.getElementById('access-fee-display').textContent = '+$600+';
+    document.getElementById('access-fee-display').textContent = 'TBD';
+    document.querySelector('#access-line .invoice-row-sub').textContent = 'A photo of the area helps us confirm — we\'ll sort this on the call';
   } else {
     accessLine.style.display = 'none';
   }
