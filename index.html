@@ -1825,6 +1825,7 @@
 // GHL WEBHOOK — swap in real URL before launch
 // ──────────────────────────────────────────────
 const GHL_WEBHOOK_URL = 'https://hook.us1.make.com/n9xtdy5aok4e62wpat9gydco3lef9b26';
+const CITY_REPORT_WEBHOOK_URL = 'https://hook.us1.make.com/ajqn2t5aqwg12h1wqvg52q5et2540fhb';
 
 // ──────────────────────────────────────────────
 // STATE
@@ -2843,6 +2844,60 @@ function setVh() {
 }
 setVh();
 window.addEventListener('resize', setVh);
+
+// ──────────────────────────────────────────────
+// WEEKLY CITY REPORT SYNC
+// ──────────────────────────────────────────────
+function syncCityReport() {
+  try {
+    if (!CITY_REPORT_WEBHOOK_URL || CITY_REPORT_WEBHOOK_URL === 'PASTE_CITY_REPORT_WEBHOOK_URL_HERE') return;
+
+    const log = JSON.parse(localStorage.getItem('jps_city_log') || '[]');
+    if (log.length === 0) return;
+
+    const lastSync = localStorage.getItem('jps_city_log_last_sync');
+    const syncDate = lastSync ? new Date(lastSync) : null;
+    const now = new Date();
+
+    // Only sync once per 7 days
+    if (syncDate && (now - syncDate) < 7 * 24 * 60 * 60 * 1000) return;
+
+    // Aggregate entries: group by city|state
+    const map = {};
+    log.forEach(function(e) {
+      const key = (e.city || '') + '|' + (e.state || '');
+      if (!map[key]) map[key] = { city: e.city, state: e.state, count: 0, matched: 0, fallback: 0, manual: 0 };
+      map[key].count++;
+      if (e.source === 'matched') map[key].matched++;
+      else if (e.source === 'fallback') map[key].fallback++;
+      else if (e.source === 'manual') map[key].manual++;
+    });
+
+    // Sort by count descending
+    const cities = Object.values(map).sort(function(a, b) { return b.count - a.count; });
+
+    const payload = {
+      type: 'city_report',
+      period_start: syncDate ? syncDate.toISOString() : log[0].ts,
+      period_end: now.toISOString(),
+      total_selections: log.length,
+      unique_cities: cities.length,
+      cities: cities
+    };
+
+    fetch(CITY_REPORT_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function() {
+      localStorage.setItem('jps_city_log_last_sync', now.toISOString());
+      localStorage.setItem('jps_city_log', '[]');
+    }).catch(function() {
+      // Silent fail — will retry next page load after 7 days
+    });
+  } catch(e) {}
+}
+syncCityReport();
 
 // Initialize
 updateProgressSteps(1);
