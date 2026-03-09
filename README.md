@@ -15,7 +15,7 @@ Right now a homeowner finds JPS, calls or fills out a form, and waits. Someone c
 The vision is a fully self-serve funnel:
 
 ```
-Customer answers 5 questions
+Customer answers 4 questions
     ↓
 They see their exact price — itemized, transparent, no surprises
     ↓
@@ -43,7 +43,7 @@ This is the slot-finding and booking engine. Phase 2 requires both repos to talk
 
 ## What This Is (Technical)
 
-A single-file HTML/CSS/JS lead capture and pricing tool for residential oil tank removal in RI, MA, and CT. Homeowners answer 5 questions, get an itemized price estimate, and submit their contact info. No backend, no framework, no build step — just one `index.html` deployed via GitHub Pages.
+A single-file HTML/CSS/JS lead capture and pricing tool for residential oil tank removal in RI, MA, and CT. Homeowners answer 4 questions, get an itemized price estimate, and submit their contact info. No backend, no framework, no build step — just one `index.html` deployed via GitHub Pages.
 
 **This is Phase 1.** The end goal (Phase 2) is that after submitting their info, the customer sees available appointment dates and books on the spot — no callback needed. See the Phase 2 section below before touching anything.
 
@@ -51,12 +51,11 @@ A single-file HTML/CSS/JS lead capture and pricing tool for residential oil tank
 
 ## Phase 1 — Current State (LIVE)
 
-### The 5-Step Wizard
-1. **Tank size** — 275 gal / 330 gal / Not sure
-2. **Location + exit type** — Basement (with sub-question: Walkout / Bulkhead / Stairs) / Garage / Outside
-3. **Access** — Clear / Unsure / Restricted
-4. **Oil level** — Empty / ¼ or less / More than ½ / No gauge
-5. **State & City** — RI (no city needed), MA (city autocomplete), CT (city autocomplete). City input displays with state abbreviation (e.g. "Thompson, CT")
+### The 4-Step Wizard
+1. **Location + exit type** — Basement (with sub-question: Walkout / Bulkhead / Stairs) / Garage / Outside
+2. **Access** — Clear / Unsure / Restricted
+3. **Oil level** — Empty / ¼ or less / More than ½ / No gauge
+4. **State & City** — RI (no city needed), MA (city autocomplete), CT (city autocomplete). City input displays with state abbreviation (e.g. "Thompson, CT")
 
 → **Results screen** — itemized invoice with live price
 → **CTA form** — name, phone, email, notes
@@ -74,26 +73,146 @@ A single-file HTML/CSS/JS lead capture and pricing tool for residential oil tank
 | Unknown city | Soft fallback — state default price, logged to localStorage as `jps_unknown_cities` |
 
 ### City Data
-All 373 MA cities and 70 CT cities are hardcoded into a `cityData` array inside `index.html`. No runtime Airtable API calls — instant load. If pricing changes, re-run `build-citydata.js` to regenerate the array and paste it back in.
+All 373 MA cities and 70 CT cities are hardcoded into a `cityData` array inside `index.html`. No runtime Airtable API calls — instant load. If pricing changes, regenerate the array from Airtable and paste it back in.
 
 - MA entries: `{ city, state: "MA", removal_fee, permit_fee }`
 - CT entries: `{ city, state: "CT", removal_fee }` (no permit)
 - Source: Airtable base `appUscw3WgCDWkRt9` — MA table `tblJFQSsGfEuLmZc5`, CT table `tblXgn86E0R7hAZqz`
 
-### Make Webhook (LIVE)
+---
+
+## Webhooks & Integrations
+
+### Make Webhook — Lead Submission (LIVE)
 On form submit, a POST fires to a Make (formerly Integromat) webhook (`GHL_WEBHOOK_URL` constant near line 1827 of `index.html`). This is connected and live — leads flow into Make for routing to GHL and any other automations.
 
 Payload fields:
 ```
 name, phone, email, note,
 tank_size, location_type, exit_type, access_type, oil_level,
-excess_oil_fee, state, city,
-base_removal_fee, estimated_total_low, estimated_total_high,
-permit_fee, restricted_access, stair_removal,
-source: "estimator_tool"
+base_removal_fee, excess_oil_fee, permit_fee,
+estimated_total_low, estimated_total_high,
+restricted_access, stair_removal,
+state, city,
+source: "estimator_tool",
+
+// Attribution / UTM (see section below)
+utm_source, utm_medium, utm_campaign, utm_term, utm_content,
+gclid, gad_source, fbclid, msclkid,
+landing_page, landing_page_full, referrer
 ```
 
 All job variables are intentionally included — Phase 2 needs them.
+
+### Make Webhook — Weekly City Report
+A second webhook fires once per 7 days on page load. It aggregates city selections from `localStorage` and sends a summary report. Useful for spotting unknown cities and regional demand patterns.
+
+---
+
+## UTM & Attribution Tracking
+
+Full-funnel attribution is captured automatically on page load and included in every webhook payload.
+
+### Tracked Parameters
+
+| Category | Parameters |
+|---|---|
+| Standard UTM | `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content` |
+| Google Ads | `gclid`, `gad_source` |
+| Facebook / Meta | `fbclid` |
+| Microsoft Ads | `msclkid` |
+| Page context | `landing_page` (URL without query), `landing_page_full` (complete URL), `referrer`, `timestamp` |
+
+### How It Works
+1. On page load, all URL query params are read via `URLSearchParams`
+2. Values are stored in `sessionStorage` under `jps_attribution` so they survive in-page navigation
+3. If a visitor arrives with new query params, they overwrite any previously stored values
+4. `landing_page`, `landing_page_full`, `referrer`, and `timestamp` are always captured — even without UTM params
+5. On form submit, all attribution fields are merged into the webhook payload
+
+### Testing Attribution Locally
+
+Paste this in your browser console while on the estimator page to simulate a Google Ads click:
+
+```js
+window.location.search = '?utm_source=google&utm_medium=cpc&utm_campaign=spring_test&utm_term=oil+tank+removal&utm_content=ad_v2&gclid=test_gclid_123&fbclid=test_fb_456';
+```
+
+The page reloads with UTM params in the URL — exactly like a real visitor clicking an ad. Fill out the estimator normally and submit. Check the Make execution log and GHL contact — you should see all normal lead data plus the UTM/attribution fields.
+
+---
+
+## Key Functions Reference
+
+| Function | Purpose |
+|---|---|
+| `startEstimator()` | Show quiz, hide intro screen |
+| `goToStep(n)` | Navigate between wizard screens 1–4 |
+| `selectLocation(el)` | Basement/Garage/Outside selection; shows exit sub-question if basement |
+| `selectCard(el, type)` | Generic card selection (access, oil) |
+| `selectState(el)` | State selection; conditionally shows city input |
+| `onCityInput(input)` | City autocomplete from `cityData` array |
+| `selectCity(city, fee, removalFee)` | Confirm matched city, lock in pricing |
+| `selectCityFallback(city)` | Fallback for unknown city; uses state-level pricing |
+| `computePricing()` | Calculate total and display itemized invoice |
+| `updateEstimateBar()` | Update floating price bar at bottom |
+| `submitCTA()` | Validate form, build payload, fire webhook |
+| `showSuccess(name)` | Show success screen with time-aware message |
+| `syncCityReport()` | Weekly city selection report via webhook |
+
+---
+
+## localStorage / sessionStorage Keys
+
+| Key | Storage | Purpose |
+|---|---|---|
+| `jps_city_log` | localStorage | Array of city selections with timestamps (up to 500 entries) |
+| `jps_unknown_cities` | localStorage | Set of unrecognized city:state combos |
+| `jps_city_log_last_sync` | localStorage | Timestamp of last weekly city report sync |
+| `jps_attribution` | sessionStorage | UTM + landing page + referrer data for current session |
+
+---
+
+## Dev Mode & Debugging
+
+- If `GHL_WEBHOOK_URL` is not set or is `'PASTE_GHL_WEBHOOK_URL_HERE'`, form submission skips the webhook and logs the full payload to the browser console
+- All key events log to console with `[Estimator]` prefix
+- Form submission payload is logged: `console.log('[Estimator] Submitting to GHL:', payload)`
+- Webhook errors are caught and logged; the success screen still shows (graceful degradation)
+
+---
+
+## Tech Stack
+
+| Layer | What | Where |
+|---|---|---|
+| Estimator | Single HTML file | GitHub Pages (this repo) |
+| City pricing data | Hardcoded array in index.html | Rebuilt from Airtable when prices change |
+| Lead capture | Make webhook → GHL | Make scenario receives form submissions, routes to GHL |
+| Slot logic + booking | Route Optimizer backend | Render — `route-optimizer-jps.onrender.com` |
+| CRM + automations | GoHighLevel | GHL |
+| Job/pricing data source | Airtable | Base `appUscw3WgCDWkRt9` |
+
+---
+
+## Files in This Repo
+
+| File | Purpose |
+|---|---|
+| `index.html` | The entire estimator app — HTML, CSS, and JS in one file |
+| `README.md` | This documentation |
+
+---
+
+## Deployment
+
+GitHub Pages auto-deploys from the `master` branch. Push to master → live in ~1 minute.
+
+```bash
+git add index.html
+git commit -m "description of change"
+git push origin master
+```
 
 ---
 
@@ -140,7 +259,7 @@ The Route Optimizer currently does geographic clustering and capacity checks (3 
 | `access_type: "restricted"` | Adds longer time buffer per slot |
 | `tank_size: "330"` | Heavier job — affects crew capacity |
 
-These variables are already being sent in the GHL payload from the estimator. The Route Optimizer just needs to read them.
+These variables are already being sent in the webhook payload from the estimator. The Route Optimizer just needs to read them.
 
 ### Customer-Facing UI Principles
 The internal Route Optimizer UI is data-heavy — that's correct for Norman/VA use. The customer-facing booking UI must be the opposite:
@@ -154,50 +273,14 @@ Suggested toggle: `?mode=customer` vs `?mode=internal` on the Route Optimizer UR
 
 ---
 
-## Tech Stack
-
-| Layer | What | Where |
-|---|---|---|
-| Estimator | Single HTML file | GitHub Pages (this repo) |
-| City pricing data | Hardcoded array in index.html | Rebuilt from Airtable when prices change |
-| Lead capture | Make webhook → GHL | Make scenario receives form submissions, routes to GHL |
-| Slot logic + booking | Route Optimizer backend | Render — `route-optimizer-jps.onrender.com` |
-| CRM + automations | GoHighLevel | GHL |
-| Job/pricing data source | Airtable | Base `appUscw3WgCDWkRt9` |
-
----
-
-## Files in This Repo
-
-| File | Purpose |
-|---|---|
-| `index.html` | The entire estimator app — HTML, CSS, and JS in one file |
-| `build-citydata.js` | Node script to regenerate `cityData` array from Airtable export |
-| `citydata-output.js` | Generated city array output (paste contents into index.html) |
-| `patch2.js`, `patch3.js` | One-time patch scripts — already applied, kept for reference |
-
----
-
-## Deployment
-
-GitHub Pages auto-deploys from the `master` branch. Push to master → live in ~1 minute.
-
-```bash
-export PATH="$PATH:/c/Program Files/GitHub CLI"
-git add index.html
-git commit -m "description of change"
-git push origin master
-```
-
----
-
 ## Open Items Before Phase 2 Can Start
 
 1. ~~**Webhook URL**~~ — **DONE.** Make webhook connected and firing on form submit
-2. **Route Optimizer oil constraints** — must be implemented and tested before customer-facing booking UI is built
-3. **Route Optimizer backend endpoint** — new POST endpoint needed that creates GHL contact + returns available slots in one call
-4. **Copy/messaging polish** — Norman is handling the wording throughout the estimator
-5. **Embed on removemyoiltank.com/estimate** — currently standalone on GitHub Pages
+2. ~~**UTM / Attribution tracking**~~ — **DONE.** Full UTM, gclid, fbclid, msclkid, landing page, and referrer tracking live
+3. **Route Optimizer oil constraints** — must be implemented and tested before customer-facing booking UI is built
+4. **Route Optimizer backend endpoint** — new POST endpoint needed that creates GHL contact + returns available slots in one call
+5. **Copy/messaging polish** — Norman is handling the wording throughout the estimator
+6. **Embed on removemyoiltank.com/estimate** — currently standalone on GitHub Pages
 
 ---
 
