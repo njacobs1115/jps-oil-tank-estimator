@@ -1097,18 +1097,6 @@
       color: var(--muted); margin-bottom: 8px;
     }
     /* Compact 3-col layout for exit type — keeps everything in viewport */
-    /* Card with photo thumbnail */
-    .card-with-photo { gap: 10px; }
-    .card-photo {
-      width: 64px;
-      height: 56px;
-      object-fit: cover;
-      border-radius: 8px;
-      flex-shrink: 0;
-      border: 1px solid var(--border);
-    }
-    #location-cards.location-minimized .card-photo { display: none; }
-
     /* Location cards minimize when basement selected */
     #location-cards { transition: gap 0.2s ease; }
     #location-cards.location-minimized { gap: 4px; }
@@ -1421,12 +1409,12 @@
       <p>There is no wrong answer here.</p>
     </div>
     <div class="cards" id="location-cards">
-      <button class="card card-with-photo" data-value="basement" onclick="selectLocation(this)">
+      <button class="card" data-value="basement" onclick="selectLocation(this)">
+        <span class="card-icon">🏠</span>
         <div class="card-body">
           <div class="card-label">Basement</div>
           <div class="card-sub">Inside the home, below ground level</div>
         </div>
-        <img class="card-photo" src="basement-tank.webp" alt="Oil tank in basement" />
         <span class="card-check"></span>
       </button>
       <button class="card" id="garage-card" data-value="garage" onclick="selectLocation(this)">
@@ -1530,7 +1518,7 @@
   <div class="screen" id="screen-3" data-step="3">
     <div class="step-heading">
       <h1>How much oil is in the tank?</h1>
-      <p>Up to 50 gallons is covered in your flat rate. More than half full? We add a flat $150 — that's it. We never charge by the gallon.</p>
+      <p>What does the gauge on the tank read?</p>
     </div>
     <div class="oil-grid" id="oil-cards">
       <button class="oil-tile" data-value="quarter" onclick="selectCard(this,'oil')">
