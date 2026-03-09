@@ -123,6 +123,114 @@
       transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    /* ─── INTRO SCREEN ─── */
+    .intro-screen {
+      width: 100%;
+      max-width: 560px;
+      padding: 0 16px 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .intro-screen.hidden { display: none; }
+
+    .intro-hero {
+      background: var(--navy);
+      border-radius: 0 0 24px 24px;
+      padding: 32px 24px 36px;
+      text-align: center;
+      color: #fff;
+    }
+    .intro-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--brand);
+      margin-bottom: 14px;
+    }
+    .intro-headline {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.18;
+      letter-spacing: -0.6px;
+      color: #fff;
+      margin-bottom: 14px;
+    }
+    .intro-sub {
+      font-size: 15px;
+      line-height: 1.65;
+      color: rgba(255,255,255,.65);
+      margin-bottom: 28px;
+    }
+    .intro-trust-pills {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .intro-pill {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 99px;
+      padding: 5px 13px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,.85);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .intro-pill .pill-icon { color: var(--brand); font-size: 12px; }
+    .btn-intro-start {
+      width: 100%;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 18px 24px;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: -0.2px;
+      transition: background var(--transition), transform var(--transition);
+      box-shadow: 0 4px 20px rgba(22,163,74,.35);
+    }
+    .btn-intro-start:hover { background: #15803d; }
+    .btn-intro-start:active { transform: scale(0.98); }
+    .intro-start-sub {
+      margin-top: 10px;
+      font-size: 12px;
+      color: rgba(255,255,255,.4);
+    }
+
+    .intro-checklist {
+      background: #fff;
+      border-radius: 16px;
+      margin-top: 16px;
+      padding: 20px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: var(--shadow);
+    }
+    .intro-check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-mid);
+    }
+    .intro-check-icon {
+      color: var(--brand);
+      font-size: 15px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      font-weight: 700;
+    }
+
     /* ─── LAYOUT SHELL ─── */
     .shell {
       width: 100%;
@@ -1123,8 +1231,44 @@
   </div>
 </header>
 
-<!-- Progress dot indicators -->
-<div class="progress-steps">
+<!-- ══════════════════════════════════════
+     INTRO SCREEN — shown before step 1
+══════════════════════════════════════ -->
+<div class="intro-screen" id="intro-screen">
+  <div class="intro-hero">
+    <div class="intro-eyebrow">Free Instant Estimate</div>
+    <h1 class="intro-headline">Find out exactly what your oil tank removal costs.</h1>
+    <p class="intro-sub">5 quick questions. Real itemized price — not a ballpark. No phone call required to get your number.</p>
+    <div class="intro-trust-pills">
+      <div class="intro-pill"><span class="pill-icon">★</span> 400+ Five-Star Reviews</div>
+      <div class="intro-pill"><span class="pill-icon">✓</span> Licensed RI · MA · CT</div>
+      <div class="intro-pill"><span class="pill-icon">✓</span> Since 2013</div>
+    </div>
+    <button class="btn-intro-start" onclick="startEstimator()">Get My Price →</button>
+    <div class="intro-start-sub">Takes about 60 seconds &nbsp;·&nbsp; No email required</div>
+  </div>
+  <div class="intro-checklist">
+    <div class="intro-check-item">
+      <span class="intro-check-icon">✓</span>
+      <span><strong>Flat rate pricing.</strong> One price covers permits, oil pumping, cutting, haul-off, and cleanup. Nothing added at the door.</span>
+    </div>
+    <div class="intro-check-item">
+      <span class="intro-check-icon">✓</span>
+      <span><strong>You don't pay until it's done.</strong> No deposit, no commitment until the tank is out.</span>
+    </div>
+    <div class="intro-check-item">
+      <span class="intro-check-icon">✓</span>
+      <span><strong>We handle every permit.</strong> You sign nothing, file nothing, chase nothing.</span>
+    </div>
+    <div class="intro-check-item">
+      <span class="intro-check-icon">✓</span>
+      <span><strong>Most jobs scheduled within the week.</strong> We move fast — especially when you have a closing deadline.</span>
+    </div>
+  </div>
+</div>
+
+<!-- Progress dot indicators — hidden on intro screen -->
+<div class="progress-steps" id="progress-steps" style="display:none;">
   <div class="progress-step active" id="dot-1">
     <div class="step-dot" id="dot-num-1">1</div>
     <div class="step-label">Size</div>
@@ -1151,7 +1295,7 @@
   </div>
 </div>
 
-<div class="shell">
+<div class="shell" id="quiz-shell" style="display:none;">
 
   <!-- ══════════════════════════════════════
        STEP 1 — TANK SIZE
@@ -2120,7 +2264,14 @@ function startOver() {
     if (el) el.disabled = true;
   });
   document.getElementById('estimate-bar').classList.remove('visible');
-  goToStep(1);
+  // Return to intro screen
+  document.getElementById('intro-screen').classList.remove('hidden');
+  document.getElementById('progress-steps').style.display = 'none';
+  document.getElementById('quiz-shell').style.display = 'none';
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-1').classList.add('active');
+  updateProgressSteps(1);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ──────────────────────────────────────────────
@@ -2560,6 +2711,16 @@ function showSuccess(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-success').classList.add('active');
   updateProgressSteps(99);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ──────────────────────────────────────────────
+// INTRO → QUIZ TRANSITION
+// ──────────────────────────────────────────────
+function startEstimator() {
+  document.getElementById('intro-screen').classList.add('hidden');
+  document.getElementById('progress-steps').style.display = 'flex';
+  document.getElementById('quiz-shell').style.display = '';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
