@@ -971,6 +971,68 @@
     }
 
     /* ─── RESPONSIVE ─── */
+
+    /* Desktop — bigger text for older readers */
+    @media (min-width: 640px) {
+      .step-heading h1 { font-size: 30px; }
+      .step-heading p  { font-size: 16px; }
+      .card-label      { font-size: 17px; }
+      .card-sub        { font-size: 14px; }
+      .card            { padding: 18px 22px; min-height: 72px; }
+      .btn-next, .btn-back { font-size: 16px; padding: 14px 28px; }
+      .cta-heading     { font-size: 22px; }
+      .cta-sub         { font-size: 16px; }
+      .btn-cta         { font-size: 18px; padding: 18px; }
+      label            { font-size: 15px; }
+      input, textarea  { font-size: 16px; }
+    }
+
+    /* Mobile — no-scroll on quiz steps, intro above fold */
+    @media (max-width: 639px) {
+      /* Intro: compact so both cards fit above fold */
+      .intro-hero      { padding: 22px 18px 24px; }
+      .intro-headline  { font-size: 22px; margin-bottom: 10px; }
+      .intro-sub       { font-size: 13px; margin-bottom: 18px; line-height: 1.5; }
+      .intro-trust-pills { margin-bottom: 18px; gap: 6px; }
+      .intro-pill      { font-size: 11px; padding: 4px 10px; }
+      .btn-intro-start { font-size: 16px; padding: 15px 20px; }
+      .intro-start-sub { font-size: 11px; margin-top: 8px; }
+      .intro-checklist { padding: 14px 16px; gap: 9px; margin-top: 10px; }
+      .intro-check-item { font-size: 12px; gap: 8px; }
+      .intro-check-icon { font-size: 13px; }
+
+      /* Quiz shell: fill remaining viewport, no scroll on steps */
+      .shell {
+        padding: 16px 14px 90px;
+        height: calc(var(--vh, 1vh) * 100 - 118px);
+        overflow: hidden;
+      }
+      /* Results screen gets scroll back */
+      .shell.results-mode {
+        height: auto;
+        overflow-y: auto;
+        min-height: calc(var(--vh, 1vh) * 100 - 118px);
+      }
+      /* Step layout: fill shell height, nav pinned to bottom */
+      .screen.active {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      .cards { flex: 1; justify-content: center; }
+
+      /* Tighter cards on mobile so 3 fit without scrolling */
+      .card            { padding: 11px 14px; min-height: 54px; gap: 10px; }
+      .card-label      { font-size: 14px; }
+      .card-sub        { font-size: 12px; }
+      .cards           { gap: 8px; }
+      .step-heading    { margin-bottom: 10px; }
+      .step-heading h1 { font-size: 21px; margin-bottom: 5px; }
+      .step-heading p  { font-size: 13px; line-height: 1.45; }
+      .nav-row         { margin-top: 10px; }
+      .card-icon       { width: 32px; height: 32px; font-size: 18px; }
+    }
+
     @media (max-width: 420px) {
       .results-hero .total-amount { font-size: 56px; }
       .site-header .header-wordmark { display: none; }
@@ -2234,6 +2296,7 @@ function updateProgressSteps(step) {
 function goToStep(n) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + n).classList.add('active');
+  document.getElementById('quiz-shell').classList.remove('results-mode');
   updateProgressSteps(n);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -2244,6 +2307,7 @@ function showResults() {
   computePricing();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-results').classList.add('active');
+  document.getElementById('quiz-shell').classList.add('results-mode');
   updateProgressSteps(99);
   document.getElementById('estimate-bar').classList.remove('visible');
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2723,6 +2787,15 @@ function startEstimator() {
   document.getElementById('quiz-shell').style.display = '';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+// ──────────────────────────────────────────────
+// VIEWPORT HEIGHT FIX (iOS Safari includes browser chrome in vh)
+// ──────────────────────────────────────────────
+function setVh() {
+  document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+}
+setVh();
+window.addEventListener('resize', setVh);
 
 // Initialize
 updateProgressSteps(1);
