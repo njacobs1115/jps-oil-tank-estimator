@@ -1082,6 +1082,22 @@
     .step-connector.done { background: rgba(22,163,74,.4); }
 
     /* ─── EXIT REVEAL ─── */
+    /* Garage card collapses when basement selected */
+    #garage-card {
+      overflow: hidden;
+      max-height: 100px;
+      transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+      opacity: 1;
+    }
+    #garage-card.collapsed {
+      max-height: 0;
+      opacity: 0;
+      margin: 0;
+      padding: 0;
+      border: none;
+      pointer-events: none;
+    }
+
     .exit-reveal {
       display: none;
       margin-top: 12px;
@@ -1097,26 +1113,10 @@
     }
     /* Compact 3-col layout for exit type — keeps everything in viewport */
     #exit-cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      display: flex;
+      flex-direction: column;
       gap: 8px;
     }
-    #exit-cards .card {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 10px 6px;
-      min-height: unset;
-      gap: 4px;
-    }
-    #exit-cards .card .card-icon {
-      font-size: 20px;
-      width: auto; height: auto;
-      background: none;
-    }
-    #exit-cards .card .card-label { font-size: 12px; font-weight: 600; }
-    #exit-cards .card .card-sub { font-size: 11px; }
-    #exit-cards .card .card-check { display: none; }
     @keyframes fadeDown {
       from { opacity: 0; transform: translateY(-6px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -1342,7 +1342,7 @@
         </div>
         <span class="card-check"></span>
       </button>
-      <button class="card" data-value="garage" onclick="selectLocation(this)">
+      <button class="card" id="garage-card" data-value="garage" onclick="selectLocation(this)">
         <span class="card-icon">🚗</span>
         <div class="card-body">
           <div class="card-label">Garage</div>
@@ -2276,11 +2276,14 @@ function selectLocation(el) {
   answers.location = el.dataset.value;
 
   const exitReveal = document.getElementById('exit-reveal');
+  const garageCard = document.getElementById('garage-card');
   if (answers.location === 'basement') {
+    garageCard.classList.add('collapsed');
     exitReveal.classList.add('visible');
     answers.exit = null;
     document.querySelectorAll('#exit-cards .card').forEach(c => c.classList.remove('selected'));
   } else {
+    garageCard.classList.remove('collapsed');
     exitReveal.classList.remove('visible');
     answers.exit = null;
   }
