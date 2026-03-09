@@ -2508,6 +2508,16 @@ function onCityInput(input) {
   list.classList.add('open');
 }
 
+function logCitySelection(city, state, source) {
+  try {
+    const log = JSON.parse(localStorage.getItem('jps_city_log') || '[]');
+    log.push({ city, state, source, ts: new Date().toISOString() });
+    // Keep last 500 entries to avoid bloating localStorage
+    if (log.length > 500) log.splice(0, log.length - 500);
+    localStorage.setItem('jps_city_log', JSON.stringify(log));
+  } catch(e) {}
+}
+
 function selectCity(city, fee, removalFee) {
   answers.city = city;
   answers.permitFee = (fee === null || fee === undefined || fee === 'null') ? null : fee;
@@ -2518,6 +2528,7 @@ function selectCity(city, fee, removalFee) {
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
   document.getElementById('next-4').disabled = false;
+  logCitySelection(city, answers.state, 'matched');
   updateEstimateBar();
 }
 
@@ -2531,6 +2542,7 @@ function selectCityManual(city) {
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
   document.getElementById('next-4').disabled = false;
+  logCitySelection(city, answers.state, 'manual');
   updateEstimateBar();
 }
 
@@ -2552,6 +2564,7 @@ function selectCityFallback(city) {
     const entry = answers.state + ':' + city;
     if (!unknown.includes(entry)) { unknown.push(entry); localStorage.setItem('jps_unknown_cities', JSON.stringify(unknown)); }
   } catch(e) {}
+  logCitySelection(city, answers.state, 'fallback');
   updateEstimateBar();
 }
 
