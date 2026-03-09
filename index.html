@@ -282,104 +282,6 @@
       line-height: 1.6;
     }
 
-    /* ─── SIZE TILE GRID (Step 1 only) ─── */
-    .size-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-    .size-tile {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 24px 16px 20px;
-      background: var(--bg);
-      border: 2px solid var(--border);
-      border-radius: var(--radius);
-      cursor: pointer;
-      text-align: center;
-      transition: border-color var(--transition), background var(--transition), box-shadow var(--transition), transform var(--transition);
-      box-shadow: var(--shadow-sm);
-      gap: 2px;
-    }
-    .size-tile:hover {
-      border-color: #86efac;
-      background: var(--brand-light);
-      box-shadow: 0 0 0 3px #bbf7d0;
-      transform: translateY(-2px);
-    }
-    .size-tile.selected {
-      border-color: var(--brand);
-      background: var(--brand-light);
-      box-shadow: 0 0 0 3px #bbf7d0;
-    }
-    .size-tile-number {
-      font-size: 52px;
-      font-weight: 800;
-      line-height: 1;
-      color: var(--text);
-      letter-spacing: -2px;
-    }
-    .size-tile.selected .size-tile-number { color: var(--brand); }
-    .size-tile-unit {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-top: 2px;
-    }
-    .size-tile-label {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-    .size-tile-badge {
-      display: inline-block;
-      margin-top: 8px;
-      background: var(--navy);
-      color: #fff;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 3px 9px;
-      border-radius: 99px;
-      letter-spacing: 0.2px;
-    }
-    .size-tile.selected .size-tile-badge {
-      background: var(--brand);
-    }
-    .size-tile-check {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      border: 2px solid var(--border);
-      background: var(--bg);
-      transition: all var(--transition);
-    }
-    .size-tile.selected .size-tile-check {
-      background: var(--brand);
-      border-color: var(--brand);
-    }
-    .size-tile.selected .size-tile-check::after {
-      content: '';
-      display: block;
-      width: 5px;
-      height: 9px;
-      border: 2px solid #fff;
-      border-top: none;
-      border-left: none;
-      transform: rotate(45deg) translate(2px, -1px);
-      margin: auto;
-    }
-    .size-unsure {
-      width: 100%;
-    }
 
     /* ─── OPTION CARDS ─── */
     .cards {
@@ -1401,7 +1303,7 @@
   <div class="intro-hero">
     <div class="intro-eyebrow">Free Instant Estimate</div>
     <h1 class="intro-headline">Find out exactly what your oil tank removal costs.</h1>
-    <p class="intro-sub">Five quick questions.<br>No phone number or email required.</p>
+    <p class="intro-sub">Four quick questions.<br>No phone number or email required.</p>
     <button class="btn-intro-start" onclick="startEstimator()">Get My Price →</button>
     <div class="intro-start-sub">60 seconds &nbsp;·&nbsp; No number or email required to see your price</div>
   </div>
@@ -1425,27 +1327,22 @@
 <div class="progress-steps" id="progress-steps" style="display:none;">
   <div class="progress-step active" id="dot-1">
     <div class="step-dot" id="dot-num-1">1</div>
-    <div class="step-label">Size</div>
+    <div class="step-label">Location</div>
   </div>
   <div class="step-connector" id="con-12"></div>
   <div class="progress-step" id="dot-2">
     <div class="step-dot" id="dot-num-2">2</div>
-    <div class="step-label">Location</div>
+    <div class="step-label">Access</div>
   </div>
   <div class="step-connector" id="con-23"></div>
   <div class="progress-step" id="dot-3">
     <div class="step-dot" id="dot-num-3">3</div>
-    <div class="step-label">Access</div>
+    <div class="step-label">Oil Level</div>
   </div>
   <div class="step-connector" id="con-34"></div>
   <div class="progress-step" id="dot-4">
     <div class="step-dot" id="dot-num-4">4</div>
-    <div class="step-label">Oil Level</div>
-  </div>
-  <div class="step-connector" id="con-45"></div>
-  <div class="progress-step" id="dot-5">
-    <div class="step-dot" id="dot-num-5">5</div>
-    <div class="step-label">Location</div>
+    <div class="step-label">State</div>
   </div>
 </div>
 
@@ -1455,42 +1352,6 @@
        STEP 1 — TANK SIZE
   ══════════════════════════════════════ -->
   <div class="screen active" id="screen-1" data-step="1">
-    <div class="step-heading">
-      <h1>What size is your oil tank?</h1>
-      <p>Not sure? Pick 275 — that's 9 out of 10 homes we remove. We confirm the size when we arrive.</p>
-    </div>
-    <div class="size-grid">
-      <button class="size-tile" data-value="275" onclick="selectCard(this,'size')">
-        <span class="size-tile-check"></span>
-        <div class="size-tile-number">275</div>
-        <div class="size-tile-unit">gallon</div>
-        <div class="size-tile-label">Most common</div>
-        <span class="size-tile-badge">9 out of 10 homes</span>
-      </button>
-      <button class="size-tile" data-value="330" onclick="selectCard(this,'size')">
-        <span class="size-tile-check"></span>
-        <div class="size-tile-number">330</div>
-        <div class="size-tile-unit">gallon</div>
-        <div class="size-tile-label">Larger tank</div>
-      </button>
-    </div>
-    <button class="size-unsure card" data-value="unsure" onclick="selectCard(this,'size')">
-      <div class="card-body">
-        <div class="card-label">I'm not sure</div>
-        <div class="card-sub">No problem — it won't change your estimate much either way</div>
-      </div>
-      <span class="card-check"></span>
-    </button>
-    <div class="nav-row">
-      <div></div>
-      <button class="btn-next" id="next-1" onclick="goToStep(2)" disabled>Continue →</button>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════
-       STEP 2 — TANK LOCATION + EXIT TYPE
-  ══════════════════════════════════════ -->
-  <div class="screen" id="screen-2" data-step="2">
     <div class="step-heading">
       <h1>Where is the tank located?</h1>
       <p>This determines how we get it out. We've handled every situation — there's no wrong answer here.</p>
@@ -1554,15 +1415,15 @@
     </div>
 
     <div class="nav-row">
-      <button class="btn-back" onclick="goToStep(4)">← Back</button>
-      <button class="btn-next" id="next-2" onclick="goToStep(3)" disabled>Continue →</button>
+      <div></div>
+      <button class="btn-next" id="next-1" onclick="goToStep(2)" disabled>Continue →</button>
     </div>
   </div>
 
   <!-- ══════════════════════════════════════
-       STEP 3 — TANK ACCESS
+       STEP 2 — TANK ACCESS
   ══════════════════════════════════════ -->
-  <div class="screen" id="screen-3" data-step="3">
+  <div class="screen" id="screen-2" data-step="2">
     <div class="step-heading">
       <h1>How easy is it to access the tank?</h1>
       <p>Be honest here — it's the only thing that keeps your estimate accurate and avoids surprises on job day.</p>
@@ -1594,15 +1455,15 @@
       </button>
     </div>
     <div class="nav-row">
-      <button class="btn-back" onclick="goToStep(2)">← Back</button>
-      <button class="btn-next" id="next-3" onclick="goToStep(4)" disabled>Continue →</button>
+      <button class="btn-back" onclick="goToStep(1)">← Back</button>
+      <button class="btn-next" id="next-2" onclick="goToStep(3)" disabled>Continue →</button>
     </div>
   </div>
 
   <!-- ══════════════════════════════════════
-       STEP 4 — OIL LEVEL
+       STEP 3 — OIL LEVEL
   ══════════════════════════════════════ -->
-  <div class="screen" id="screen-4" data-step="4">
+  <div class="screen" id="screen-3" data-step="3">
     <div class="step-heading">
       <h1>How much oil is in the tank?</h1>
       <p>Up to 50 gallons is covered in your flat rate. More than half full? We add a flat $150 — that's it. We never charge by the gallon.</p>
@@ -1644,15 +1505,15 @@
       </button>
     </div>
     <div class="nav-row">
-      <button class="btn-back" onclick="goToStep(3)">← Back</button>
-      <button class="btn-next" id="next-4" onclick="goToStep(5)" disabled>Continue →</button>
+      <button class="btn-back" onclick="goToStep(2)">← Back</button>
+      <button class="btn-next" id="next-3" onclick="goToStep(4)" disabled>Continue →</button>
     </div>
   </div>
 
   <!-- ══════════════════════════════════════
-       STEP 5 — STATE & CITY
+       STEP 4 — STATE & CITY
   ══════════════════════════════════════ -->
-  <div class="screen" id="screen-5" data-step="5">
+  <div class="screen" id="screen-4" data-step="4">
     <div class="step-heading">
       <h1>Last one — where is the property?</h1>
       <p>We pull every permit ourselves. You don't file anything, sign anything, or chase anything.</p>
@@ -1700,8 +1561,8 @@
     </div>
 
     <div class="nav-row">
-      <button class="btn-back" onclick="goToStep(4)">← Back</button>
-      <button class="btn-next" id="next-5" onclick="showResults()" disabled>See My Estimate →</button>
+      <button class="btn-back" onclick="goToStep(3)">← Back</button>
+      <button class="btn-next" id="next-4" onclick="showResults()" disabled>See My Estimate →</button>
     </div>
   </div>
 
@@ -2363,11 +2224,11 @@ loadAirtableData();
 // ──────────────────────────────────────────────
 // NAVIGATION
 // ──────────────────────────────────────────────
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 4;
 
 function updateProgressSteps(step) {
   const n = typeof step === 'number' ? step : 99;
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 4; i++) {
     const dot = document.getElementById('dot-' + i);
     if (!dot) continue;
     dot.classList.remove('active', 'done');
@@ -2376,7 +2237,7 @@ function updateProgressSteps(step) {
     const num = document.getElementById('dot-num-' + i);
     if (num) num.textContent = (n === 99 || i < n) ? '✓' : i;
   }
-  for (let i = 1; i <= 4; i++) {
+  for (let i = 1; i <= 3; i++) {
     const con = document.getElementById('con-' + i + (i+1));
     if (con) con.classList.toggle('done', n === 99 || n > i);
   }
@@ -2412,7 +2273,7 @@ function startOver() {
   document.getElementById('ri-note').classList.remove('visible');
   document.getElementById('ct-note').style.display = 'none';
   document.getElementById('city-wrap').style.display = 'none';
-  ['next-1','next-2','next-3','next-4','next-5'].forEach(id => {
+  ['next-1','next-2','next-3','next-4'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.disabled = true;
   });
@@ -2446,7 +2307,7 @@ function selectLocation(el) {
     exitReveal.classList.remove('visible');
     answers.exit = null;
   }
-  checkStep2Ready();
+  checkStep1Ready();
   updateEstimateBar();
 }
 
@@ -2455,20 +2316,18 @@ function selectExit(el) {
   document.querySelectorAll('#exit-cards .card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   answers.exit = el.dataset.value;
-  checkStep2Ready();
+  checkStep1Ready();
 }
 
-function checkStep2Ready() {
+function checkStep1Ready() {
   const ready = answers.location !== null &&
     (answers.location !== 'basement' || answers.exit !== null);
-  document.getElementById('next-2').disabled = !ready;
+  document.getElementById('next-1').disabled = !ready;
 }
 
 // Generic card select — enables the next button for the current step
 function selectCard(el, type) {
-  // Deselect all siblings — works for both .cards lists and .size-grid tiles
   const screen = el.closest('.screen');
-  screen.querySelectorAll('.size-tile, .size-unsure').forEach(c => c.classList.remove('selected'));
   screen.querySelectorAll('.cards .card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   answers[type] = el.dataset.value;
@@ -2490,7 +2349,7 @@ function selectState(el) {
   const riNote = document.getElementById('ri-note');
   const ctNote = document.getElementById('ct-note');
   const cityWrap = document.getElementById('city-wrap');
-  const nextBtn = document.getElementById('next-5');
+  const nextBtn = document.getElementById('next-4');
 
   // Reset all conditional UI first
   riNote.classList.remove('visible');
@@ -2535,7 +2394,7 @@ function onCityInput(input) {
   answers.city = null;
   answers.permitFee = null;
   answers.cityRemovalFee = null;
-  document.getElementById('next-5').disabled = true;
+  document.getElementById('next-4').disabled = true;
   input.classList.remove('has-value');
 
   if (val.length < 2) { list.classList.remove('open'); return; }
@@ -2574,7 +2433,7 @@ function selectCity(city, fee, removalFee) {
   input.value = city;
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
-  document.getElementById('next-5').disabled = false;
+  document.getElementById('next-4').disabled = false;
   updateEstimateBar();
 }
 
@@ -2587,7 +2446,7 @@ function selectCityManual(city) {
   input.value = city;
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
-  document.getElementById('next-5').disabled = false;
+  document.getElementById('next-4').disabled = false;
   updateEstimateBar();
 }
 
@@ -2602,7 +2461,7 @@ function selectCityFallback(city) {
   input.value = city;
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
-  document.getElementById('next-5').disabled = false;
+  document.getElementById('next-4').disabled = false;
   // Log for Norman to review unknown cities
   try {
     const unknown = JSON.parse(localStorage.getItem('jps_unknown_cities') || '[]');
