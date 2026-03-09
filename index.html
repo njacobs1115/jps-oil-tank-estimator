@@ -1831,15 +1831,34 @@ const CITY_REPORT_WEBHOOK_URL = 'https://hook.us1.make.com/ajqn2t5aqwg12h1wqvg52
 // STATE
 // ──────────────────────────────────────────────
 
-// Capture UTM params from the landing URL
+// Capture all attribution params from the landing URL
 const utmParams = (function() {
   const params = new URLSearchParams(window.location.search);
-  const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
-  const utm = {};
-  keys.forEach(function(k) { if (params.get(k)) utm[k] = params.get(k); });
-  // Persist so they survive page navigation / reloads
-  if (Object.keys(utm).length) sessionStorage.setItem('jps_utm', JSON.stringify(utm));
-  return Object.keys(utm).length ? utm : JSON.parse(sessionStorage.getItem('jps_utm') || '{}');
+  const keys = [
+    // Standard UTM
+    'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content',
+    // Google Ads
+    'gclid', 'gad_source',
+    // Facebook / Meta
+    'fbclid',
+    // Microsoft Ads
+    'msclkid'
+  ];
+  const data = {};
+  keys.forEach(function(k) { if (params.get(k)) data[k] = params.get(k); });
+
+  // Always capture landing page & referrer on first visit
+  data.landing_page = window.location.href.split('?')[0];
+  data.landing_page_full = window.location.href;
+  data.referrer = document.referrer || '';
+  data.timestamp = new Date().toISOString();
+
+  // Persist so they survive reloads — only overwrite if we have fresh query params
+  var hasQueryParams = keys.some(function(k) { return params.get(k); });
+  if (hasQueryParams) sessionStorage.setItem('jps_attribution', JSON.stringify(data));
+  var stored = JSON.parse(sessionStorage.getItem('jps_attribution') || '{}');
+  // Merge: fresh params win, but keep stored landing_page if no new query params
+  return hasQueryParams ? data : Object.keys(stored).length ? stored : data;
 })();
 
 const answers = {
@@ -2785,11 +2804,18 @@ function submitCTA() {
     restricted_access: isRestricted ? 'true' : 'false',
     stair_removal: answers.exit === 'stairs' ? 'true' : 'false',
     source: 'estimator_tool',
+    // Attribution
     utm_source: utmParams.utm_source || '',
     utm_medium: utmParams.utm_medium || '',
     utm_campaign: utmParams.utm_campaign || '',
     utm_term: utmParams.utm_term || '',
-    utm_content: utmParams.utm_content || ''
+    utm_content: utmParams.utm_content || '',
+    gclid: utmParams.gclid || '',
+    gad_source: utmParams.gad_source || '',
+    fbclid: utmParams.fbclid || '',
+    msclkid: utmParams.msclkid || '',
+    landing_page: utmParams.landing_page || '',
+    referrer: utmParams.referrer || ''
   };
 
   console.log('[Estimator] Submitting to GHL:', payload);
@@ -2904,7 +2930,13 @@ function syncCityReport() {
       utm_medium: utmParams.utm_medium || '',
       utm_campaign: utmParams.utm_campaign || '',
       utm_term: utmParams.utm_term || '',
-      utm_content: utmParams.utm_content || ''
+      utm_content: utmParams.utm_content || '',
+      gclid: utmParams.gclid || '',
+      gad_source: utmParams.gad_source || '',
+      fbclid: utmParams.fbclid || '',
+      msclkid: utmParams.msclkid || '',
+      landing_page: utmParams.landing_page || '',
+      referrer: utmParams.referrer || ''
     };
 
     fetch(CITY_REPORT_WEBHOOK_URL, {
