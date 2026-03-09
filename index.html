@@ -2514,7 +2514,7 @@ function selectCity(city, fee, removalFee) {
   answers.cityRemovalFee = removalFee || 600;
   answers.permitSource = 'airtable';
   const input = document.getElementById('city-input');
-  input.value = city;
+  input.value = city + (answers.state ? ', ' + answers.state : '');
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
   document.getElementById('next-4').disabled = false;
@@ -2527,7 +2527,7 @@ function selectCityManual(city) {
   answers.cityRemovalFee = null;
   answers.permitSource = 'tbd';
   const input = document.getElementById('city-input');
-  input.value = city;
+  input.value = city + (answers.state ? ', ' + answers.state : '');
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
   document.getElementById('next-4').disabled = false;
@@ -2542,7 +2542,7 @@ function selectCityFallback(city) {
   answers.cityRemovalFee = answers.state === 'CT' ? 700 : 600;
   answers.permitSource = 'tbd';
   const input = document.getElementById('city-input');
-  input.value = city;
+  input.value = city + (answers.state ? ', ' + answers.state : '');
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
   document.getElementById('next-4').disabled = false;
