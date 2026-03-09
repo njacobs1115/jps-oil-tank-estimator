@@ -1159,13 +1159,13 @@
   <div class="screen active" id="screen-1" data-step="1">
     <div class="step-heading">
       <h1>What size is your oil tank?</h1>
-      <p>Most residential tanks are 275 gallons. If you're unsure, select that — we'll confirm on-site.</p>
+      <p>Not sure? Pick 275 — that's 9 out of 10 homes we remove. We confirm the size when we arrive.</p>
     </div>
     <div class="cards" id="size-cards">
       <button class="card" data-value="275" onclick="selectCard(this,'size')">
         <div class="card-body">
           <div class="card-label">275 Gallon</div>
-          <div class="card-sub">Most common residential tank size</div>
+          <div class="card-sub">The most common residential size — odds are, this is yours</div>
         </div>
         <span class="card-badge">Most Common</span>
         <span class="card-check"></span>
@@ -1173,7 +1173,7 @@
       <button class="card" data-value="330" onclick="selectCard(this,'size')">
         <div class="card-body">
           <div class="card-label">330 Gallon</div>
-          <div class="card-sub">Slightly larger — typically older installations</div>
+          <div class="card-sub">Slightly larger — common in homes built before 1975</div>
         </div>
         <span class="card-check"></span>
       </button>
@@ -1181,7 +1181,7 @@
         <span class="card-icon">❓</span>
         <div class="card-body">
           <div class="card-label">I'm not sure</div>
-          <div class="card-sub">We'll confirm the size when we arrive — no problem</div>
+          <div class="card-sub">No problem — it won't change your estimate much either way</div>
         </div>
         <span class="card-check"></span>
       </button>
@@ -1197,8 +1197,8 @@
   ══════════════════════════════════════ -->
   <div class="screen" id="screen-2" data-step="2">
     <div class="step-heading">
-      <h1>Where is your oil tank?</h1>
-      <p>Tank location affects how we access and remove it.</p>
+      <h1>Where is the tank located?</h1>
+      <p>This determines how we get it out. We've handled every situation — there's no wrong answer here.</p>
     </div>
     <div class="cards" id="location-cards">
       <button class="card" data-value="basement" onclick="selectLocation(this)">
@@ -1229,7 +1229,7 @@
 
     <!-- Exit type — reveals when basement selected -->
     <div class="exit-reveal" id="exit-reveal">
-      <div class="exit-reveal-label">How does the tank exit the basement?</div>
+      <div class="exit-reveal-label">How does the tank leave the basement?</div>
       <div class="cards" id="exit-cards">
         <button class="card" data-value="walkout" onclick="selectExit(this)">
           <span class="card-icon">🚪</span>
@@ -1251,7 +1251,7 @@
           <span class="card-icon">🪜</span>
           <div class="card-body">
             <div class="card-label">Up the stairs / through the house</div>
-            <div class="card-sub">Tank must navigate stairs and living space</div>
+            <div class="card-sub">We handle this regularly — takes a bit more time, that's all</div>
           </div>
           <span class="card-check"></span>
         </button>
@@ -1269,31 +1269,31 @@
   ══════════════════════════════════════ -->
   <div class="screen" id="screen-3" data-step="3">
     <div class="step-heading">
-      <h1>Is the tank accessible to our technicians?</h1>
-      <p>Access and difficulty of removal significantly impact pricing. Be as accurate as you can — it protects you from surprises on job day.</p>
+      <h1>How easy is it to access the tank?</h1>
+      <p>Be honest here — it's the only thing that keeps your estimate accurate and avoids surprises on job day.</p>
     </div>
     <div class="cards" id="access-cards">
       <button class="card" data-value="open" onclick="selectCard(this,'access')">
         <span class="card-icon">✅</span>
         <div class="card-body">
-          <div class="card-label">Yes — accessible and in the open</div>
-          <div class="card-sub">Clear path to the tank, no major obstacles</div>
+          <div class="card-label">Easy — open and accessible</div>
+          <div class="card-sub">Clear path, no obstacles between us and the tank</div>
         </div>
         <span class="card-check"></span>
       </button>
       <button class="card" data-value="unsure" onclick="selectCard(this,'access')">
         <span class="card-icon">🤔</span>
         <div class="card-body">
-          <div class="card-label">I'm unsure</div>
-          <div class="card-sub">We'll assess access during your free site verification — no commitment required</div>
+          <div class="card-label">I'm not sure</div>
+          <div class="card-sub">A quick photo when we call clears this up in seconds</div>
         </div>
         <span class="card-check"></span>
       </button>
       <button class="card" data-value="restricted" onclick="selectCard(this,'access')">
         <span class="card-icon">⚠️</span>
         <div class="card-body">
-          <div class="card-label">The tank is: behind a wall, cubbyhole, crawl space, etc.</div>
-          <div class="card-sub">Obstructed access — surcharge may apply, confirmed on-site</div>
+          <div class="card-label">Tight or obstructed</div>
+          <div class="card-sub">Behind a wall, crawl space, or cubbyhole — surcharge may apply, always confirmed before we start</div>
         </div>
         <span class="card-check"></span>
       </button>
@@ -1309,15 +1309,15 @@
   ══════════════════════════════════════ -->
   <div class="screen" id="screen-4" data-step="4">
     <div class="step-heading">
-      <h1>What does the gauge on top of the tank read?</h1>
-      <p>Up to 50 gallons of oil disposal is included in your flat rate. If the tank is more than half full, a flat $150 excess disposal fee applies — we never charge by the gallon.</p>
+      <h1>How much oil is in the tank?</h1>
+      <p>Up to 50 gallons is covered in your flat rate. More than half full? We add a flat $150 — that's it. We never charge by the gallon.</p>
     </div>
     <div class="cards" id="oil-cards">
       <button class="card" data-value="empty" onclick="selectCard(this,'oil')">
         <span class="card-icon">💨</span>
         <div class="card-body">
           <div class="card-label">Empty</div>
-          <div class="card-sub">Gauge reads empty — disposal included</div>
+          <div class="card-sub">Disposal fully covered — nothing extra</div>
         </div>
         <span class="card-badge">Included</span>
         <span class="card-check"></span>
@@ -1326,7 +1326,7 @@
         <span class="card-icon">🟡</span>
         <div class="card-body">
           <div class="card-label">¼ or less</div>
-          <div class="card-sub">Low level — disposal included in flat rate</div>
+          <div class="card-sub">Covered in your flat rate — no extra charge</div>
         </div>
         <span class="card-badge">Included</span>
         <span class="card-check"></span>
@@ -1342,8 +1342,8 @@
       <button class="card" data-value="no_gauge" onclick="selectCard(this,'oil')">
         <span class="card-icon">❓</span>
         <div class="card-body">
-          <div class="card-label">There is no gauge on the tank</div>
-          <div class="card-sub">We'll assess the oil level on-site during your free verification</div>
+          <div class="card-label">No gauge / can't tell</div>
+          <div class="card-sub">We'll sort it on the call — a quick photo of the tank is all we need</div>
         </div>
         <span class="card-check"></span>
       </button>
@@ -1359,8 +1359,8 @@
   ══════════════════════════════════════ -->
   <div class="screen" id="screen-5" data-step="5">
     <div class="step-heading">
-      <h1>Where is the property?</h1>
-      <p>We serve RI, MA, and CT. Your state determines permit requirements.</p>
+      <h1>Last one — where is the property?</h1>
+      <p>We pull every permit ourselves. You don't file anything, sign anything, or chase anything.</p>
     </div>
 
     <div class="state-grid">
@@ -1380,12 +1380,12 @@
 
     <div class="ri-note" id="ri-note">
       <span class="ri-note-icon">✅</span>
-      <span><strong>Rhode Island requires no permit.</strong> No permit fee, no waiting — most RI jobs are scheduled within the same week.</span>
+      <span><strong>Rhode Island requires no permit for oil tank removal.</strong> No fee, no waiting — most RI jobs are on the schedule within the same week.</span>
     </div>
 
     <div class="ri-note" id="ct-note" style="display:none;">
       <span class="ri-note-icon">✅</span>
-      <span><strong>Connecticut requires no permit for oil tank removal.</strong> No permit fee added to your estimate.</span>
+      <span><strong>Connecticut requires no permit for oil tank removal.</strong> No permit fee — what you see is what you pay.</span>
     </div>
 
     <div class="city-wrap" id="city-wrap" style="display:none;">
@@ -1417,18 +1417,18 @@
 
     <!-- Hero total -->
     <div class="results-hero">
-      <div class="total-label">Your Estimated Total</div>
+      <div class="total-label">Your All-In Price</div>
       <div class="total-amount" id="results-total-display">$600</div>
       <div class="total-range" id="results-range-display"></div>
       <div class="hero-badge">
-        <span>✓</span> Transparent, all-in pricing — no surprises on job day
+        <span>✓</span> Flat rate · No hourly billing · No surprises on job day
       </div>
     </div>
 
     <!-- Trust note -->
     <div class="trust-banner">
       <span class="trust-banner-icon">🛡️</span>
-      <span>Flat rate pricing. No upsells. What you see is what you pay — and you don't pay a dime until the job is complete.</span>
+      <span>You don't pay until the tank is gone. The number above is the number on your invoice — no asterisks, no surprises.</span>
     </div>
 
     <!-- Stairs warning (conditional) -->
@@ -1453,7 +1453,7 @@
       <div class="invoice-row">
         <div class="invoice-row-desc">
           <div class="invoice-row-name">Base Removal Fee</div>
-          <div class="invoice-row-sub" id="base-sub">Cutting, safe removal &amp; haul-off</div>
+          <div class="invoice-row-sub" id="base-sub">Cutting, safe removal &amp; disposal</div>
         </div>
         <div class="invoice-row-amount" id="base-fee-display">$600</div>
       </div>
@@ -1461,7 +1461,7 @@
       <div class="invoice-row" id="access-line" style="display:none;">
         <div class="invoice-row-desc">
           <div class="invoice-row-name">Restricted Access Surcharge</div>
-          <div class="invoice-row-sub">Crawlspace / obstructed — confirmed at site visit</div>
+          <div class="invoice-row-sub">Crawlspace / obstructed — confirmed when we connect</div>
         </div>
         <div class="invoice-row-amount" id="access-fee-display">+$600</div>
       </div>
@@ -1469,7 +1469,7 @@
       <div class="invoice-row">
         <div class="invoice-row-desc">
           <div class="invoice-row-name">Oil &amp; Sludge Disposal</div>
-          <div class="invoice-row-sub">Up to 50 gallons included in your flat rate. Excess oil: flat $150 — never by the gallon.</div>
+          <div class="invoice-row-sub">Up to 50 gallons of oil &amp; sludge included</div>
         </div>
         <div class="invoice-row-amount included">Included ✓</div>
       </div>
@@ -1491,7 +1491,7 @@
       </div>
 
       <div class="invoice-total-row">
-        <div class="invoice-total-label">Estimated Total</div>
+        <div class="invoice-total-label">Your Total</div>
         <div class="invoice-total-amount" id="total-display">$600</div>
       </div>
     </div>
@@ -1499,11 +1499,11 @@
     <!-- Why our prices -->
     <div class="why-expand">
       <button class="why-toggle" onclick="toggleWhy(this)">
-        Why are our prices what they are?
+        How we price our jobs — and why it's different
         <i class="chevron">▼</i>
       </button>
       <div class="why-body" id="why-body">
-        Every job is quoted at a flat rate — no hourly billing, no per-gallon disposal charges, no permit markups. We pull your permits, handle the oil, and haul everything away. What you see in this estimate is what you pay on job day. Nothing more.
+        Most contractors bill hourly or charge per gallon for disposal. We don't. One flat rate covers everything: permits, oil pumping, tank cutting, haul-off, and cleanup. We've done this since 2013 — we know exactly what each job costs and we quote it that way. The number above is the number on your invoice. No exceptions.
       </div>
     </div>
 
@@ -1514,12 +1514,12 @@
         <span class="proof-label">Five-Star Reviews</span>
       </div>
       <div class="proof-item">
-        <span class="proof-number">Since 2013</span>
-        <span class="proof-label">Serving RI, MA &amp; CT</span>
+        <span class="proof-number">10,000+</span>
+        <span class="proof-label">Tanks Removed</span>
       </div>
       <div class="proof-item">
-        <span class="proof-number">Licensed</span>
-        <span class="proof-label">RI, MA &amp; CT</span>
+        <span class="proof-number">Fully</span>
+        <span class="proof-label">Insured</span>
       </div>
     </div>
 
@@ -1527,8 +1527,8 @@
 
     <!-- CTA Form -->
     <div class="cta-section">
-      <div class="cta-heading">Lock In This Estimate — Free Site Verification</div>
-      <div class="cta-sub">No payment until the job is complete. We confirm access and conditions, then your price is locked.</div>
+      <div class="cta-heading">That's your number. Let's get it on the schedule.</div>
+      <div class="cta-sub">No payment today. We'll call to confirm access — then your price is locked and you're on the books.</div>
 
       <div class="form-field">
         <label for="cta-name">Your Name *</label>
@@ -1549,8 +1549,8 @@
         <textarea id="cta-note" placeholder="E.g. tank is behind a furnace, driveway access, tenant in unit..."></textarea>
       </div>
 
-      <button class="btn-cta" onclick="submitCTA()">Lock In This Estimate →</button>
-      <div class="btn-cta-sub">Mon–Fri 7am–5pm: we call within minutes. After hours: we'll call first thing next business morning.</div>
+      <button class="btn-cta" onclick="submitCTA()">Lock In This Price →</button>
+      <div class="btn-cta-sub">Most customers hear from us within minutes. Most jobs scheduled within the week.</div>
 
       <button class="btn-secondary" onclick="startOver()">Start Over</button>
     </div>
@@ -1563,14 +1563,11 @@
   <div class="screen" id="screen-success">
     <div class="success-wrap">
       <div class="success-icon">✅</div>
-      <div class="success-heading">You're all set, <span id="success-name">there</span>!</div>
-      <div class="success-body" id="success-body">We received your estimate request and will reach out within 2 hours during business hours to confirm your details and lock in your price.</div>
+      <div class="success-heading">You're booked in, <span id="success-name">there</span>. We've got it from here.</div>
+      <div class="success-body" id="success-body">We're reviewing your details right now. Expect a call or text shortly — we'll confirm access and lock in your removal date.</div>
       <div class="success-detail">
-        <strong>What happens next:</strong><br />
-        1. We review your tank details<br />
-        2. Quick call or text to confirm access (5–10 min)<br />
-        3. Your price is locked — no surprises on job day<br /><br />
-        Questions? Call or text us at <strong><a href="tel:+14013893200" style="color:var(--brand)">(401) 389-3200</a></strong>
+        We confirm access → lock your price → show up on the scheduled day and handle everything. Between now and then, you don't have to do a thing.<br /><br />
+        Questions? Call or text Norman directly: <strong><a href="tel:+14013893200" style="color:var(--brand)">(401) 389-3200</a></strong>
       </div>
     </div>
   </div>
@@ -1580,7 +1577,7 @@
 <!-- Estimate bar — fixed bottom -->
 <div class="estimate-bar" id="estimate-bar">
   <div class="estimate-bar-left">
-    <div class="estimate-bar-label">Your estimate so far</div>
+    <div class="estimate-bar-label">Your price so far</div>
     <div class="estimate-bar-note" id="estimate-bar-note">Updates as you answer</div>
   </div>
   <div class="estimate-bar-amount" id="estimate-bar-amount">from $600</div>
@@ -2247,7 +2244,7 @@ function onCityInput(input) {
     const stateName = answers.state === 'CT' ? 'Connecticut' : 'Massachusetts';
     list.innerHTML = `<div class="autocomplete-item" onclick="selectCityFallback('${val.replace(/'/g,"\\'")}')">
       <span>${val}, ${answers.state}</span>
-      <span class="fee-hint">We serve most of ${stateName} — price confirmed at site visit</span>
+      <span class="fee-hint">We serve most of ${stateName} — price confirmed when we connect</span>
     </div>`;
     list.classList.add('open');
     return;
@@ -2372,16 +2369,16 @@ function computePricing() {
   const isFallbackCity = answers.permitSource === 'tbd';
   if (isRestricted) {
     totalEl.textContent = '$' + lowTotal.toLocaleString();
-    rangeEl.textContent = 'Up to $' + highTotal.toLocaleString() + ' depending on access — confirmed on-site';
+    rangeEl.textContent = 'Up to $' + highTotal.toLocaleString() + ' depending on access — confirmed when we connect';
   } else if (isFallbackCity && answers.state === 'MA') {
     totalEl.textContent = '$' + (BASE + oilFee);
-    rangeEl.textContent = '+ permit fee — confirmed at your free site visit';
+    rangeEl.textContent = '+ permit fee — confirmed when we connect';
   } else if (isFallbackCity) {
     totalEl.textContent = 'from $' + lowTotal.toLocaleString();
-    rangeEl.textContent = 'Final price confirmed at your free site visit';
+    rangeEl.textContent = 'Final price confirmed when we connect';
   } else if (permitFee === null) {
     totalEl.textContent = '$' + (BASE + oilFee);
-    rangeEl.textContent = '+ permit fee (confirmed at site verification)';
+    rangeEl.textContent = '+ permit fee (confirmed when we connect)';
   } else {
     totalEl.textContent = '$' + lowTotal.toLocaleString();
     rangeEl.textContent = '';
@@ -2391,10 +2388,10 @@ function computePricing() {
   document.getElementById('base-fee-display').textContent = isFallbackCity ? 'from $' + BASE : '$' + BASE;
   document.getElementById('base-sub').textContent =
     isFallbackCity
-      ? 'Starting price for ' + answers.city + ' — confirmed at site visit'
+      ? 'Starting price for ' + answers.city + ' — confirmed when we connect'
       : answers.location === 'basement'
-        ? 'Basement removal — cutting, safe extraction & haul-off'
-        : 'Cutting, safe removal & haul-off';
+        ? 'Basement removal — cutting, safe extraction & disposal'
+        : 'Cutting, safe removal & disposal';
 
   // Access surcharge line
   const accessLine = document.getElementById('access-line');
@@ -2429,7 +2426,7 @@ function computePricing() {
   } else if (permitFee === null) {
     permitLine.style.display = 'flex';
     permitDisplay.textContent = 'TBD';
-    permitSub.textContent = 'Permit fee for ' + (answers.city || 'your city') + ' confirmed at site verification';
+    permitSub.textContent = 'Permit fee for ' + (answers.city || 'your city') + ' — confirmed when we connect';
     permitDisplay.classList.remove('included');
   } else {
     permitLine.style.display = 'flex';
@@ -2545,6 +2542,20 @@ function submitCTA() {
 
 function showSuccess(name) {
   document.getElementById('success-name').textContent = name.split(' ')[0];
+
+  // Time-aware success message
+  const now = new Date();
+  const day = now.getDay();   // 0=Sun, 6=Sat
+  const hour = now.getHours(); // 0-23 local
+  const isBusinessHours = day >= 1 && day <= 5 && hour >= 7 && hour < 17;
+  const bodyEl = document.getElementById('success-body');
+  if (isBusinessHours) {
+    bodyEl.textContent = "We're reviewing your details right now. You'll hear from us within the next few minutes — we'll confirm access and lock in your date.";
+  } else {
+    const nextDay = (day === 5 || day === 6) ? 'Monday' : 'tomorrow';
+    bodyEl.textContent = "Your estimate is saved. We'll be in touch first thing " + nextDay + " morning to confirm access and get you on the schedule.";
+  }
+
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-success').classList.add('active');
   updateProgressSteps(99);
