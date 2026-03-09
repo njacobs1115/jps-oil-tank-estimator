@@ -56,7 +56,7 @@ A single-file HTML/CSS/JS lead capture and pricing tool for residential oil tank
 2. **Location + exit type** — Basement (with sub-question: Walkout / Bulkhead / Stairs) / Garage / Outside
 3. **Access** — Clear / Unsure / Restricted
 4. **Oil level** — Empty / ¼ or less / More than ½ / No gauge
-5. **State & City** — RI (no city needed), MA (city autocomplete), CT (city autocomplete)
+5. **State & City** — RI (no city needed), MA (city autocomplete), CT (city autocomplete). City input displays with state abbreviation (e.g. "Thompson, CT")
 
 → **Results screen** — itemized invoice with live price
 → **CTA form** — name, phone, email, notes
@@ -80,8 +80,8 @@ All 373 MA cities and 70 CT cities are hardcoded into a `cityData` array inside 
 - CT entries: `{ city, state: "CT", removal_fee }` (no permit)
 - Source: Airtable base `appUscw3WgCDWkRt9` — MA table `tblJFQSsGfEuLmZc5`, CT table `tblXgn86E0R7hAZqz`
 
-### GHL Webhook
-On form submit, a POST fires to `GHL_WEBHOOK_URL` (defined near line 1500 of `index.html`). Currently a placeholder — Norman needs to paste the real URL before this goes fully live.
+### Make Webhook (LIVE)
+On form submit, a POST fires to a Make (formerly Integromat) webhook (`GHL_WEBHOOK_URL` constant near line 1827 of `index.html`). This is connected and live — leads flow into Make for routing to GHL and any other automations.
 
 Payload fields:
 ```
@@ -160,7 +160,7 @@ Suggested toggle: `?mode=customer` vs `?mode=internal` on the Route Optimizer UR
 |---|---|---|
 | Estimator | Single HTML file | GitHub Pages (this repo) |
 | City pricing data | Hardcoded array in index.html | Rebuilt from Airtable when prices change |
-| Lead capture | GHL webhook | GHL location `3bkvnPQV7Lj7BZp5dbjr` |
+| Lead capture | Make webhook → GHL | Make scenario receives form submissions, routes to GHL |
 | Slot logic + booking | Route Optimizer backend | Render — `route-optimizer-jps.onrender.com` |
 | CRM + automations | GoHighLevel | GHL |
 | Job/pricing data source | Airtable | Base `appUscw3WgCDWkRt9` |
@@ -193,7 +193,7 @@ git push origin master
 
 ## Open Items Before Phase 2 Can Start
 
-1. **GHL webhook URL** — Norman needs to paste the real URL into `const GHL_WEBHOOK_URL` (~line 1500 of index.html)
+1. ~~**Webhook URL**~~ — **DONE.** Make webhook connected and firing on form submit
 2. **Route Optimizer oil constraints** — must be implemented and tested before customer-facing booking UI is built
 3. **Route Optimizer backend endpoint** — new POST endpoint needed that creates GHL contact + returns available slots in one call
 4. **Copy/messaging polish** — Norman is handling the wording throughout the estimator
