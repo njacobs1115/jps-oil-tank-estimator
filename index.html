@@ -55,15 +55,16 @@
       align-items: center;
     }
 
-    /* ─── SITE HEADER — dark top bar ─── */
+    /* ─── SITE HEADER — light top bar ─── */
     .site-header {
       width: 100%;
-      background: var(--navy);
+      background: #fff;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 14px 20px;
       margin-bottom: 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
     }
     .header-left {
       display: flex;
@@ -71,43 +72,61 @@
       gap: 12px;
     }
     .site-header img {
-      height: 38px;
+      height: 42px;
       width: auto;
       display: block;
     }
     .header-divider {
       width: 1px;
       height: 28px;
-      background: rgba(255,255,255,.15);
+      background: rgba(0,0,0,.12);
     }
     .header-wordmark {
-      font-size: 13px;
-      font-weight: 600;
-      color: rgba(255,255,255,.9);
-      line-height: 1.25;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .header-wordmark span {
       display: block;
-      font-size: 11px;
-      font-weight: 400;
-      color: rgba(255,255,255,.45);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.8px;
     }
     .header-trust {
       display: flex;
       align-items: center;
-      gap: 6px;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 99px;
-      padding: 5px 12px;
-      font-size: 12px;
-      font-weight: 600;
-      color: rgba(255,255,255,.85);
+      gap: 5px;
+      background: var(--navy);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #fff;
       white-space: nowrap;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+    .header-trust .trust-rating {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .header-trust .trust-count {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0.9;
     }
     .header-trust .star-icon {
       color: #fbbf24;
-      font-size: 12px;
+      font-size: 14px;
     }
 
     /* ─── PROGRESS TRACK — thin bar below header ─── */
@@ -135,33 +154,39 @@
     .intro-screen.hidden { display: none; }
 
     .intro-hero {
-      background: var(--navy);
+      background: linear-gradient(170deg, rgba(20, 30, 48, 0.88) 0%, rgba(26, 31, 46, 0.92) 100%),
+                  url('https://removemyoiltank.com/wp-content/uploads/2024/02/Oil-Tank-Removal-RI-JPS-Process-2-scaled.jpg') center/cover no-repeat;
       border-radius: 24px;
-      padding: 22px 22px 24px;
+      padding: 28px 22px 26px;
       text-align: center;
       color: #fff;
     }
     .intro-eyebrow {
-      font-size: 11px;
-      font-weight: 700;
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 1.2px;
+      letter-spacing: 1.5px;
       color: var(--brand);
-      margin-bottom: 10px;
+      margin-bottom: 14px;
+      background: rgba(22, 163, 74, 0.12);
+      padding: 5px 14px;
+      border-radius: 6px;
     }
     .intro-headline {
-      font-size: 24px;
+      font-size: 26px;
       font-weight: 800;
-      line-height: 1.2;
-      letter-spacing: -0.5px;
+      line-height: 1.18;
+      letter-spacing: -0.3px;
       color: #fff;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
     }
     .intro-sub {
-      font-size: 14px;
+      font-size: 15px;
       line-height: 1.55;
-      color: rgba(255,255,255,.65);
-      margin-bottom: 16px;
+      color: rgba(255,255,255,.7);
+      margin-bottom: 18px;
     }
     .btn-intro-start {
       width: 100%;
@@ -169,46 +194,62 @@
       color: #fff;
       border: none;
       border-radius: 14px;
-      padding: 15px 24px;
-      font-size: 18px;
+      padding: 17px 24px;
+      font-size: 20px;
       font-weight: 800;
       cursor: pointer;
-      letter-spacing: -0.2px;
+      letter-spacing: 0.5px;
       transition: background var(--transition), transform var(--transition);
-      box-shadow: 0 4px 20px rgba(22,163,74,.35);
+      box-shadow: 0 6px 24px rgba(22,163,74,.4);
     }
     .btn-intro-start:hover { background: #15803d; }
     .btn-intro-start:active { transform: scale(0.98); }
     .intro-start-sub {
-      margin-top: 8px;
-      font-size: 11px;
-      color: rgba(255,255,255,.4);
+      margin-top: 10px;
+      font-size: 12px;
+      color: rgba(255,255,255,.5);
     }
 
     .intro-checklist {
-      background: #fff;
-      border-radius: 16px;
-      margin-top: 12px;
-      padding: 16px 18px;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      box-shadow: var(--shadow);
+      margin-top: 12px;
     }
     .intro-check-item {
       display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      font-size: 13px;
-      line-height: 1.5;
-      color: var(--text-mid);
+      align-items: center;
+      gap: 14px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
     }
     .intro-check-icon {
-      color: var(--brand);
-      font-size: 14px;
       flex-shrink: 0;
-      margin-top: 1px;
-      font-weight: 700;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      line-height: 1;
+    }
+    .intro-check-text {
+      flex: 1;
+    }
+    .intro-check-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+      margin-bottom: 3px;
+    }
+    .intro-check-desc {
+      font-size: 13px;
+      color: var(--text-mid);
+      line-height: 1.45;
     }
 
     /* ─── LAYOUT SHELL ─── */
@@ -1338,13 +1379,13 @@
     />
     <div class="header-divider"></div>
     <div class="header-wordmark">
-      RemoveMyOilTank.com
-      <span>Jacobs Property Solutions</span>
+      Jacobs Property Solutions
+      <span>Oil Tank Removal</span>
     </div>
   </div>
   <div class="header-trust">
-    <span class="star-icon">★</span>
-    400+ Five-Star Reviews
+    <div class="trust-rating"><span class="star-icon">★</span> 4.9</div>
+    <div class="trust-count">400+ Reviews</div>
   </div>
 </header>
 
@@ -1355,22 +1396,31 @@
   <div class="intro-hero">
     <div class="intro-eyebrow">Free Instant Estimate</div>
     <h1 class="intro-headline">Find out exactly what your oil tank removal costs.</h1>
-    <p class="intro-sub">Four quick questions.<br>No phone number or email required.</p>
-    <button class="btn-intro-start" onclick="startEstimator()">Get My Price →</button>
-    <div class="intro-start-sub">60 seconds &nbsp;·&nbsp; No number or email required to see your price</div>
+    <p class="intro-sub">Four quick questions. Completely<br>private—no phone or email required.</p>
+    <button class="btn-intro-start" onclick="startEstimator()">GET MY PRICE →</button>
+    <div class="intro-start-sub">~60 seconds to your instant price.</div>
   </div>
   <div class="intro-checklist">
     <div class="intro-check-item">
-      <span class="intro-check-icon">✓</span>
-      <span><strong>Flat rate pricing.</strong> One price covers permits, oil pumping, cutting, disposal, and cleanup. Nothing added at the door.</span>
+      <span class="intro-check-icon">🏷️</span>
+      <div class="intro-check-text">
+        <div class="intro-check-title">Flat-Rate Pricing.</div>
+        <div class="intro-check-desc">One all-inclusive price covers permits, removal, and cleanup. Zero surprises.</div>
+      </div>
     </div>
     <div class="intro-check-item">
-      <span class="intro-check-icon">✓</span>
-      <span><strong>You don't pay until the tank is out.</strong> No deposit, no commitment until the job is done.</span>
+      <span class="intro-check-icon">📅</span>
+      <div class="intro-check-text">
+        <div class="intro-check-title">Fast Turnaround.</div>
+        <div class="intro-check-desc">Most jobs are scheduled and completed within the week—ideal for deadlines.</div>
+      </div>
     </div>
     <div class="intro-check-item">
-      <span class="intro-check-icon">✓</span>
-      <span><strong>Most jobs scheduled within the week.</strong> We move fast — especially when you have a closing deadline.</span>
+      <span class="intro-check-icon">💰</span>
+      <div class="intro-check-text">
+        <div class="intro-check-title">Pay-On-Completion.</div>
+        <div class="intro-check-desc">Zero deposit. Full payment is due only <em>after</em> the tank is out. Risk-free.</div>
+      </div>
     </div>
   </div>
 </div>
