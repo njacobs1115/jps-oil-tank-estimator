@@ -1082,21 +1082,6 @@
     .step-connector.done { background: rgba(22,163,74,.4); }
 
     /* ─── EXIT REVEAL ─── */
-    /* Garage card collapses when basement selected */
-    #garage-card {
-      overflow: hidden;
-      max-height: 100px;
-      transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease, padding 0.3s ease;
-      opacity: 1;
-    }
-    #garage-card.collapsed {
-      max-height: 0;
-      opacity: 0;
-      margin: 0;
-      padding: 0;
-      border: none;
-      pointer-events: none;
-    }
 
     .exit-reveal {
       display: none;
@@ -2278,12 +2263,12 @@ function selectLocation(el) {
   const exitReveal = document.getElementById('exit-reveal');
   const garageCard = document.getElementById('garage-card');
   if (answers.location === 'basement') {
-    garageCard.classList.add('collapsed');
+    garageCard.style.display = 'none';
     exitReveal.classList.add('visible');
     answers.exit = null;
     document.querySelectorAll('#exit-cards .card').forEach(c => c.classList.remove('selected'));
   } else {
-    garageCard.classList.remove('collapsed');
+    garageCard.style.display = '';
     exitReveal.classList.remove('visible');
     answers.exit = null;
   }
