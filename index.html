@@ -1118,7 +1118,7 @@
     /* Oil level — 2x2 tile grid */
     .oil-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 10px;
     }
     .oil-tile {
@@ -1521,19 +1521,14 @@
       <p>Up to 50 gallons is covered in your flat rate. More than half full? We add a flat $150 — that's it. We never charge by the gallon.</p>
     </div>
     <div class="oil-grid" id="oil-cards">
-      <button class="oil-tile" data-value="empty" onclick="selectCard(this,'oil')">
-        <span class="oil-tile-check"></span>
-        <div class="oil-tile-label">Empty</div>
-        <span class="oil-tile-badge">Included</span>
-      </button>
       <button class="oil-tile" data-value="quarter" onclick="selectCard(this,'oil')">
         <span class="oil-tile-check"></span>
-        <div class="oil-tile-label">¼ or less</div>
+        <div class="oil-tile-label">Less than ¼</div>
         <span class="oil-tile-badge">Included</span>
       </button>
       <button class="oil-tile" data-value="half_plus" onclick="selectCard(this,'oil')">
         <span class="oil-tile-check"></span>
-        <div class="oil-tile-label">More than ½</div>
+        <div class="oil-tile-label">More than ¼</div>
       </button>
       <button class="oil-tile" data-value="no_gauge" onclick="selectCard(this,'oil')">
         <span class="oil-tile-check"></span>
