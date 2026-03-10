@@ -1789,13 +1789,26 @@
 
     <div class="divider"></div>
 
-    <!-- CTA — primary = self-book, secondary = call -->
+    <!-- CTA — two paths: book now or email estimate -->
     <div class="cta-section">
-      <div class="cta-heading">That’s your number. Ready to book your removal?</div>
-      <div class="cta-sub">Skip the callback — pick your own date and you’re confirmed in under 60 seconds.</div>
+      <div class="cta-heading">That&rsquo;s your number. What would you like to do?</div>
 
-      <button class="btn-cta" onclick="goToCheckout()">Book My Removal — Pick a Date →</button>
+      <button class="btn-cta" onclick="goToCheckout()">Book My Removal &mdash; Pick a Date &rarr;</button>
       <div class="btn-cta-sub">No payment today. Your appointment is locked in instantly.</div>
+
+      <div style="display:flex;align-items:center;gap:12px;margin:16px 0;">
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+        <span style="font-size:13px;color:var(--muted);white-space:nowrap;">Not ready to book?</span>
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+      </div>
+
+      <button class="btn-secondary" onclick="goToEstimate()"
+        style="width:100%;height:48px;font-size:15px;font-weight:600;">
+        Email Me My Estimate
+      </button>
+      <div style="text-align:center;font-size:12px;color:var(--muted);margin-top:6px;">
+        We&rsquo;ll send your price in writing &mdash; good for 14 days.
+      </div>
 
       <a href="tel:+14013893200" class="btn-secondary"
          style="display:flex;align-items:center;justify-content:center;text-decoration:none;margin-top:12px;height:48px;border-radius:var(--radius-sm);border:1.5px solid var(--border);color:var(--muted);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:all var(--transition);">
@@ -1982,7 +1995,9 @@
 // ──────────────────────────────────────────────
 // GHL WEBHOOK — swap in real URL before launch
 // ──────────────────────────────────────────────
-const GHL_WEBHOOK_URL = 'https://hook.us1.make.com/n9xtdy5aok4e62wpat9gydco3lef9b26';
+const GHL_WEBHOOK_URL      = 'https://hook.us1.make.com/n9xtdy5aok4e62wpat9gydco3lef9b26';
+// Fires when customer wants an estimate emailed — Make creates contact + sends estimate
+const ESTIMATE_WEBHOOK_URL = 'PASTE_ESTIMATE_WEBHOOK_URL_HERE';
 const ROUTE_OPTIMIZER_URL = 'https://route-optimizer-jps.onrender.com';
 
 // ──────────────────────────────────────────────
@@ -3274,6 +3289,7 @@ async function confirmBooking() {
         estimatedPrice: booking.estimatedPrice,
         tankLocation:   answers.location || '',
         tankAccess:     answers.access   || '',
+        tags:           ['calc-booked'],
       }),
     });
     const data = await resp.json();
@@ -3309,6 +3325,175 @@ function showBookingFailed() {
   document.getElementById('booking-failed').style.display  = 'block';
 }
 
+
+// ── ESTIMATE PATH ─────────────────────────────────────────────────────────
+function goToEstimate() {
+  var cityEl = document.getElementById('est-city');
+  if (cityEl && answers.city && answers.city !== 'Rhode Island') {
+    cityEl.value = answers.city;
+  }
+  var priceEl = document.getElementById('estimate-price-display');
+  if (priceEl) {
+    var heroEl = document.getElementById('results-total-display');
+    if (heroEl) priceEl.textContent = heroEl.textContent;
+  }
+  goToScreen('estimate-form');
+}
+
+async function submitEstimate() {
+  ['est-first','est-last','est-email','est-address','est-city','est-zip'].forEach(function(id) {
+    var err = document.getElementById('err-' + id);
+    if (err) err.style.display = 'none';
+  });
+
+  var firstName = document.getElementById('est-first').value.trim();
+  var lastName  = document.getElementById('est-last').value.trim();
+  var email     = document.getElementById('est-email').value.trim();
+  var phone     = document.getElementById('est-phone').value.trim();
+  var address   = document.getElementById('est-address').value.trim();
+  var city      = document.getElementById('est-city').value.trim();
+  var zip       = document.getElementById('est-zip').value.trim();
+
+  var valid = true;
+  function showErr(id) { document.getElementById(id).style.display = 'block'; valid = false; }
+
+  if (!firstName) showErr('err-est-first');
+  if (!lastName)  showErr('err-est-last');
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) showErr('err-est-email');
+  if (!address)   showErr('err-est-address');
+  if (!city)      showErr('err-est-city');
+  if (!zip || zip.replace(/\D/g,'').length !== 5) showErr('err-est-zip');
+  if (!valid) return;
+
+  var btn = document.getElementById('btn-send-estimate');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  var payload = {
+    firstName:      firstName,
+    lastName:       lastName,
+    email:          email,
+    phone:          phone,
+    address:        address,
+    city:           city,
+    state:          answers.state || '',
+    zip:            zip,
+    tankLocation:   answers.location || '',
+    estimatedPrice: booking.estimatedPrice,
+    tags:           ['calc-estimate'],
+    utm_source:     attr.utm_source   || '',
+    utm_medium:     attr.utm_medium   || '',
+    utm_campaign:   attr.utm_campaign || '',
+    landing_page:   attr.landing_page || '',
+  };
+
+  try {
+    if (!ESTIMATE_WEBHOOK_URL || ESTIMATE_WEBHOOK_URL.indexOf('PASTE_') === 0) {
+      console.warn('[Funnel] ESTIMATE_WEBHOOK_URL not configured — skipping in dev mode');
+    } else {
+      await fetch(ESTIMATE_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    }
+  } catch(err) {
+    console.error('[Funnel] estimate webhook error:', err);
+    // Don't block the user — still show confirmation
+  }
+
+  document.getElementById('estimate-sent-name').textContent    = firstName;
+  document.getElementById('estimate-sent-email').textContent   = email;
+  document.getElementById('estimate-sent-price').textContent   = '$' + booking.estimatedPrice;
+  document.getElementById('estimate-sent-address').textContent = address + ', ' + city + ', ' + (answers.state || '') + ' ' + zip;
+  goToScreen('estimate-sent');
+}
+
 </script>
+
+  <!-- ======================================================
+       SCREEN: EMAIL MY ESTIMATE
+  ====================================================== -->
+  <div class="screen" id="screen-estimate-form">
+    <div class="step-heading">
+      <h1>Where should we send your estimate?</h1>
+      <p>Your price is <strong id="estimate-price-display">locked</strong>. We&rsquo;ll email it to you &mdash; good for 14 days.</p>
+    </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label for="est-first">First Name *</label>
+        <input type="text" id="est-first" name="fname" placeholder="Jane" autocomplete="given-name" />
+        <div class="field-error" id="err-est-first">Required.</div>
+      </div>
+      <div class="form-field">
+        <label for="est-last">Last Name *</label>
+        <input type="text" id="est-last" name="lname" placeholder="Smith" autocomplete="family-name" />
+        <div class="field-error" id="err-est-last">Required.</div>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label for="est-email">Email Address *</label>
+      <input type="email" id="est-email" name="email" placeholder="you@example.com" autocomplete="email" />
+      <div class="field-error" id="err-est-email">Valid email required &mdash; we need it to send your estimate.</div>
+    </div>
+
+    <div class="form-field">
+      <label for="est-phone">Phone <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+      <input type="tel" id="est-phone" name="phone" placeholder="(401) 555-0100" inputmode="numeric" autocomplete="tel" />
+    </div>
+
+    <div class="form-field">
+      <label for="est-address">Street Address *</label>
+      <input type="text" id="est-address" name="address" placeholder="123 Main St" autocomplete="address-line1" />
+      <div class="field-error" id="err-est-address">Street address required.</div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label for="est-city">City *</label>
+        <input type="text" id="est-city" name="city" placeholder="Cranston" autocomplete="address-level2" />
+        <div class="field-error" id="err-est-city">City required.</div>
+      </div>
+      <div class="form-field">
+        <label for="est-zip">ZIP Code *</label>
+        <input type="text" id="est-zip" name="zip" placeholder="02920" inputmode="numeric"
+          autocomplete="postal-code" maxlength="5" />
+        <div class="field-error" id="err-est-zip">5-digit ZIP required.</div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goToScreen('results')">Back</button>
+      <button class="btn-next" id="btn-send-estimate" onclick="submitEstimate()">Send My Estimate</button>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       SCREEN: ESTIMATE SENT
+  ====================================================== -->
+  <div class="screen" id="screen-estimate-sent">
+    <div style="text-align:center;padding:32px 0 16px;">
+      <div style="font-size:56px;margin-bottom:16px;">&#x1F4E7;</div>
+      <h1 style="font-size:24px;font-weight:700;color:var(--text);margin:0 0 12px;">
+        Your estimate is on its way, <span id="estimate-sent-name">there</span>!
+      </h1>
+      <p style="color:var(--muted);font-size:15px;line-height:1.6;max-width:320px;margin:0 auto 24px;">
+        Check your inbox at <strong id="estimate-sent-email"></strong>.<br>
+        Your price is locked for <strong>14 days</strong>.
+      </p>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;max-width:320px;margin:0 auto 24px;text-align:left;font-size:14px;line-height:1.8;">
+        <div><strong>Total:</strong> <span id="estimate-sent-price"></span></div>
+        <div><strong>Address:</strong> <span id="estimate-sent-address"></span></div>
+      </div>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:24px;">Ready to lock in a date? We&rsquo;re one call away.</p>
+      <a href="tel:+14013893200"
+        style="display:inline-flex;align-items:center;justify-content:center;height:48px;padding:0 28px;border-radius:var(--radius-sm);background:var(--brand);color:#fff;font-size:15px;font-weight:700;text-decoration:none;">
+        Call (401) 389-3200
+      </a>
+    </div>
+  </div>
+
 </body>
 </html>
