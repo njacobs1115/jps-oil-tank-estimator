@@ -127,7 +127,7 @@
     .intro-screen {
       width: 100%;
       max-width: 560px;
-      padding: 16px 16px 20px;
+      padding: 14px 14px 20px;
       display: flex;
       flex-direction: column;
       gap: 0;
@@ -135,87 +135,120 @@
     .intro-screen.hidden { display: none; }
 
     .intro-hero {
-      background: var(--navy);
-      border-radius: 24px;
-      padding: 22px 22px 24px;
+      background: linear-gradient(160deg, #1e2740 0%, #111827 100%);
+      border-radius: 20px;
+      padding: 26px 22px 24px;
       text-align: center;
       color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .intro-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% -20%, rgba(22,163,74,.22) 0%, transparent 65%);
+      pointer-events: none;
     }
     .intro-eyebrow {
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 1.2px;
+      letter-spacing: 2px;
       color: var(--brand);
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
     .intro-headline {
-      font-size: 24px;
+      font-size: 27px;
       font-weight: 800;
-      line-height: 1.2;
-      letter-spacing: -0.5px;
+      line-height: 1.15;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
       color: #fff;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
     .intro-sub {
       font-size: 14px;
       line-height: 1.55;
-      color: rgba(255,255,255,.65);
-      margin-bottom: 16px;
+      color: rgba(255,255,255,.6);
+      margin-bottom: 20px;
     }
     .btn-intro-start {
       width: 100%;
       background: var(--brand);
       color: #fff;
       border: none;
-      border-radius: 14px;
-      padding: 15px 24px;
-      font-size: 18px;
+      border-radius: 12px;
+      padding: 17px 24px;
+      font-size: 17px;
       font-weight: 800;
       cursor: pointer;
-      letter-spacing: -0.2px;
-      transition: background var(--transition), transform var(--transition);
-      box-shadow: 0 4px 20px rgba(22,163,74,.35);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 6px 24px rgba(22,163,74,.45);
     }
-    .btn-intro-start:hover { background: #15803d; }
+    .btn-intro-start:hover { background: #15803d; box-shadow: 0 8px 28px rgba(22,163,74,.55); }
     .btn-intro-start:active { transform: scale(0.98); }
     .intro-start-sub {
-      margin-top: 8px;
-      font-size: 11px;
-      color: rgba(255,255,255,.4);
+      margin-top: 10px;
+      font-size: 12px;
+      color: rgba(255,255,255,.38);
     }
 
-    .intro-checklist {
-      background: #fff;
-      border-radius: 16px;
-      margin-top: 12px;
-      padding: 16px 18px;
+    /* Trust badges below the hero */
+    .intro-badges {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 9px;
+      margin-top: 10px;
+    }
+    .intro-badge {
+      background: #fff;
+      border-radius: 14px;
+      padding: 13px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
       box-shadow: var(--shadow);
     }
-    .intro-check-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      font-size: 13px;
-      line-height: 1.5;
-      color: var(--text-mid);
-    }
-    .intro-check-icon {
-      color: var(--brand);
-      font-size: 14px;
+    .intro-badge-icon {
+      font-size: 22px;
       flex-shrink: 0;
-      margin-top: 1px;
-      font-weight: 700;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--brand-light);
+      border-radius: 10px;
+      border: 1px solid var(--brand-mid);
     }
+    .intro-badge-text { flex: 1; min-width: 0; }
+    .intro-badge-title {
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .intro-badge-desc {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+    /* keep old checklist class for safety */
+    .intro-checklist { display: none; }
+    .intro-check-item { display: none; }
+    .intro-check-icon { display: none; }
 
     /* ─── LAYOUT SHELL ─── */
     .shell {
       width: 100%;
       max-width: 560px;
-      padding: 28px 16px 100px;
+      padding: 20px 16px 90px;
       /* Safety net: if content overflows on very small screens, scroll rather than hide */
       overflow-y: auto;
     }
@@ -1081,40 +1114,12 @@
     }
     .step-connector.done { background: rgba(22,163,74,.4); }
 
-    /* ─── EXIT REVEAL ─── */
-
-    .exit-reveal {
-      display: none;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1.5px dashed var(--border);
-      animation: fadeDown 0.2s ease;
-    }
-    .exit-reveal.visible { display: block; }
-    .exit-reveal-label {
-      font-size: 11px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.5px;
-      color: var(--muted); margin-bottom: 8px;
-    }
-    /* Compact 3-col layout for exit type — keeps everything in viewport */
-    /* Location cards minimize when basement selected */
-    #location-cards { transition: gap 0.2s ease; }
-    #location-cards.location-minimized { gap: 4px; }
-    #location-cards.location-minimized .card {
-      padding: 6px 14px;
-      min-height: 0;
-      transition: padding 0.2s ease, min-height 0.2s ease;
-    }
-    #location-cards.location-minimized .card-sub { display: none; }
-    #location-cards.location-minimized .card-icon { display: none; }
-    #location-cards.location-minimized .card-label { font-size: 13px; }
-
+    /* screen-1b exit cards — same full-size style as other screens */
     #exit-cards {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
-    #exit-cards .card { padding: 9px 14px; min-height: 48px; }
     /* Oil level — 2x2 tile grid */
     .oil-grid {
       display: grid;
@@ -1421,7 +1426,7 @@
   </div>
   <div class="header-trust">
     <span class="star-icon">★</span>
-    400+ Five-Star Reviews
+    4.9 &nbsp;·&nbsp; 400+ Reviews
   </div>
 </header>
 
@@ -1432,22 +1437,31 @@
   <div class="intro-hero">
     <div class="intro-eyebrow">Free Instant Estimate</div>
     <h1 class="intro-headline">Find out exactly what your oil tank removal costs.</h1>
-    <p class="intro-sub">Four quick questions.<br>No phone number or email required.</p>
+    <p class="intro-sub">Four quick questions. Completely private —<br>no phone or email required.</p>
     <button class="btn-intro-start" onclick="startEstimator()">Get My Price →</button>
-    <div class="intro-start-sub">60 seconds &nbsp;·&nbsp; No number or email required to see your price</div>
+    <div class="intro-start-sub">~60 seconds to your instant price</div>
   </div>
-  <div class="intro-checklist">
-    <div class="intro-check-item">
-      <span class="intro-check-icon">✓</span>
-      <span><strong>Flat rate pricing.</strong> One price covers permits, oil pumping, cutting, disposal, and cleanup. Nothing added at the door.</span>
+  <div class="intro-badges">
+    <div class="intro-badge">
+      <div class="intro-badge-icon">🏷️</div>
+      <div class="intro-badge-text">
+        <div class="intro-badge-title">Flat-Rate Pricing.</div>
+        <div class="intro-badge-desc">One all-inclusive price covers permits, removal, and cleanup. Zero surprises.</div>
+      </div>
     </div>
-    <div class="intro-check-item">
-      <span class="intro-check-icon">✓</span>
-      <span><strong>You don't pay until the tank is out.</strong> No deposit, no commitment until the job is done.</span>
+    <div class="intro-badge">
+      <div class="intro-badge-icon">📅</div>
+      <div class="intro-badge-text">
+        <div class="intro-badge-title">Fast Turnaround.</div>
+        <div class="intro-badge-desc">Most jobs scheduled and completed within the week — ideal for closing deadlines.</div>
+      </div>
     </div>
-    <div class="intro-check-item">
-      <span class="intro-check-icon">✓</span>
-      <span><strong>Most jobs scheduled within the week.</strong> We move fast — especially when you have a closing deadline.</span>
+    <div class="intro-badge">
+      <div class="intro-badge-icon">💰</div>
+      <div class="intro-badge-text">
+        <div class="intro-badge-title">Pay-On-Completion.</div>
+        <div class="intro-badge-desc">Zero deposit. Full payment is due only <em>after</em> the tank is out. Risk-free.</div>
+      </div>
     </div>
   </div>
 </div>
@@ -1511,41 +1525,49 @@
         <span class="card-check"></span>
       </button>
     </div>
-
-    <!-- Exit type — reveals when basement selected -->
-    <div class="exit-reveal" id="exit-reveal">
-      <div class="exit-reveal-label">How does the tank leave the basement?</div>
-      <div class="cards" id="exit-cards">
-        <button class="card" data-value="walkout" onclick="selectExit(this)">
-          <span class="card-icon">🚪</span>
-          <div class="card-body">
-            <div class="card-label">Walkout / Ground-level door</div>
-            <div class="card-sub">Door opens directly outside — no stairs</div>
-          </div>
-          <span class="card-check"></span>
-        </button>
-        <button class="card" data-value="bulkhead" onclick="selectExit(this)">
-          <span class="card-icon">🔲</span>
-          <div class="card-body">
-            <div class="card-label">Bulkhead</div>
-            <div class="card-sub">Up through an exterior hatch</div>
-          </div>
-          <span class="card-check"></span>
-        </button>
-        <button class="card" data-value="stairs" onclick="selectExit(this)">
-          <span class="card-icon">🪜</span>
-          <div class="card-body">
-            <div class="card-label">Up the stairs / through the house</div>
-            <div class="card-sub">We handle this regularly — takes a bit more time, that's all</div>
-          </div>
-          <span class="card-check"></span>
-        </button>
-      </div>
-    </div>
-
     <div class="nav-row">
       <div></div>
-      <button class="btn-next" id="next-1" onclick="goToStep(2)" disabled>Continue →</button>
+      <button class="btn-next" id="next-1" onclick="continueFromStep1()" disabled>Continue →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STEP 1B — BASEMENT EXIT METHOD
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen-1b" data-step="1">
+    <div class="step-heading">
+      <h1>How does the tank leave the basement?</h1>
+      <p>This helps us plan the right equipment for your job.</p>
+    </div>
+    <div class="cards" id="exit-cards">
+      <button class="card" data-value="walkout" onclick="selectExit(this)">
+        <span class="card-icon">🚪</span>
+        <div class="card-body">
+          <div class="card-label">Walkout / Ground-level door</div>
+          <div class="card-sub">Door opens directly outside — no stairs</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="bulkhead" onclick="selectExit(this)">
+        <span class="card-icon">🔲</span>
+        <div class="card-body">
+          <div class="card-label">Bulkhead</div>
+          <div class="card-sub">Up through an exterior hatch</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="stairs" onclick="selectExit(this)">
+        <span class="card-icon">🪜</span>
+        <div class="card-body">
+          <div class="card-label">Up the stairs / through the house</div>
+          <div class="card-sub">We handle this regularly — takes a bit more time, that's all</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goToStep(1)">← Back</button>
+      <button class="btn-next" id="next-1b" onclick="goToStep(2)" disabled>Continue →</button>
     </div>
   </div>
 
@@ -2500,10 +2522,21 @@ function updateProgressSteps(step) {
 
 function goToStep(n) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + n).classList.add('active');
+  // Support '1b' as a special sub-step (still step 1 in the progress bar)
+  const screenId = 'screen-' + n;
+  document.getElementById(screenId).classList.add('active');
   document.getElementById('quiz-shell').classList.remove('results-mode');
-  updateProgressSteps(n);
+  updateProgressSteps(n === '1b' ? 1 : n);
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Called by screen-1's Continue button — routes to 1b for basement, else step 2
+function continueFromStep1() {
+  if (answers.location === 'basement') {
+    goToStep('1b');
+  } else {
+    goToStep(2);
+  }
 }
 
 function showResults() {
@@ -2524,7 +2557,8 @@ function startOver() {
   document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('selected'));
   const ci = document.getElementById('city-input');
   if (ci) { ci.value = ''; ci.classList.remove('has-value'); }
-  document.getElementById('exit-reveal').classList.remove('visible');
+  const nb = document.getElementById('next-1b');
+  if (nb) nb.disabled = true;
   document.getElementById('ri-note').classList.remove('visible');
   document.getElementById('ct-note').style.display = 'none';
   document.getElementById('city-wrap').style.display = 'none';
@@ -2547,40 +2581,34 @@ function startOver() {
 // CARD SELECTION
 // ──────────────────────────────────────────────
 
-// Location cards — special: may reveal exit sub-question
+// Location cards — screen-1 only picks the type; basement exit is on screen-1b
 function selectLocation(el) {
   document.querySelectorAll('#location-cards .card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   answers.location = el.dataset.value;
-
-  const exitReveal = document.getElementById('exit-reveal');
-  const locationCards = document.getElementById('location-cards');
-  if (answers.location === 'basement') {
-    locationCards.classList.add('location-minimized');
-    exitReveal.classList.add('visible');
+  // If switching away from basement, clear any previously selected exit
+  if (answers.location !== 'basement') {
     answers.exit = null;
     document.querySelectorAll('#exit-cards .card').forEach(c => c.classList.remove('selected'));
-  } else {
-    locationCards.classList.remove('location-minimized');
-    exitReveal.classList.remove('visible');
-    answers.exit = null;
+    const nb = document.getElementById('next-1b');
+    if (nb) nb.disabled = true;
   }
   checkStep1Ready();
   updateEstimateBar();
 }
 
-// Exit cards
+// Exit cards — on screen-1b
 function selectExit(el) {
   document.querySelectorAll('#exit-cards .card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   answers.exit = el.dataset.value;
-  checkStep1Ready();
+  document.getElementById('next-1b').disabled = false;
+  updateEstimateBar();
 }
 
 function checkStep1Ready() {
-  const ready = answers.location !== null &&
-    (answers.location !== 'basement' || answers.exit !== null);
-  document.getElementById('next-1').disabled = !ready;
+  // Screen-1 Continue is enabled as soon as any location is selected
+  document.getElementById('next-1').disabled = (answers.location === null);
 }
 
 // Generic card select — enables the next button for the current step
@@ -2688,7 +2716,7 @@ function selectCity(city, fee, removalFee) {
   answers.cityRemovalFee = removalFee || 600;
   answers.permitSource = 'airtable';
   const input = document.getElementById('city-input');
-  input.value = city;
+  input.value = city + ', ' + answers.state;
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
   document.getElementById('next-4').disabled = false;
@@ -2701,7 +2729,7 @@ function selectCityManual(city) {
   answers.cityRemovalFee = null;
   answers.permitSource = 'tbd';
   const input = document.getElementById('city-input');
-  input.value = city;
+  input.value = city + ', ' + answers.state;
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
   document.getElementById('next-4').disabled = false;
@@ -2716,7 +2744,7 @@ function selectCityFallback(city) {
   answers.cityRemovalFee = answers.state === 'CT' ? 700 : 600;
   answers.permitSource = 'tbd';
   const input = document.getElementById('city-input');
-  input.value = city;
+  input.value = city + ', ' + answers.state;
   input.classList.add('has-value');
   document.getElementById('autocomplete-list').classList.remove('open');
   document.getElementById('next-4').disabled = false;
