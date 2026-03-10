@@ -1840,42 +1840,42 @@
     <div class="form-row">
       <div class="form-field">
         <label for="book-first">First Name *</label>
-        <input type="text" id="book-first" placeholder="Jane" autocomplete="given-name" />
+        <input type="text" id="book-first" name="fname" placeholder="Jane" autocomplete="given-name" />
         <div class="field-error" id="err-first">Required.</div>
       </div>
       <div class="form-field">
         <label for="book-last">Last Name *</label>
-        <input type="text" id="book-last" placeholder="Smith" autocomplete="family-name" />
+        <input type="text" id="book-last" name="lname" placeholder="Smith" autocomplete="family-name" />
         <div class="field-error" id="err-last">Required.</div>
       </div>
     </div>
 
     <div class="form-field">
       <label for="book-phone">Phone Number *</label>
-      <input type="tel" id="book-phone" placeholder="(401) 555-0100" inputmode="numeric" autocomplete="tel" />
+      <input type="tel" id="book-phone" name="phone" placeholder="(401) 555-0100" inputmode="numeric" autocomplete="tel" />
       <div class="field-error" id="err-book-phone">Valid phone required (10 digits).</div>
     </div>
 
     <div class="form-field">
       <label for="book-email">Email <span style="font-weight:400;color:var(--muted)">(optional — confirmation sent here)</span></label>
-      <input type="email" id="book-email" placeholder="you@example.com" autocomplete="email" />
+      <input type="email" id="book-email" name="email" placeholder="you@example.com" autocomplete="email" />
     </div>
 
     <div class="form-field">
       <label for="book-address">Street Address *</label>
-      <input type="text" id="book-address" placeholder="123 Main St" autocomplete="address-line1" />
+      <input type="text" id="book-address" name="address" placeholder="123 Main St" autocomplete="address-line1" />
       <div class="field-error" id="err-address">Street address required.</div>
     </div>
 
     <div class="form-row">
       <div class="form-field">
         <label for="book-city">City *</label>
-        <input type="text" id="book-city" placeholder="Cranston" autocomplete="address-level2" />
+        <input type="text" id="book-city" name="city" placeholder="Cranston" autocomplete="address-level2" />
         <div class="field-error" id="err-city">City required.</div>
       </div>
       <div class="form-field">
         <label for="book-zip">ZIP Code *</label>
-        <input type="text" id="book-zip" placeholder="02920" inputmode="numeric"
+        <input type="text" id="book-zip" name="zip" placeholder="02920" inputmode="numeric"
           autocomplete="postal-code" maxlength="5" />
         <div class="field-error" id="err-zip">5-digit ZIP required.</div>
       </div>
@@ -1907,7 +1907,7 @@
   <div class="screen" id="screen-dates">
     <div class="loading-wrap" id="dates-loading">
       <div class="spinner"></div>
-      <div class="loading-text">Finding the best open dates near you…</div>
+      <div class="loading-text" id="dates-loading-text">Finding the best open dates near you…</div>
     </div>
     <div id="dates-content" style="display:none;">
       <div class="step-heading">
@@ -3164,26 +3164,46 @@ function fireLeadWebhook() {
 }
 
 async function fetchSlots() {
-  try {
-    const resp = await fetch(ROUTE_OPTIMIZER_URL + '/api/public/find-slots', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        address:     booking.address,
-        city:        booking.city,
-        state:       booking.state,
-        zip:         booking.zip,
-        oilLevel:    booking.oilGauge,
-        serviceType: 'OT',
-      }),
-    });
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const data = await resp.json();
-    if (!data.success || !data.slots || !data.slots.length) { showDatesError(); return; }
-    renderSlots(data.slots);
-  } catch(err) {
-    console.error('[Funnel] fetchSlots error:', err);
-    showDatesError();
+  const loadingText = document.getElementById('dates-loading-text');
+  const payload = JSON.stringify({
+    address:     booking.address,
+    city:        booking.city,
+    state:       booking.state,
+    zip:         booking.zip,
+    oilLevel:    booking.oilGauge,
+    serviceType: 'OT',
+  });
+
+  // Try up to 3 times — Render free tier can take 30s to wake from cold start
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      if (attempt === 2) loadingText.textContent = 'Still loading — almost there…';
+      if (attempt === 3) loadingText.textContent = 'One more second…';
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 40000); // 40s per attempt
+
+      const resp = await fetch(ROUTE_OPTIMIZER_URL + '/api/public/find-slots', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload,
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      if (!data.success || !data.slots || !data.slots.length) { showDatesError(); return; }
+      renderSlots(data.slots);
+      return; // success — stop retrying
+
+    } catch(err) {
+      console.warn('[Funnel] fetchSlots attempt ' + attempt + ' failed:', err.message);
+      if (attempt === 3) {
+        console.error('[Funnel] All fetchSlots attempts failed.');
+        showDatesError();
+      }
+    }
   }
 }
 
