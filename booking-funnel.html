@@ -1,0 +1,3294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oil Tank Removal Cost Estimator | RemoveMyOilTank.com</title>
+  <meta name="description" content="Get an instant, itemized estimate for oil tank removal in RI, MA, and CT. Transparent pricing with no hidden fees." />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Free Oil Tank Removal Estimator" />
+  <meta property="og:description" content="Instant itemized estimate. No email required. See exactly what you'll pay — and why." />
+  <meta property="og:url" content="https://removemyoiltank.com/estimate" />
+
+  <!-- Open Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── DESIGN TOKENS ─── */
+    :root {
+      --navy:         #1a1f2e;   /* primary dark — header, CTA button */
+      --navy-light:   #252b3b;   /* hover state on dark surfaces */
+      --brand:        #16a34a;   /* rich green accent — progress bar, checkmarks, selected borders */
+      --brand-light:  #f0fdf4;   /* very light green tint for selected card bg */
+      --brand-mid:    #dcfce7;   /* slightly deeper tint for borders */
+      --text:         #111827;
+      --text-mid:     #374151;
+      --muted:        #6b7280;
+      --border:       #e5e7eb;
+      --border-focus: #d1d5db;
+      --bg:           #ffffff;
+      --surface:      #f9fafb;
+      --surface-2:    #f3f4f6;
+      --radius:       16px;
+      --radius-sm:    10px;
+      --radius-xs:    6px;
+      --shadow-sm:    0 1px 2px rgba(0,0,0,.06);
+      --shadow:       0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.07);
+      --shadow-md:    0 4px 6px rgba(0,0,0,.05), 0 10px 30px rgba(0,0,0,.08);
+      --transition:   0.16s ease;
+      --warm-bg:      #f5f4f0;
+    }
+
+    /* ─── RESET ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body {
+      font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--warm-bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ─── SITE HEADER — dark top bar ─── */
+    .site-header {
+      width: 100%;
+      background: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      margin-bottom: 0;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .site-header img {
+      height: 38px;
+      width: auto;
+      display: block;
+    }
+    .header-divider {
+      width: 1px;
+      height: 28px;
+      background: rgba(255,255,255,.15);
+    }
+    .header-wordmark {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,.9);
+      line-height: 1.25;
+    }
+    .header-wordmark span {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      color: rgba(255,255,255,.45);
+    }
+    .header-trust {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 99px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,.85);
+      white-space: nowrap;
+    }
+    .header-trust .star-icon {
+      color: #fbbf24;
+      font-size: 12px;
+    }
+
+    /* ─── PROGRESS TRACK — thin bar below header ─── */
+    .progress-bar-global {
+      width: 100%;
+      height: 3px;
+      background: rgba(255,255,255,.1);
+      position: relative;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--brand);
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ─── INTRO SCREEN ─── */
+    .intro-screen {
+      width: 100%;
+      max-width: 560px;
+      padding: 16px 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .intro-screen.hidden { display: none; }
+
+    .intro-hero {
+      background: var(--navy);
+      border-radius: 24px;
+      padding: 22px 22px 24px;
+      text-align: center;
+      color: #fff;
+    }
+    .intro-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--brand);
+      margin-bottom: 10px;
+    }
+    .intro-headline {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .intro-sub {
+      font-size: 14px;
+      line-height: 1.55;
+      color: rgba(255,255,255,.65);
+      margin-bottom: 16px;
+    }
+    .btn-intro-start {
+      width: 100%;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 15px 24px;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: -0.2px;
+      transition: background var(--transition), transform var(--transition);
+      box-shadow: 0 4px 20px rgba(22,163,74,.35);
+    }
+    .btn-intro-start:hover { background: #15803d; }
+    .btn-intro-start:active { transform: scale(0.98); }
+    .intro-start-sub {
+      margin-top: 8px;
+      font-size: 11px;
+      color: rgba(255,255,255,.4);
+    }
+
+    .intro-checklist {
+      background: #fff;
+      border-radius: 16px;
+      margin-top: 12px;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: var(--shadow);
+    }
+    .intro-check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-mid);
+    }
+    .intro-check-icon {
+      color: var(--brand);
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      font-weight: 700;
+    }
+
+    /* ─── LAYOUT SHELL ─── */
+    .shell {
+      width: 100%;
+      max-width: 560px;
+      padding: 28px 16px 100px;
+      /* Safety net: if content overflows on very small screens, scroll rather than hide */
+      overflow-y: auto;
+    }
+
+    /* ─── STEP META ─── */
+    .step-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .step-badge {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--brand);
+      background: var(--brand-light);
+      border: 1px solid var(--brand-mid);
+      padding: 4px 10px;
+      border-radius: 99px;
+    }
+    .step-fraction {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    /* ─── STEP HEADING ─── */
+    .step-heading {
+      margin-bottom: 16px;
+    }
+    .step-heading h1 {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .step-heading p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+
+    /* ─── OPTION CARDS ─── */
+    .cards {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      background: var(--bg);
+      transition: border-color var(--transition), background var(--transition), box-shadow var(--transition), transform var(--transition);
+      text-align: left;
+      width: 100%;
+      min-height: 62px;
+      box-shadow: var(--shadow-sm);
+    }
+    .card:hover {
+      border-color: #86efac;
+      background: var(--brand-light);
+      box-shadow: 0 0 0 3px #bbf7d0;
+      transform: translateY(-1px);
+    }
+    .card.selected {
+      border-color: var(--brand);
+      background: var(--brand-light);
+      box-shadow: 0 0 0 3px #bbf7d0;
+    }
+    .card-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .card.selected .card-icon,
+    .card:hover .card-icon {
+      background: var(--brand-mid);
+      border-color: #86efac;
+    }
+    .card-body { flex: 1; min-width: 0; }
+    .card-label {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--text);
+    }
+    .card-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+      line-height: 1.45;
+    }
+    .card-badge {
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--navy);
+      color: #fff;
+      padding: 3px 9px;
+      border-radius: 99px;
+      flex-shrink: 0;
+      letter-spacing: 0.2px;
+    }
+    /* Check circle */
+    .card-check {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all var(--transition);
+      background: var(--bg);
+    }
+    .card.selected .card-check {
+      background: var(--brand);
+      border-color: var(--brand);
+    }
+    .card.selected .card-check::after {
+      content: '';
+      display: block;
+      width: 6px;
+      height: 10px;
+      border: 2.5px solid #fff;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg) translate(-1px, -1px);
+    }
+
+    /* ─── STATE GRID ─── */
+    .state-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .state-btn {
+      padding: 20px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      background: var(--bg);
+      text-align: center;
+      transition: all var(--transition);
+      font-family: inherit;
+      box-shadow: var(--shadow-sm);
+    }
+    .state-btn:hover {
+      border-color: #86efac;
+      background: var(--brand-light);
+      box-shadow: 0 0 0 3px #bbf7d0;
+      transform: translateY(-1px);
+    }
+    .state-btn.selected {
+      border-color: var(--brand);
+      background: var(--brand-light);
+      box-shadow: 0 0 0 3px #bbf7d0;
+    }
+    .state-btn .state-abbr {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      display: block;
+      color: var(--text);
+    }
+    .state-btn.selected .state-abbr { color: var(--brand); }
+    .state-btn .state-name {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    /* ─── CITY INPUT ─── */
+    .city-wrap { margin-top: 4px; }
+    .city-wrap label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-mid);
+      margin-bottom: 8px;
+    }
+    .city-input-wrap { position: relative; }
+    .city-input {
+      width: 100%;
+      padding: 15px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 16px; /* prevent iOS zoom */
+      font-family: inherit;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+    .city-input:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px #bbf7d0;
+    }
+    .city-input.has-value {
+      border-color: var(--brand);
+    }
+
+    .autocomplete-list {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0; right: 0;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-md);
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+    }
+    .autocomplete-list.open { display: block; }
+    .autocomplete-item {
+      padding: 12px 18px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition);
+    }
+    .autocomplete-item:last-child { border-bottom: none; }
+    .autocomplete-item:hover { background: var(--surface); }
+    .autocomplete-item .fee-hint {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .ri-note {
+      background: var(--brand-light);
+      border: 1px solid #bbf7d0;
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      font-size: 13px;
+      color: #15803d;
+      margin-top: 12px;
+      line-height: 1.55;
+      display: none;
+    }
+    .ri-note.visible { display: flex; gap: 10px; align-items: flex-start; }
+    .ri-note-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ─── NAV BUTTONS ─── */
+    .nav-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 28px;
+    }
+    .btn-back {
+      flex: 0 0 auto;
+      padding: 0 22px;
+      height: 52px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      color: var(--text-mid);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-back:hover {
+      border-color: var(--border-focus);
+      color: var(--text);
+      background: var(--surface);
+    }
+    .btn-next {
+      flex: 1;
+      height: 52px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: var(--brand);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.1px;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 2px 8px rgba(22,163,74,.3);
+    }
+    .btn-next:hover {
+      background: #15803d;
+      box-shadow: 0 4px 14px rgba(22,163,74,.4);
+    }
+    .btn-next:active { transform: scale(0.98); }
+    .btn-next:disabled {
+      background: var(--surface-2);
+      color: var(--muted);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* ─── RESULTS: HERO AMOUNT ─── */
+    .results-hero {
+      text-align: center;
+      padding: 32px 24px 28px;
+      background: var(--navy);
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .results-hero::before {
+      /* subtle radial glow */
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(22,163,74,.18) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .results-hero .total-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,.5);
+      margin-bottom: 10px;
+    }
+    .results-hero .total-amount {
+      font-size: 72px;
+      font-weight: 800;
+      letter-spacing: -3px;
+      color: #ffffff;
+      line-height: 1;
+    }
+    .results-hero .total-range {
+      font-size: 14px;
+      color: rgba(255,255,255,.55);
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+    .results-hero .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 16px;
+      background: rgba(22,163,74,.2);
+      border: 1px solid rgba(22,163,74,.35);
+      border-radius: 99px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #4ade80;
+    }
+
+    /* ─── TRUST BANNER ─── */
+    .trust-banner {
+      background: var(--brand-light);
+      border: 1px solid #bbf7d0;
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      font-size: 13px;
+      color: #15803d;
+      line-height: 1.55;
+      margin-bottom: 16px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .trust-banner-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ─── LEAK WARNING ─── */
+    .leak-note {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      font-size: 13px;
+      color: #92400e;
+      line-height: 1.55;
+      margin-bottom: 16px;
+      display: none;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .leak-note.visible { display: flex; }
+    .leak-note-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ─── INVOICE BREAKDOWN ─── */
+    .invoice {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 16px;
+      background: var(--bg);
+      box-shadow: var(--shadow-sm);
+    }
+    .invoice-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .invoice-header-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+    }
+    .invoice-header-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .invoice-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .invoice-row:last-child { border-bottom: none; }
+    .invoice-row-desc { flex: 1; min-width: 0; padding-right: 16px; }
+    .invoice-row-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.35;
+    }
+    .invoice-row-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+    .invoice-row-amount {
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+      color: var(--text);
+    }
+    .invoice-row-amount.included {
+      color: var(--brand);
+      font-size: 13px;
+    }
+    .invoice-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: var(--navy);
+      border-top: 2px solid var(--navy);
+    }
+    .invoice-total-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: rgba(255,255,255,.8);
+    }
+    .invoice-total-amount {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+    }
+
+    /* ─── WHY EXPAND ─── */
+    .why-expand {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 20px;
+      overflow: hidden;
+      background: var(--bg);
+      box-shadow: var(--shadow-sm);
+    }
+    .why-toggle {
+      width: 100%;
+      padding: 15px 20px;
+      background: var(--bg);
+      border: none;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-mid);
+      transition: background var(--transition);
+    }
+    .why-toggle:hover { background: var(--surface); }
+    .why-toggle .chevron {
+      transition: transform 0.22s;
+      font-style: normal;
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .why-toggle.open .chevron { transform: rotate(180deg); }
+    .why-body {
+      display: none;
+      padding: 0 20px 16px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.65;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+    }
+    .why-body.open { display: block; }
+
+    /* ─── SOCIAL PROOF ─── */
+    .social-proof {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .proof-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 10px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+    .proof-number {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      display: block;
+      letter-spacing: -0.3px;
+    }
+    .proof-label {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-top: 3px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    /* ─── SECTION DIVIDER ─── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+
+    /* ─── CTA FORM ─── */
+    .cta-section { margin-top: 4px; }
+    .cta-heading {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .cta-sub {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 24px;
+    }
+    .form-field { margin-bottom: 16px; }
+    .form-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-mid);
+      margin-bottom: 7px;
+    }
+    .form-field input,
+    .form-field textarea {
+      width: 100%;
+      padding: 14px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 16px; /* prevent iOS zoom */
+      font-family: inherit;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      -webkit-appearance: none;
+      box-shadow: var(--shadow-sm);
+    }
+    .form-field input:focus,
+    .form-field textarea:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px #bbf7d0;
+    }
+    .form-field textarea { resize: none; min-height: 84px; }
+    .field-error {
+      font-size: 12px;
+      color: #dc2626;
+      margin-top: 6px;
+      display: none;
+      font-weight: 500;
+    }
+    .field-error.visible { display: block; }
+
+    /* ─── CTA BUTTON — dark navy for premium feel ─── */
+    .btn-cta {
+      width: 100%;
+      height: 58px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: var(--navy);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.2px;
+      margin-top: 4px;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 2px 10px rgba(26,31,46,.25);
+    }
+    .btn-cta:hover {
+      background: var(--navy-light);
+      box-shadow: 0 4px 18px rgba(26,31,46,.3);
+    }
+    .btn-cta:active { transform: scale(0.99); }
+    .btn-cta:disabled {
+      background: var(--surface-2);
+      color: var(--muted);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .btn-cta-sub {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 10px;
+      line-height: 1.45;
+    }
+    .btn-secondary {
+      width: 100%;
+      height: 48px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      margin-top: 12px;
+      transition: all var(--transition);
+    }
+    .btn-secondary:hover { border-color: var(--text); color: var(--text); }
+
+    /* ─── SUCCESS SCREEN ─── */
+    .success-wrap {
+      text-align: center;
+      padding: 28px 0 12px;
+    }
+    .success-icon {
+      width: 76px;
+      height: 76px;
+      background: var(--brand-light);
+      border: 2px solid #bbf7d0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      margin: 0 auto 24px;
+    }
+    .success-heading {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: -0.4px;
+    }
+    .success-body {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+    .success-detail {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+      text-align: left;
+      margin-bottom: 24px;
+    }
+    .success-detail strong { color: var(--text); }
+
+    /* ─── SCREENS — slide animation ─── */
+    .screen { display: none; }
+    .screen.active {
+      display: block;
+      animation: slideIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(16px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ─── RESPONSIVE ─── */
+
+    /* Desktop — bigger text for older readers */
+    @media (min-width: 640px) {
+      .step-heading h1 { font-size: 30px; }
+      .step-heading p  { font-size: 16px; }
+      .card-label      { font-size: 17px; }
+      .card-sub        { font-size: 14px; }
+      .card            { padding: 18px 22px; min-height: 72px; }
+      .btn-next, .btn-back { font-size: 16px; padding: 14px 28px; }
+      .cta-heading     { font-size: 22px; }
+      .cta-sub         { font-size: 16px; }
+      .btn-cta         { font-size: 18px; padding: 18px; }
+      label            { font-size: 15px; }
+      input, textarea  { font-size: 16px; }
+    }
+
+    /* Mobile — no-scroll on quiz steps, intro above fold */
+    @media (max-width: 639px) {
+      /* Intro: compact so both cards fit above fold */
+      .intro-hero      { padding: 22px 18px 24px; }
+      .intro-headline  { font-size: 22px; margin-bottom: 10px; }
+      .intro-sub       { font-size: 13px; margin-bottom: 18px; line-height: 1.5; }
+
+      .btn-intro-start { font-size: 16px; padding: 15px 20px; }
+      .intro-start-sub { font-size: 11px; margin-top: 8px; }
+      .intro-checklist { padding: 14px 16px; gap: 9px; margin-top: 10px; }
+      .intro-check-item { font-size: 12px; gap: 8px; }
+      .intro-check-icon { font-size: 13px; }
+
+      /* Quiz shell: fill remaining viewport, no scroll on steps */
+      .shell {
+        padding: 16px 14px 90px;
+        height: calc(var(--vh, 1vh) * 100 - 118px);
+        overflow: hidden;
+      }
+      /* Results screen gets scroll back */
+      .shell.results-mode {
+        height: auto;
+        overflow-y: auto;
+        min-height: calc(var(--vh, 1vh) * 100 - 118px);
+      }
+      /* Step layout: fill shell height, nav pinned to bottom */
+      .screen.active {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      .cards { flex: 1; justify-content: center; }
+
+      /* Tighter cards on mobile so 3 fit without scrolling */
+      .card            { padding: 11px 14px; min-height: 54px; gap: 10px; }
+      .card-label      { font-size: 14px; }
+      .card-sub        { font-size: 12px; }
+      .cards           { gap: 8px; }
+      .step-heading    { margin-bottom: 10px; }
+      .step-heading h1 { font-size: 21px; margin-bottom: 5px; }
+      .step-heading p  { font-size: 13px; line-height: 1.45; }
+      .nav-row         { margin-top: 10px; }
+      .card-icon       { width: 32px; height: 32px; font-size: 18px; }
+    }
+
+    @media (max-width: 420px) {
+      .results-hero .total-amount { font-size: 56px; }
+      .site-header .header-wordmark { display: none; }
+      .header-divider { display: none; }
+    }
+    @media (max-width: 360px) {
+      .results-hero .total-amount { font-size: 46px; }
+      .social-proof { grid-template-columns: 1fr 1fr; }
+      .proof-item:last-child { grid-column: span 2; }
+      .cards-2col { grid-template-columns: 1fr; }
+    }
+
+    /* ─── PROGRESS DOTS ─── */
+    .progress-steps {
+      width: 100%;
+      background: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 24px 14px;
+    }
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      flex: 0 0 auto;
+    }
+    .step-dot {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.1);
+      border: 2px solid rgba(255,255,255,.2);
+      color: rgba(255,255,255,.35);
+      font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .progress-step.active .step-dot {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #fff;
+      box-shadow: 0 0 0 3px rgba(22,163,74,.3);
+    }
+    .progress-step.done .step-dot {
+      background: rgba(22,163,74,.2);
+      border-color: var(--brand);
+      color: var(--brand);
+      font-size: 11px;
+    }
+    .step-label {
+      font-size: 9px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      color: rgba(255,255,255,.25);
+      text-align: center;
+    }
+    .progress-step.active .step-label { color: rgba(255,255,255,.75); }
+    .progress-step.done .step-label { color: rgba(22,163,74,.6); }
+    .step-connector {
+      flex: 1;
+      height: 2px;
+      background: rgba(255,255,255,.1);
+      margin-bottom: 14px;
+      min-width: 20px; max-width: 60px;
+      transition: background 0.3s;
+    }
+    .step-connector.done { background: rgba(22,163,74,.4); }
+
+    /* ─── EXIT REVEAL ─── */
+
+    .exit-reveal {
+      display: none;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1.5px dashed var(--border);
+      animation: fadeDown 0.2s ease;
+    }
+    .exit-reveal.visible { display: block; }
+    .exit-reveal-label {
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--muted); margin-bottom: 8px;
+    }
+    /* Compact 3-col layout for exit type — keeps everything in viewport */
+    /* Location cards minimize when basement selected */
+    #location-cards { transition: gap 0.2s ease; }
+    #location-cards.location-minimized { gap: 4px; }
+    #location-cards.location-minimized .card {
+      padding: 6px 14px;
+      min-height: 0;
+      transition: padding 0.2s ease, min-height 0.2s ease;
+    }
+    #location-cards.location-minimized .card-sub { display: none; }
+    #location-cards.location-minimized .card-icon { display: none; }
+    #location-cards.location-minimized .card-label { font-size: 13px; }
+
+    #exit-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    #exit-cards .card { padding: 9px 14px; min-height: 48px; }
+    /* Oil level — 2x2 tile grid */
+    .oil-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .oil-tile {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 22px 12px 18px;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      text-align: center;
+      transition: border-color var(--transition), background var(--transition), box-shadow var(--transition), transform var(--transition);
+      box-shadow: var(--shadow-sm);
+      gap: 8px;
+      min-height: 90px;
+    }
+    .oil-tile:hover {
+      border-color: #86efac;
+      background: var(--brand-light);
+      box-shadow: 0 0 0 3px #bbf7d0;
+      transform: translateY(-1px);
+    }
+    .oil-tile.selected {
+      border-color: var(--brand);
+      background: var(--brand-light);
+      box-shadow: 0 0 0 3px #bbf7d0;
+    }
+    .oil-tile-label {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .oil-tile.selected .oil-tile-label { color: var(--brand); }
+    .oil-tile-badge {
+      font-size: 10px;
+      font-weight: 700;
+      background: var(--navy);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 99px;
+      letter-spacing: 0.3px;
+    }
+    .oil-tile.selected .oil-tile-badge { background: var(--brand); }
+    .oil-tile-check {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--bg);
+      transition: all var(--transition);
+    }
+    .oil-tile.selected .oil-tile-check {
+      background: var(--brand);
+      border-color: var(--brand);
+    }
+    .oil-tile.selected .oil-tile-check::after {
+      content: '';
+      display: block;
+      width: 4px;
+      height: 8px;
+      border: 2px solid #fff;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg) translate(2px, -1px);
+      margin: auto;
+    }
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── 2-COL CARDS ─── */
+    .cards-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .cards-2col .card {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      min-height: 100px;
+      position: relative;
+    }
+    .cards-2col .card .card-check {
+      position: absolute;
+      top: 12px; right: 12px;
+    }
+
+    /* ─── STAIRS WARNING ─── */
+    .stairs-note {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      font-size: 13px; color: #9a3412;
+      line-height: 1.55; margin-bottom: 16px;
+      display: none; gap: 10px; align-items: flex-start;
+    }
+    .stairs-note.visible { display: flex; }
+
+    /* ─── ESTIMATE BAR (fixed bottom) ─── */
+    body { padding-bottom: 70px; }
+    .estimate-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: var(--navy);
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding: 10px 24px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 200;
+      box-shadow: 0 -4px 20px rgba(0,0,0,.2);
+    }
+    .estimate-bar.visible { display: flex; }
+    .estimate-bar-left { display: flex; flex-direction: column; gap: 2px; }
+    .estimate-bar-label {
+      font-size: 10px; font-weight: 700;
+      color: rgba(255,255,255,.45);
+      text-transform: uppercase; letter-spacing: 0.6px;
+    }
+    .estimate-bar-note { font-size: 11px; color: rgba(255,255,255,.5); }
+    .estimate-bar-amount {
+      font-size: 20px; font-weight: 800;
+      color: #fff; letter-spacing: -0.3px;
+    }
+  
+    /* ─── SINGLE-SCREEN QUESTION GROUPS ─── */
+    .q-group {
+      margin-bottom: 28px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+    }
+    .q-group:last-of-type {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    .q-label {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .q-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    /* 3-column compact cards */
+    .cards-3col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .cards-3col .card {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 14px 8px;
+      gap: 4px;
+    }
+    .cards-3col .card .card-icon { font-size: 22px; }
+    .cards-3col .card .card-label { font-size: 13px; font-weight: 600; }
+    .cards-3col .card .card-check { display: none; }
+    .cards-3col .card .card-body { width: 100%; }
+    .cards-3col .card .card-badge { font-size: 10px; margin-top: 2px; }
+    /* 2-column cards */
+    .cards-2col {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .cards-2col .card { padding: 14px 12px; min-height: 80px; }
+    .cards-2col .card .card-icon { font-size: 20px; }
+    .cards-2col .card .card-check { display: none; }
+    .cards-2col .card .card-label { font-size: 14px; }
+    .cards-2col .card .card-sub { font-size: 12px; }
+    /* Override: selected state for compact grids */
+    .cards-3col .card.selected,
+    .cards-2col .card.selected {
+      border-color: var(--brand);
+      background: var(--brand-light);
+      box-shadow: 0 0 0 2px var(--brand);
+    }
+    /* autocomplete error */
+    .autocomplete-error {
+      cursor: default;
+      color: #dc2626;
+    }
+    .autocomplete-error a {
+      color: var(--brand);
+      text-decoration: none;
+    }
+
+
+    /* ─── BOOKING FLOW: slot cards, loading, select, form row ─── */
+
+    .slot-cards { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+    .slot-card {
+      display:flex; align-items:center; gap:16px;
+      padding:16px 20px;
+      border:2px solid var(--border); border-radius:var(--radius);
+      cursor:pointer; background:var(--bg);
+      transition:all var(--transition); box-shadow:var(--shadow-sm);
+      text-align:left; width:100%; font-family:inherit;
+    }
+    .slot-card:hover {
+      border-color:#86efac; background:var(--brand-light);
+      box-shadow:0 0 0 3px #bbf7d0; transform:translateY(-1px);
+    }
+    .slot-card.selected {
+      border-color:var(--brand); background:var(--brand-light);
+      box-shadow:0 0 0 3px #bbf7d0;
+    }
+    .slot-rank {
+      font-size:10px; font-weight:700; text-transform:uppercase;
+      letter-spacing:0.5px; padding:3px 9px; border-radius:99px;
+      background:var(--navy); color:#fff; flex-shrink:0;
+    }
+    .slot-card.selected .slot-rank { background:var(--brand); }
+    .slot-body { flex:1; min-width:0; }
+    .slot-date { font-size:15px; font-weight:700; color:var(--text); line-height:1.3; }
+    .slot-time { font-size:13px; color:var(--muted); margin-top:2px; }
+    .slot-check {
+      width:24px; height:24px; border-radius:50%;
+      border:2px solid var(--border); display:flex;
+      align-items:center; justify-content:center; flex-shrink:0;
+      transition:all var(--transition); background:var(--bg);
+    }
+    .slot-card.selected .slot-check { background:var(--brand); border-color:var(--brand); }
+    .slot-card.selected .slot-check::after {
+      content:''; display:block; width:6px; height:10px;
+      border:2.5px solid #fff; border-top:none; border-left:none;
+      transform:rotate(45deg) translate(-1px,-1px);
+    }
+
+    /* Loading spinner */
+    .loading-wrap { text-align:center; padding:48px 20px; }
+    .spinner {
+      width:40px; height:40px; border:3px solid var(--border);
+      border-top-color:var(--brand); border-radius:50%;
+      animation:spin 0.7s linear infinite; margin:0 auto 16px;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .loading-text { font-size:15px; color:var(--muted); font-weight:500; }
+
+    /* Select dropdown */
+    .form-field select {
+      width:100%; padding:14px 44px 14px 18px;
+      border:1.5px solid var(--border); border-radius:var(--radius-sm);
+      font-size:16px; font-family:inherit; background:var(--bg); color:var(--text);
+      outline:none; -webkit-appearance:none; appearance:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:right 16px center;
+      cursor:pointer; transition:border-color var(--transition),box-shadow var(--transition);
+      box-shadow:var(--shadow-sm);
+    }
+    .form-field select:focus { border-color:var(--brand); box-shadow:0 0 0 3px #bbf7d0; }
+
+    /* 2-col form row */
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    @media (max-width:400px) { .form-row { grid-template-columns:1fr; } }
+
+    /* Booking summary on success */
+    .booking-summary {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius); padding:18px 20px; margin-bottom:16px;
+      font-size:14px; color:var(--muted); line-height:1.8; text-align:left;
+    }
+    .booking-summary strong { color:var(--text); }
+
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     SITE HEADER — dark nav bar
+══════════════════════════════════════ -->
+<header class="site-header">
+  <div class="header-left">
+    <img
+      src="https://removemyoiltank.com/wp-content/uploads/2024/06/Oil-Tank-Removal-MA-Jacobs-Property-Solutions-Logo-2024.png"
+      alt="Jacobs Property Solutions"
+    />
+    <div class="header-divider"></div>
+    <div class="header-wordmark">
+      RemoveMyOilTank.com
+      <span>Jacobs Property Solutions</span>
+    </div>
+  </div>
+  <div class="header-trust">
+    <span class="star-icon">★</span>
+    400+ Five-Star Reviews
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════
+     INTRO SCREEN — shown before step 1
+══════════════════════════════════════ -->
+<div class="intro-screen" id="intro-screen">
+  <div class="intro-hero">
+    <div class="intro-eyebrow">Free Instant Estimate</div>
+    <h1 class="intro-headline">Find out exactly what your oil tank removal costs.</h1>
+    <p class="intro-sub">Four quick questions.<br>No phone number or email required.</p>
+    <button class="btn-intro-start" onclick="startEstimator()">Get My Price →</button>
+    <div class="intro-start-sub">60 seconds &nbsp;·&nbsp; No number or email required to see your price</div>
+  </div>
+  <div class="intro-checklist">
+    <div class="intro-check-item">
+      <span class="intro-check-icon">✓</span>
+      <span><strong>Flat rate pricing.</strong> One price covers permits, oil pumping, cutting, disposal, and cleanup. Nothing added at the door.</span>
+    </div>
+    <div class="intro-check-item">
+      <span class="intro-check-icon">✓</span>
+      <span><strong>You don't pay until the tank is out.</strong> No deposit, no commitment until the job is done.</span>
+    </div>
+    <div class="intro-check-item">
+      <span class="intro-check-icon">✓</span>
+      <span><strong>Most jobs scheduled within the week.</strong> We move fast — especially when you have a closing deadline.</span>
+    </div>
+  </div>
+</div>
+
+<!-- Progress dot indicators — hidden on intro screen -->
+<div class="progress-steps" id="progress-steps" style="display:none;">
+  <div class="progress-step active" id="dot-1">
+    <div class="step-dot" id="dot-num-1">1</div>
+    <div class="step-label">Location</div>
+  </div>
+  <div class="step-connector" id="con-12"></div>
+  <div class="progress-step" id="dot-2">
+    <div class="step-dot" id="dot-num-2">2</div>
+    <div class="step-label">Access</div>
+  </div>
+  <div class="step-connector" id="con-23"></div>
+  <div class="progress-step" id="dot-3">
+    <div class="step-dot" id="dot-num-3">3</div>
+    <div class="step-label">Oil Level</div>
+  </div>
+  <div class="step-connector" id="con-34"></div>
+  <div class="progress-step" id="dot-4">
+    <div class="step-dot" id="dot-num-4">4</div>
+    <div class="step-label">State</div>
+  </div>
+</div>
+
+<div class="shell" id="quiz-shell" style="display:none;">
+
+  <!-- ══════════════════════════════════════
+       STEP 1 — TANK SIZE
+  ══════════════════════════════════════ -->
+  <div class="screen active" id="screen-1" data-step="1">
+    <div class="step-heading">
+      <h1>Where is the tank located?</h1>
+      <p>There is no wrong answer here.</p>
+    </div>
+    <div class="cards" id="location-cards">
+      <button class="card" data-value="basement" onclick="selectLocation(this)">
+        <span class="card-icon">🏠</span>
+        <div class="card-body">
+          <div class="card-label">Basement</div>
+          <div class="card-sub">Inside the home, below ground level</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" id="garage-card" data-value="garage" onclick="selectLocation(this)">
+        <span class="card-icon">🚗</span>
+        <div class="card-body">
+          <div class="card-label">Garage</div>
+          <div class="card-sub">Attached or detached garage</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="outside" onclick="selectLocation(this)">
+        <span class="card-icon">🌿</span>
+        <div class="card-body">
+          <div class="card-label">Outside</div>
+          <div class="card-sub">Above ground, exterior of the home</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+    </div>
+
+    <!-- Exit type — reveals when basement selected -->
+    <div class="exit-reveal" id="exit-reveal">
+      <div class="exit-reveal-label">How does the tank leave the basement?</div>
+      <div class="cards" id="exit-cards">
+        <button class="card" data-value="walkout" onclick="selectExit(this)">
+          <span class="card-icon">🚪</span>
+          <div class="card-body">
+            <div class="card-label">Walkout / Ground-level door</div>
+            <div class="card-sub">Door opens directly outside — no stairs</div>
+          </div>
+          <span class="card-check"></span>
+        </button>
+        <button class="card" data-value="bulkhead" onclick="selectExit(this)">
+          <span class="card-icon">🔲</span>
+          <div class="card-body">
+            <div class="card-label">Bulkhead</div>
+            <div class="card-sub">Up through an exterior hatch</div>
+          </div>
+          <span class="card-check"></span>
+        </button>
+        <button class="card" data-value="stairs" onclick="selectExit(this)">
+          <span class="card-icon">🪜</span>
+          <div class="card-body">
+            <div class="card-label">Up the stairs / through the house</div>
+            <div class="card-sub">We handle this regularly — takes a bit more time, that's all</div>
+          </div>
+          <span class="card-check"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <div></div>
+      <button class="btn-next" id="next-1" onclick="goToStep(2)" disabled>Continue →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STEP 2 — TANK ACCESS
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen-2" data-step="2">
+    <div class="step-heading">
+      <h1>How easy is it to access the tank?</h1>
+      <p>Be honest here — it's the only thing that keeps your estimate accurate and avoids surprises on job day.</p>
+    </div>
+    <div class="cards" id="access-cards">
+      <button class="card" data-value="open" onclick="selectCard(this,'access')">
+        <span class="card-icon">✅</span>
+        <div class="card-body">
+          <div class="card-label">Easy — open and accessible</div>
+          <div class="card-sub">Clear path, no obstacles between us and the tank</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="unsure" onclick="selectCard(this,'access')">
+        <span class="card-icon">🤔</span>
+        <div class="card-body">
+          <div class="card-label">I'm not sure</div>
+          <div class="card-sub">A quick photo when we call clears this up in seconds</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+      <button class="card" data-value="restricted" onclick="selectCard(this,'access')">
+        <span class="card-icon">⚠️</span>
+        <div class="card-body">
+          <div class="card-label">Tight or obstructed</div>
+          <div class="card-sub">Behind a wall, crawl space, or cubbyhole — surcharge may apply, always confirmed before we start</div>
+        </div>
+        <span class="card-check"></span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goToStep(1)">← Back</button>
+      <button class="btn-next" id="next-2" onclick="goToStep(3)" disabled>Continue →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STEP 3 — OIL LEVEL
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen-3" data-step="3">
+    <div class="step-heading">
+      <h1>How much oil is in the tank?</h1>
+      <p>What does the gauge on the tank read?</p>
+    </div>
+    <div class="oil-grid" id="oil-cards">
+      <button class="oil-tile" data-value="quarter" onclick="selectCard(this,'oil')">
+        <span class="oil-tile-check"></span>
+        <div class="oil-tile-label">Less than ¼</div>
+        <span class="oil-tile-badge">Included</span>
+      </button>
+      <button class="oil-tile" data-value="half_plus" onclick="selectCard(this,'oil')">
+        <span class="oil-tile-check"></span>
+        <div class="oil-tile-label">More than ¼</div>
+      </button>
+      <button class="oil-tile" data-value="no_gauge" onclick="selectCard(this,'oil')">
+        <span class="oil-tile-check"></span>
+        <div class="oil-tile-label">I don't know</div>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goToStep(2)">← Back</button>
+      <button class="btn-next" id="next-3" onclick="goToStep(4)" disabled>Continue →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       STEP 4 — STATE & CITY
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen-4" data-step="4">
+    <div class="step-heading">
+      <h1>Last one — where is the property?</h1>
+      <p>We pull every permit ourselves. You don't file anything, sign anything, or chase anything.</p>
+    </div>
+
+    <div class="state-grid">
+      <button class="state-btn" data-value="RI" onclick="selectState(this)">
+        <span class="state-abbr">RI</span>
+        <div class="state-name">Rhode Island</div>
+      </button>
+      <button class="state-btn" data-value="MA" onclick="selectState(this)">
+        <span class="state-abbr">MA</span>
+        <div class="state-name">Massachusetts</div>
+      </button>
+      <button class="state-btn" data-value="CT" onclick="selectState(this)">
+        <span class="state-abbr">CT</span>
+        <div class="state-name">Connecticut</div>
+      </button>
+    </div>
+
+    <div class="ri-note" id="ri-note">
+      <span class="ri-note-icon">✅</span>
+      <span><strong>Rhode Island requires no permit for oil tank removal.</strong> No fee, no waiting — most RI jobs are on the schedule within the same week.</span>
+    </div>
+
+    <div class="ri-note" id="ct-note" style="display:none;">
+      <span class="ri-note-icon">✅</span>
+      <span><strong>Connecticut requires no permit for oil tank removal.</strong> No permit fee — what you see is what you pay.</span>
+    </div>
+
+    <div class="city-wrap" id="city-wrap" style="display:none;">
+      <label for="city-input">City / Town</label>
+      <div class="city-input-wrap">
+        <input
+          type="text"
+          id="city-input"
+          class="city-input"
+          placeholder="Start typing your city..."
+          autocomplete="off"
+          oninput="onCityInput(this)"
+          onblur="hideAutocompleteSoon()"
+        />
+        <div class="autocomplete-list" id="autocomplete-list"></div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goToStep(3)">← Back</button>
+      <button class="btn-next" id="next-4" onclick="showResults()" disabled>See My Estimate →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       RESULTS SCREEN
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen-results">
+
+    <!-- Hero total -->
+    <div class="results-hero">
+      <div class="total-label">Your All-In Price</div>
+      <div class="total-amount" id="results-total-display">$600</div>
+      <div class="total-range" id="results-range-display"></div>
+      <div class="hero-badge">
+        <span>✓</span> Flat rate · No hourly billing · No surprises on job day
+      </div>
+    </div>
+
+    <!-- Trust note -->
+    <div class="trust-banner">
+      <span class="trust-banner-icon">🛡️</span>
+      <span>You don't pay until the tank is gone. The number above is the number on your invoice — no asterisks, no surprises.</span>
+    </div>
+
+    <!-- Stairs warning (conditional) -->
+    <div class="stairs-note" id="stairs-note">
+      <span>🪜</span>
+      <span><strong>Stair removal noted.</strong> Navigating stairs and living space adds time. We'll confirm scope on-site — most stair jobs still fall within standard pricing.</span>
+    </div>
+
+    <!-- Leak warning (conditional) -->
+    <div class="leak-note" id="leak-note">
+      <span class="leak-note-icon">🚨</span>
+      <span><strong>Heads up:</strong> Contamination cleanup is separate and not included in this estimate. We'll assess on-site and connect you with certified remediation partners if needed — pricing depends on scope.</span>
+    </div>
+
+    <!-- Invoice-style breakdown -->
+    <div class="invoice">
+      <div class="invoice-header">
+        <span class="invoice-header-title">Price Breakdown</span>
+        <span class="invoice-header-label">Amount</span>
+      </div>
+
+      <div class="invoice-row">
+        <div class="invoice-row-desc">
+          <div class="invoice-row-name">Base Removal Fee</div>
+          <div class="invoice-row-sub" id="base-sub">Cutting, safe removal &amp; disposal</div>
+        </div>
+        <div class="invoice-row-amount" id="base-fee-display">$600</div>
+      </div>
+
+      <div class="invoice-row" id="access-line" style="display:none;">
+        <div class="invoice-row-desc">
+          <div class="invoice-row-name">Restricted Access Surcharge</div>
+          <div class="invoice-row-sub">Crawlspace / obstructed — confirmed when we connect</div>
+        </div>
+        <div class="invoice-row-amount" id="access-fee-display">+$600</div>
+      </div>
+
+      <div class="invoice-row">
+        <div class="invoice-row-desc">
+          <div class="invoice-row-name">Oil &amp; Sludge Disposal</div>
+          <div class="invoice-row-sub">Up to 50 gallons of oil &amp; sludge included</div>
+        </div>
+        <div class="invoice-row-amount included">Included ✓</div>
+      </div>
+
+      <div class="invoice-row" id="oil-excess-line" style="display:none;">
+        <div class="invoice-row-desc">
+          <div class="invoice-row-name">Excess Oil Disposal</div>
+          <div class="invoice-row-sub">Tank is more than half full — flat fee, never by the gallon</div>
+        </div>
+        <div class="invoice-row-amount">+$150</div>
+      </div>
+
+      <div class="invoice-row" id="permit-line">
+        <div class="invoice-row-desc">
+          <div class="invoice-row-name">Permit Fee</div>
+          <div class="invoice-row-sub" id="permit-sub">We pull and pay the permit on your behalf</div>
+        </div>
+        <div class="invoice-row-amount" id="permit-fee-display">$0</div>
+      </div>
+
+      <div class="invoice-total-row">
+        <div class="invoice-total-label">Your Total</div>
+        <div class="invoice-total-amount" id="total-display">$600</div>
+      </div>
+    </div>
+
+    <!-- Why our prices -->
+    <div class="why-expand">
+      <button class="why-toggle" onclick="toggleWhy(this)">
+        How we price our jobs — and why it's different
+        <i class="chevron">▼</i>
+      </button>
+      <div class="why-body" id="why-body">
+        Most contractors bill hourly or charge per gallon for disposal. We don't. One flat rate covers everything: permits, oil pumping, tank cutting, haul-off, and cleanup. We've done this since 2013 — we know exactly what each job costs and we quote it that way. The number above is the number on your invoice. No exceptions.
+      </div>
+    </div>
+
+    <!-- Social proof tiles -->
+    <div class="social-proof">
+      <div class="proof-item">
+        <span class="proof-number">400+</span>
+        <span class="proof-label">Five-Star Reviews</span>
+      </div>
+      <div class="proof-item">
+        <span class="proof-number">10,000+</span>
+        <span class="proof-label">Tanks Removed</span>
+      </div>
+      <div class="proof-item">
+        <span class="proof-number">Fully</span>
+        <span class="proof-label">Insured</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- CTA — primary = self-book, secondary = call -->
+    <div class="cta-section">
+      <div class="cta-heading">That’s your number. Ready to book your removal?</div>
+      <div class="cta-sub">Skip the callback — pick your own date and you’re confirmed in under 60 seconds.</div>
+
+      <button class="btn-cta" onclick="goToCheckout()">Book My Removal — Pick a Date →</button>
+      <div class="btn-cta-sub">No payment today. Your appointment is locked in instantly.</div>
+
+      <a href="tel:+14013893200" class="btn-secondary"
+         style="display:flex;align-items:center;justify-content:center;text-decoration:none;margin-top:12px;height:48px;border-radius:var(--radius-sm);border:1.5px solid var(--border);color:var(--muted);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:all var(--transition);">
+        Prefer a call?&nbsp;<span style="color:var(--brand);font-weight:700;">(401) 389-3200</span>
+      </a>
+
+      <button class="btn-secondary" onclick="startOver()" style="margin-top:8px;">Start Over</button>
+    </div>
+
+  </div><!-- /screen-results -->
+
+  <!-- ══════════════════════════════════════
+       SUCCESS SCREEN
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen-success">
+    <div class="success-wrap">
+      <div class="success-icon">✅</div>
+      <div class="success-heading">You're booked in, <span id="success-name">there</span>. We've got it from here.</div>
+      <div class="success-body" id="success-body">We're reviewing your details right now. Expect a call or text shortly — we'll confirm access and lock in your removal date.</div>
+      <div class="success-detail">
+        We confirm access → lock your price → show up on the scheduled day and handle everything. Between now and then, you don't have to do a thing.<br /><br />
+        Questions? Call or text Norman directly: <strong><a href="tel:+14013893200" style="color:var(--brand)">(401) 389-3200</a></strong>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ======================================================
+       SCREEN: CHECKOUT
+  ====================================================== -->
+  <div class="screen" id="screen-checkout">
+    <div class="step-heading">
+      <h1>Almost there — where should we come?</h1>
+      <p>Your estimate is <strong id="checkout-price-display">locked</strong>. Fill this in and we’ll find the best open dates near you.</p>
+    </div>
+
+    <!-- Honeypot for bots -->
+    <input type="text" id="book-website" name="website"
+      style="position:absolute;left:-9999px;top:-9999px;opacity:0;height:0;"
+      tabindex="-1" autocomplete="off" />
+
+    <div class="form-row">
+      <div class="form-field">
+        <label for="book-first">First Name *</label>
+        <input type="text" id="book-first" placeholder="Jane" autocomplete="given-name" />
+        <div class="field-error" id="err-first">Required.</div>
+      </div>
+      <div class="form-field">
+        <label for="book-last">Last Name *</label>
+        <input type="text" id="book-last" placeholder="Smith" autocomplete="family-name" />
+        <div class="field-error" id="err-last">Required.</div>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label for="book-phone">Phone Number *</label>
+      <input type="tel" id="book-phone" placeholder="(401) 555-0100" inputmode="numeric" autocomplete="tel" />
+      <div class="field-error" id="err-book-phone">Valid phone required (10 digits).</div>
+    </div>
+
+    <div class="form-field">
+      <label for="book-email">Email <span style="font-weight:400;color:var(--muted)">(optional — confirmation sent here)</span></label>
+      <input type="email" id="book-email" placeholder="you@example.com" autocomplete="email" />
+    </div>
+
+    <div class="form-field">
+      <label for="book-address">Street Address *</label>
+      <input type="text" id="book-address" placeholder="123 Main St" autocomplete="address-line1" />
+      <div class="field-error" id="err-address">Street address required.</div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label for="book-city">City *</label>
+        <input type="text" id="book-city" placeholder="Cranston" autocomplete="address-level2" />
+        <div class="field-error" id="err-city">City required.</div>
+      </div>
+      <div class="form-field">
+        <label for="book-zip">ZIP Code *</label>
+        <input type="text" id="book-zip" placeholder="02920" inputmode="numeric"
+          autocomplete="postal-code" maxlength="5" />
+        <div class="field-error" id="err-zip">5-digit ZIP required.</div>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label for="book-oil-gauge">Oil Level (exact gauge reading) *</label>
+      <select id="book-oil-gauge">
+        <option value="" disabled selected>Select what the gauge reads...</option>
+        <option value="empty">Empty — gauge reads 0</option>
+        <option value="1/8">⅛ Full</option>
+        <option value="1/4">¼ Full</option>
+        <option value="1/2">½ Full</option>
+        <option value="3/4">¾ Full</option>
+        <option value="full">Full — gauge reads F</option>
+      </select>
+      <div class="field-error" id="err-oil-gauge">Please select the oil level.</div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goToScreen('results')">← Back</button>
+      <button class="btn-next" id="btn-find-dates" onclick="submitCheckout()">Find Available Dates →</button>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       SCREEN: DATES
+  ====================================================== -->
+  <div class="screen" id="screen-dates">
+    <div class="loading-wrap" id="dates-loading">
+      <div class="spinner"></div>
+      <div class="loading-text">Finding the best open dates near you…</div>
+    </div>
+    <div id="dates-content" style="display:none;">
+      <div class="step-heading">
+        <h1>Pick your date.</h1>
+        <p>Three options ranked by route efficiency — all confirmed for your area.</p>
+      </div>
+      <div class="slot-cards" id="slot-cards"></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goToScreen('checkout')">← Back</button>
+        <button class="btn-next" id="btn-confirm-booking" onclick="confirmBooking()" disabled>Confirm This Date →</button>
+      </div>
+    </div>
+    <div id="dates-error" style="display:none;padding-top:8px;">
+      <div class="step-heading">
+        <h1>Couldn’t load available dates.</h1>
+        <p>No worries — call us and we’ll get you on the schedule in 2 minutes.</p>
+      </div>
+      <a href="tel:+14013893200" class="btn-cta"
+         style="display:block;text-align:center;text-decoration:none;line-height:58px;border-radius:var(--radius-sm);">
+        Call (401) 389-3200 →
+      </a>
+      <button class="btn-secondary" onclick="goToScreen('checkout')" style="margin-top:10px;">← Try Again</button>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       SCREEN: BOOKING SUCCESS
+  ====================================================== -->
+  <div class="screen" id="screen-booking-success">
+    <div class="loading-wrap" id="booking-loading" style="display:none;">
+      <div class="spinner"></div>
+      <div class="loading-text">Locking in your date…</div>
+    </div>
+    <div id="booking-confirmed" style="display:none;">
+      <div class="success-wrap">
+        <div class="success-icon">📅</div>
+        <div class="success-heading">You’re on the schedule, <span id="booking-success-name">there</span>!</div>
+        <div class="success-body">Your oil tank removal is confirmed. We’ll send you a service agreement and all the details shortly.</div>
+        <div class="booking-summary" id="booking-summary-box"></div>
+        <div class="success-detail">
+          We arrive, pump the tank, cut it up, and haul everything away — all in one visit.
+          You don’t need to be there, just make sure we have access.<br /><br />
+          Questions? Call or text Norman directly:
+          <strong><a href="tel:+14013893200" style="color:var(--brand)">(401) 389-3200</a></strong>
+        </div>
+      </div>
+    </div>
+    <div id="booking-failed" style="display:none;padding-top:20px;">
+      <div class="step-heading">
+        <h1>Something went wrong.</h1>
+        <p>Call us and we’ll sort it out in 2 minutes — your date is still available.</p>
+      </div>
+      <a href="tel:+14013893200" class="btn-cta"
+         style="display:block;text-align:center;text-decoration:none;line-height:58px;border-radius:var(--radius-sm);">
+        Call (401) 389-3200 →
+      </a>
+    </div>
+  </div>
+
+</div><!-- /shell -->
+
+<!-- Estimate bar — fixed bottom -->
+<div class="estimate-bar" id="estimate-bar">
+  <div class="estimate-bar-left">
+    <div class="estimate-bar-label">Your price so far</div>
+    <div class="estimate-bar-note" id="estimate-bar-note">Updates as you answer</div>
+  </div>
+  <div class="estimate-bar-amount" id="estimate-bar-amount">from $600</div>
+</div>
+
+<script>
+// ──────────────────────────────────────────────
+// GHL WEBHOOK — swap in real URL before launch
+// ──────────────────────────────────────────────
+const GHL_WEBHOOK_URL = 'https://hook.us1.make.com/n9xtdy5aok4e62wpat9gydco3lef9b26';
+const ROUTE_OPTIMIZER_URL = 'https://route-optimizer-jps.onrender.com';
+
+// ──────────────────────────────────────────────
+// STATE
+// ──────────────────────────────────────────────
+const answers = {
+  size: null,        // 275 | 330 | unsure
+  location: null,    // basement | garage | outside
+  exit: null,        // walkout | bulkhead | stairs (basement only)
+  access: null,      // open | unsure | restricted
+  oil: null,         // empty | quarter | half_plus | no_gauge
+  state: null,
+  city: null,
+  permitFee: null,
+  permitSource: 'none',
+  cityRemovalFee: null
+};
+
+// ──────────────────────────────────────────────
+// CITY/PERMIT DATA — loaded from Airtable at runtime
+// Hard-coded fallback for prototype testing
+// ──────────────────────────────────────────────
+// Real permit fee data pulled from Airtable (373 MA cities, null = TBD)
+// Duplicates resolved: kept record with fee where both exist
+let cityData = [
+  {city:"North Chatham",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Gloucester",state:"MA",removal_fee:1125,permit_fee:100},
+  {city:"Lee",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Charlton",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Monson",state:"MA",removal_fee:800,permit_fee:50},
+  {city:"Gardner",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Fall River",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Rutland",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Merrimac",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Carver",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Medfield",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Southborough",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"West Townsend",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Peabody",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Brighton",state:"MA",removal_fee:600,permit_fee:110},
+  {city:"Cohasset",state:"MA",removal_fee:600,permit_fee:75},
+  {city:"Wilbraham",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Paxton",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Falmouth",state:"MA",removal_fee:775,permit_fee:50},
+  {city:"Easthampton",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Athol",state:"MA",removal_fee:600,permit_fee:100},
+  {city:"Amherst",state:"MA",removal_fee:775,permit_fee:50},
+  {city:"Ashburnham",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Raynham",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Holbrook",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Grafton",state:"MA",removal_fee:650,permit_fee:50},
+  {city:"Rockland",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Concord",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Westwood",state:"MA",removal_fee:600,permit_fee:40},
+  {city:"Dracut",state:"MA",removal_fee:900,permit_fee:null},
+  {city:"Erving",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Brookfield",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Wellesley",state:"MA",removal_fee:600,permit_fee:37},
+  {city:"Medford",state:"MA",removal_fee:750,permit_fee:50},
+  {city:"Greenfield",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Conway",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Marion",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"North Attleboro",state:"MA",removal_fee:600,permit_fee:53},
+  {city:"Lunenburg",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Pepperell",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"North Reading",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Oakham",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"West Harwich",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Gilbertville",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Berlin",state:"MA",removal_fee:600,permit_fee:25},
+  {city:"Leverett",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Townsend",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"West Bridgewater",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Winthrop",state:"MA",removal_fee:750,permit_fee:50},
+  {city:"Norwood",state:"MA",removal_fee:600,permit_fee:75},
+  {city:"Dennis Port",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"North Chelmsford",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Hyannis",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Northbridge",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Westford",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Danvers",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Sandisfield",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Stow",state:"MA",removal_fee:850,permit_fee:null},
+  {city:"Pembroke",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Ayer",state:"MA",removal_fee:775,permit_fee:50},
+  {city:"Brookline",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Norfolk",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Charlemont",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Lancaster",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"South Walpole",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Granby",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Oxford",state:"MA",removal_fee:600,permit_fee:25},
+  {city:"Ashby",state:"MA",removal_fee:775,permit_fee:25},
+  {city:"Sunderland",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Rockport",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Hinsdale",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Needham",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Haydenville",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Edgartown",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Manchester",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"South Yarmouth",state:"MA",removal_fee:850,permit_fee:null},
+  {city:"Sturbridge",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Blandford",state:"MA",removal_fee:850,permit_fee:25},
+  {city:"Somerset",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Hanscom Afb",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Dedham",state:"MA",removal_fee:600,permit_fee:40},
+  {city:"South Grafton",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Waltham",state:"MA",removal_fee:650,permit_fee:50},
+  {city:"Brookline",state:"MA",removal_fee:600,permit_fee:100},
+  {city:"Milford",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"South Hadley",state:"MA",removal_fee:850,permit_fee:null},
+  {city:"Warwick",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"East Falmouth",state:"MA",removal_fee:775,permit_fee:50},
+  {city:"Pocasset",state:"MA",removal_fee:725,permit_fee:null},
+  {city:"Westborough",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Harvard",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Goshen",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Abington",state:"MA",removal_fee:600,permit_fee:30},
+  {city:"Hyde Park",state:"MA",removal_fee:600,permit_fee:100},
+  {city:"Woods Hole",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Agawam",state:"MA",removal_fee:775,permit_fee:30},
+  {city:"Lincoln",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Wakefield",state:"MA",removal_fee:775,permit_fee:25},
+  {city:"Princeton",state:"MA",removal_fee:725,permit_fee:null},
+  {city:"Roxbury",state:"MA",removal_fee:600,permit_fee:100},
+  {city:"Ware",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Jamaica Plain",state:"MA",removal_fee:600,permit_fee:100},
+  {city:"Marshfield",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Webster",state:"MA",removal_fee:600,permit_fee:104},
+  {city:"Dover",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Littleton",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Shutesbury",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"New Bedford",state:"MA",removal_fee:600,permit_fee:75},
+  {city:"Turners Falls",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"West Barnstable",state:"MA",removal_fee:850,permit_fee:null},
+  {city:"Williamstown",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Uxbridge",state:"MA",removal_fee:600,permit_fee:25},
+  {city:"Centerville",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Brewster",state:"MA",removal_fee:600,permit_fee:25},
+  {city:"Scituate",state:"MA",removal_fee:800,permit_fee:100},
+  {city:"Holyoke",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Medway",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Monterey",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Blackstone",state:"MA",removal_fee:600,permit_fee:25},
+  {city:"Baldwinville",state:"MA",removal_fee:900,permit_fee:25},
+  {city:"Hadley",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Duxbury",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Natick",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Great Barrington",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Arlington",state:"MA",removal_fee:750,permit_fee:50},
+  {city:"Colrain",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Hopkinton",state:"MA",removal_fee:775,permit_fee:45},
+  {city:"Allston",state:"MA",removal_fee:600,permit_fee:110},
+  {city:"Cambridge",state:"MA",removal_fee:775,permit_fee:103},
+  {city:"Swampscott",state:"MA",removal_fee:775,permit_fee:50},
+  {city:"Barnstable",state:"MA",removal_fee:850,permit_fee:50},
+  {city:"Braintree",state:"MA",removal_fee:600,permit_fee:100},
+  {city:"Sagamore Beach",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Chicopee",state:"MA",removal_fee:900,permit_fee:null},
+  {city:"Bellingham",state:"MA",removal_fee:600,permit_fee:53},
+  {city:"Florence",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Eastham",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Huntington",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Fairhaven",state:"MA",removal_fee:600,permit_fee:30},
+  {city:"Amesbury",state:"MA",removal_fee:775,permit_fee:50},
+  {city:"Mendon",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"East Wareham",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Wilmington",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Topsfield",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"North Falmouth",state:"MA",removal_fee:800,permit_fee:50},
+  {city:"Millbury",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"South Deerfield",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Feeding Hills",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Chilmark",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Marlborough",state:"MA",removal_fee:600,permit_fee:100},
+  {city:"North Dighton",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Douglas",state:"MA",removal_fee:600,permit_fee:25},
+  {city:"Wenham",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Plainfield",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Sutton",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Wareham",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Westport",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Rowe",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Adams",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Essex",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Dalton",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"West Boylston",state:"MA",removal_fee:600,permit_fee:75},
+  {city:"Deerfield",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"New Braintree",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Walpole",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Buzzards Bay",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Seekonk",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Palmer",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Yarmouth Port",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Dorchester Center",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Winchendon",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Carlisle",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Woburn",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"West Brookfield",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Framingham",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"East Sandwich",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Fitchburg",state:"MA",removal_fee:600,permit_fee:25},
+  {city:"Hingham",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Buckland",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Byfield",state:"MA",removal_fee:775,permit_fee:50},
+  {city:"Groton",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Boston",state:"MA",removal_fee:600,permit_fee:100},
+  {city:"Lynn",state:"MA",removal_fee:775,permit_fee:100},
+  {city:"Roxbury Crossing",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Dighton",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Bernardston",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Salem",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Hatfield",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Chatham",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"North Easton",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Marstons Mills",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Shirley",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Leeds",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Stoughton",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Dartmouth",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Boxford",state:"MA",removal_fee:775,permit_fee:50},
+  {city:"Mattapoisett",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Shelburne Falls",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Wayland",state:"MA",removal_fee:775,permit_fee:50},
+  {city:"Newton",state:"MA",removal_fee:600,permit_fee:78},
+  {city:"Hopedale",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Acushnet",state:"MA",removal_fee:600,permit_fee:30},
+  {city:"Mansfield",state:"MA",removal_fee:600,permit_fee:25},
+  {city:"Lowell",state:"MA",removal_fee:775,permit_fee:50},
+  {city:"Lanesborough",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Springfield",state:"MA",removal_fee:900,permit_fee:50},
+  {city:"Falmouth",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Canton",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Petersham",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Lakeville",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"South Dennis",state:"MA",removal_fee:850,permit_fee:null},
+  {city:"Tewksbury",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Cheshire",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Upton",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Longmeadow",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Southbridge",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Foxboro",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Northfield",state:"MA",removal_fee:900,permit_fee:25},
+  {city:"Haverhill",state:"MA",removal_fee:775,permit_fee:25},
+  {city:"West Springfield",state:"MA",removal_fee:900,permit_fee:null},
+  {city:"Clinton",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Billerica",state:"MA",removal_fee:600,permit_fee:25},
+  {city:"Ludlow",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Sherborn",state:"MA",removal_fee:800,permit_fee:60},
+  {city:"Brimfield",state:"MA",removal_fee:800,permit_fee:25},
+  {city:"West Stockbridge",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Three Rivers",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Wendell Depot",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Housatonic",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Cummington",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Halifax",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Plainville",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Attleboro Falls",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Stockbridge",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"North Billerica",state:"MA",removal_fee:775,permit_fee:50},
+  {city:"Brockton",state:"MA",removal_fee:600,permit_fee:55},
+  {city:"South Chatham",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Rochdale",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Ashland",state:"MA",removal_fee:775,permit_fee:20},
+  {city:"Mashpee",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"East Brookfield",state:"MA",removal_fee:750,permit_fee:null},
+  {city:"Holliston",state:"MA",removal_fee:775,permit_fee:50},
+  {city:"Provincetown",state:"MA",removal_fee:900,permit_fee:null},
+  {city:"East Boston",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Dorchester",state:"MA",removal_fee:600,permit_fee:100},
+  {city:"Ashfield",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Somerville",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Russell",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Dennis",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Templeton",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Auburn",state:"MA",removal_fee:600,permit_fee:25},
+  {city:"Newbury",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Southfield",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Westfield",state:"MA",removal_fee:850,permit_fee:50},
+  {city:"Winchester",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Newburyport",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Hampden",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"North Oxford",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"West Wareham",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Shrewsbury",state:"MA",removal_fee:675,permit_fee:25},
+  {city:"Wales",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Southampton",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Wrentham",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Mattapan",state:"MA",removal_fee:600,permit_fee:100},
+  {city:"Pittsfield",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Chelmsford",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Lexington",state:"MA",removal_fee:600,permit_fee:53},
+  {city:"Millville",state:"MA",removal_fee:600,permit_fee:25},
+  {city:"Rehoboth",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"South Hamilton",state:"MA",removal_fee:850,permit_fee:null},
+  {city:"Sterling",state:"MA",removal_fee:750,permit_fee:25},
+  {city:"Leicester",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Vineyard Haven",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Becket",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Whitman",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Acton",state:"MA",removal_fee:775,permit_fee:50},
+  {city:"West Newbury",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Holden",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Lenox",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Watertown",state:"MA",removal_fee:600,permit_fee:40},
+  {city:"Dunstable",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Worthington",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"East Bridgewater",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Boxborough",state:"MA",removal_fee:775,permit_fee:25},
+  {city:"Bolton",state:"MA",removal_fee:600,permit_fee:25},
+  {city:"South Easton",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"South Boston",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Weymouth",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Wendell",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Avon",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Middleton",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Westminster",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Forestdale",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Spencer",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Chelsea",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"West Roxbury",state:"MA",removal_fee:600,permit_fee:110},
+  {city:"Franklin",state:"MA",removal_fee:600,permit_fee:75},
+  {city:"Beverly",state:"MA",removal_fee:775,permit_fee:25},
+  {city:"Berkshire",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Harwich",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Plymouth",state:"MA",removal_fee:750,permit_fee:150},
+  {city:"Hanover",state:"MA",removal_fee:600,permit_fee:40},
+  {city:"Harwich Port",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Plympton",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Boylston",state:"MA",removal_fee:800,permit_fee:50},
+  {city:"Holland",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Hanson",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Cotuit",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Montague",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Richmond",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Granville",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Georgetown",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Lynnfield",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Northborough",state:"MA",removal_fee:600,permit_fee:30},
+  {city:"North Brookfield",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Fayville",state:"MA",removal_fee:675,permit_fee:null},
+  {city:"Rochester",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Indian Orchard",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Osterville",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Hubbardston",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Ashley Falls",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Assonet",state:"MA",removal_fee:600,permit_fee:25},
+  {city:"Marblehead",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"East Longmeadow",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Nantucket",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"East Walpole",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Southwick",state:"MA",removal_fee:900,permit_fee:100},
+  {city:"Heath",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Hudson",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Berkley",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Barre",state:"MA",removal_fee:600,permit_fee:25},
+  {city:"Rowley",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Leominster",state:"MA",removal_fee:700,permit_fee:50},
+  {city:"Orange",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Roslindale",state:"MA",removal_fee:600,permit_fee:110},
+  {city:"Andover",state:"MA",removal_fee:775,permit_fee:50},
+  {city:"Swansea",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Worcester",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Attleboro",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Norwell",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"West Dennis",state:"MA",removal_fee:850,permit_fee:null},
+  {city:"Norton",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Wellfleet",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Tyngsboro",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Ipswich",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Sharon",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Taunton",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Millis",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Lawrence",state:"MA",removal_fee:775,permit_fee:50},
+  {city:"Burlington",state:"MA",removal_fee:775,permit_fee:50},
+  {city:"Bridgewater",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"North Adams",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Whitinsville",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Orleans",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Middleboro",state:"MA",removal_fee:600,permit_fee:25},
+  {city:"Chester",state:"MA",removal_fee:900,permit_fee:null},
+  {city:"Sandwich",state:"MA",removal_fee:775,permit_fee:50},
+  {city:"Maynard",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Otis",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Charlestown",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Belchertown",state:"MA",removal_fee:775,permit_fee:50},
+  {city:"Hull",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Sheffield",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Sudbury",state:"MA",removal_fee:775,permit_fee:null},
+  {city:"Bedford",state:"MA",removal_fee:775,permit_fee:50},
+  {city:"Kingston",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"North Grafton",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Fiskdale",state:"MA",removal_fee:700,permit_fee:null},
+  {city:"East Freetown",state:"MA",removal_fee:600,permit_fee:25},
+  {city:"Northampton",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Reading",state:"MA",removal_fee:800,permit_fee:null},
+  {city:"Williamsburg",state:"MA",removal_fee:600,permit_fee:null},
+  {city:"Randolph",state:"MA",removal_fee:600,permit_fee:50},
+  {city:"Brooklyn",state:"CT",removal_fee:700},
+  {city:"Thompson",state:"CT",removal_fee:700},
+  {city:"Colchester",state:"CT",removal_fee:700},
+  {city:"Bozrah",state:"CT",removal_fee:700},
+  {city:"Coventry",state:"CT",removal_fee:700},
+  {city:"Sterling",state:"CT",removal_fee:700},
+  {city:"Voluntown",state:"CT",removal_fee:700},
+  {city:"Guilford",state:"CT",removal_fee:950},
+  {city:"Hampton",state:"CT",removal_fee:700},
+  {city:"Stonington",state:"CT",removal_fee:700},
+  {city:"Lebanon",state:"CT",removal_fee:700},
+  {city:"Franklin",state:"CT",removal_fee:700},
+  {city:"Willimantic",state:"CT",removal_fee:700},
+  {city:"Lisbon",state:"CT",removal_fee:700},
+  {city:"Andover",state:"CT",removal_fee:750},
+  {city:"Norwich",state:"CT",removal_fee:700},
+  {city:"Wallingford",state:"CT",removal_fee:1075},
+  {city:"Putnam",state:"CT",removal_fee:700},
+  {city:"North Haven",state:"CT",removal_fee:1075},
+  {city:"East Lyme",state:"CT",removal_fee:700},
+  {city:"New Haven",state:"CT",removal_fee:1050},
+  {city:"Plainfield",state:"CT",removal_fee:700},
+  {city:"Plainville",state:"CT",removal_fee:1050},
+  {city:"Columbia",state:"CT",removal_fee:700},
+  {city:"Montville",state:"CT",removal_fee:700},
+  {city:"Wethersfield",state:"CT",removal_fee:700},
+  {city:"Mystic",state:"CT",removal_fee:700},
+  {city:"Bridgeport",state:"CT",removal_fee:700},
+  {city:"Woodstock",state:"CT",removal_fee:700},
+  {city:"Chester",state:"CT",removal_fee:800},
+  {city:"Chaplin",state:"CT",removal_fee:700},
+  {city:"Meriden",state:"CT",removal_fee:1075},
+  {city:"Pomfret",state:"CT",removal_fee:700},
+  {city:"Sprague",state:"CT",removal_fee:700},
+  {city:"East Haven",state:"CT",removal_fee:1000},
+  {city:"Ledyard",state:"CT",removal_fee:700},
+  {city:"Manchester",state:"CT",removal_fee:900},
+  {city:"New London",state:"CT",removal_fee:700},
+  {city:"Canterbury",state:"CT",removal_fee:700},
+  {city:"New Britain",state:"CT",removal_fee:1000},
+  {city:"Ashford",state:"CT",removal_fee:700},
+  {city:"Branford",state:"CT",removal_fee:1000},
+  {city:"Groton",state:"CT",removal_fee:700},
+  {city:"Killingly",state:"CT",removal_fee:700},
+  {city:"Essex",state:"CT",removal_fee:750},
+  {city:"Old Lyme",state:"CT",removal_fee:700},
+  {city:"Cromwell",state:"CT",removal_fee:950},
+  {city:"West Hartford",state:"CT",removal_fee:1050},
+  {city:"North Branford",state:"CT",removal_fee:950},
+  {city:"Salem",state:"CT",removal_fee:700},
+  {city:"Waterford",state:"CT",removal_fee:700},
+  {city:"Deep River",state:"CT",removal_fee:800},
+  {city:"Hebron",state:"CT",removal_fee:700},
+  {city:"Mansfield",state:"CT",removal_fee:700},
+  {city:"Griswold",state:"CT",removal_fee:700},
+  {city:"Madison",state:"CT",removal_fee:800},
+  {city:"Scotland",state:"CT",removal_fee:700},
+  {city:"Preston",state:"CT",removal_fee:700},
+  {city:"Rocky Hill",state:"CT",removal_fee:950},
+  {city:"Glastonbury",state:"CT",removal_fee:900},
+  {city:"East Hartford",state:"CT",removal_fee:950},
+  {city:"Middletown",state:"CT",removal_fee:900},
+  {city:"Clinton",state:"CT",removal_fee:800},
+  {city:"Hartford",state:"CT",removal_fee:950},
+  {city:"Hamden",state:"CT",removal_fee:1075},
+  {city:"Westbrook",state:"CT",removal_fee:800},
+  {city:"Eastford",state:"CT",removal_fee:700},
+  {city:"Berlin",state:"CT",removal_fee:950},
+  {city:"Windham",state:"CT",removal_fee:700},
+  {city:"Old Saybrook",state:"CT",removal_fee:750}
+];
+
+// Try to load real Airtable data — replace with your fetch endpoint if available
+async function loadAirtableData() {
+  // For prototype: uses hardcoded data above
+  // In production: fetch('/api/permit-data') or direct Airtable call
+  console.log('[Estimator] City permit data loaded. ' + cityData.length + ' cities available.');
+}
+loadAirtableData();
+
+// ──────────────────────────────────────────────
+// NAVIGATION
+// ──────────────────────────────────────────────
+const TOTAL_STEPS = 4;
+
+function updateProgressSteps(step) {
+  const n = typeof step === 'number' ? step : 99;
+  for (let i = 1; i <= 4; i++) {
+    const dot = document.getElementById('dot-' + i);
+    if (!dot) continue;
+    dot.classList.remove('active', 'done');
+    if (n === 99 || i < n) dot.classList.add('done');
+    else if (i === n) dot.classList.add('active');
+    const num = document.getElementById('dot-num-' + i);
+    if (num) num.textContent = (n === 99 || i < n) ? '✓' : i;
+  }
+  for (let i = 1; i <= 3; i++) {
+    const con = document.getElementById('con-' + i + (i+1));
+    if (con) con.classList.toggle('done', n === 99 || n > i);
+  }
+}
+
+function goToStep(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + n).classList.add('active');
+  document.getElementById('quiz-shell').classList.remove('results-mode');
+  updateProgressSteps(n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showResults() {
+  if (!answers.state) return;
+  if (answers.state === 'MA' && !answers.city) return;
+  computePricing();
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-results').classList.add('active');
+  document.getElementById('quiz-shell').classList.add('results-mode');
+  updateProgressSteps(99);
+  document.getElementById('estimate-bar').classList.remove('visible');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function startOver() {
+  Object.assign(answers, { size: null, location: null, exit: null, access: null, oil: null, state: null, city: null, permitFee: null, permitSource: 'none', cityRemovalFee: null });
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('selected'));
+  const ci = document.getElementById('city-input');
+  if (ci) { ci.value = ''; ci.classList.remove('has-value'); }
+  document.getElementById('exit-reveal').classList.remove('visible');
+  document.getElementById('ri-note').classList.remove('visible');
+  document.getElementById('ct-note').style.display = 'none';
+  document.getElementById('city-wrap').style.display = 'none';
+  ['next-1','next-2','next-3','next-4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = true;
+  });
+  document.getElementById('estimate-bar').classList.remove('visible');
+  // Return to intro screen
+  document.getElementById('intro-screen').classList.remove('hidden');
+  document.getElementById('progress-steps').style.display = 'none';
+  document.getElementById('quiz-shell').style.display = 'none';
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-1').classList.add('active');
+  updateProgressSteps(1);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ──────────────────────────────────────────────
+// CARD SELECTION
+// ──────────────────────────────────────────────
+
+// Location cards — special: may reveal exit sub-question
+function selectLocation(el) {
+  document.querySelectorAll('#location-cards .card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  answers.location = el.dataset.value;
+
+  const exitReveal = document.getElementById('exit-reveal');
+  const locationCards = document.getElementById('location-cards');
+  if (answers.location === 'basement') {
+    locationCards.classList.add('location-minimized');
+    exitReveal.classList.add('visible');
+    answers.exit = null;
+    document.querySelectorAll('#exit-cards .card').forEach(c => c.classList.remove('selected'));
+  } else {
+    locationCards.classList.remove('location-minimized');
+    exitReveal.classList.remove('visible');
+    answers.exit = null;
+  }
+  checkStep1Ready();
+  updateEstimateBar();
+}
+
+// Exit cards
+function selectExit(el) {
+  document.querySelectorAll('#exit-cards .card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  answers.exit = el.dataset.value;
+  checkStep1Ready();
+}
+
+function checkStep1Ready() {
+  const ready = answers.location !== null &&
+    (answers.location !== 'basement' || answers.exit !== null);
+  document.getElementById('next-1').disabled = !ready;
+}
+
+// Generic card select — enables the next button for the current step
+function selectCard(el, type) {
+  const screen = el.closest('.screen');
+  screen.querySelectorAll('.cards .card, .oil-tile').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[type] = el.dataset.value;
+  const stepNum = screen.dataset.step;
+  document.getElementById('next-' + stepNum).disabled = false;
+  updateEstimateBar();
+}
+
+// ──────────────────────────────────────────────
+// STATE SELECTION
+// ──────────────────────────────────────────────
+function selectState(el) {
+  document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  answers.state = el.dataset.value;
+  answers.city = null;
+  answers.permitFee = null;
+
+  const riNote = document.getElementById('ri-note');
+  const ctNote = document.getElementById('ct-note');
+  const cityWrap = document.getElementById('city-wrap');
+  const nextBtn = document.getElementById('next-4');
+
+  // Reset all conditional UI first
+  riNote.classList.remove('visible');
+  ctNote.style.display = 'none';
+  cityWrap.style.display = 'none';
+
+  if (answers.state === 'RI') {
+    riNote.classList.add('visible');
+    answers.permitFee = 0;
+    answers.permitSource = 'none';
+    answers.city = 'Rhode Island';
+    nextBtn.disabled = false;
+  } else if (answers.state === 'CT') {
+    ctNote.style.display = 'flex';
+    answers.permitFee = 0;
+    answers.permitSource = 'none';
+    answers.city = null;
+    answers.cityRemovalFee = null;
+    // CT needs city for accurate pricing
+    cityWrap.style.display = 'block';
+    const cityInputCT = document.getElementById('city-input');
+    cityInputCT.value = '';
+    cityInputCT.classList.remove('has-value');
+    nextBtn.disabled = true;
+  } else {
+    // MA
+    cityWrap.style.display = 'block';
+    const cityInput = document.getElementById('city-input');
+    cityInput.value = '';
+    cityInput.classList.remove('has-value');
+    nextBtn.disabled = true;
+  }
+  updateEstimateBar();
+}
+
+// ──────────────────────────────────────────────
+// CITY AUTOCOMPLETE
+// ──────────────────────────────────────────────
+function onCityInput(input) {
+  const val = input.value.trim();
+  const list = document.getElementById('autocomplete-list');
+  answers.city = null;
+  answers.permitFee = null;
+  answers.cityRemovalFee = null;
+  document.getElementById('next-4').disabled = true;
+  input.classList.remove('has-value');
+
+  if (val.length < 2) { list.classList.remove('open'); return; }
+
+  const filtered = cityData.filter(c =>
+    c.state === answers.state &&
+    c.city.toLowerCase().startsWith(val.toLowerCase())
+  ).slice(0, 8);
+
+  if (filtered.length === 0) {
+    // City not in our table — soft fallback: let them proceed, confirm price on-site
+    const stateName = answers.state === 'CT' ? 'Connecticut' : 'Massachusetts';
+    list.innerHTML = `<div class="autocomplete-item" onclick="selectCityFallback('${val.replace(/'/g,"\\'")}')">
+      <span>${val}, ${answers.state}</span>
+      <span class="fee-hint">We serve most of ${stateName} — price confirmed when we connect</span>
+    </div>`;
+    list.classList.add('open');
+    return;
+  }
+
+  list.innerHTML = filtered.map(c => `
+    <div class="autocomplete-item" onclick="selectCity('${c.city.replace(/'/g,"\\'")}', ${c.permit_fee !== undefined ? c.permit_fee : 'null'}, ${c.removal_fee || 600})">
+      <span>${c.city}, ${c.state}</span>
+      <span class="fee-hint">${c.state === 'CT' ? '$' + (c.removal_fee || 600) + ' flat rate' : (c.permit_fee !== null && c.permit_fee > 0 ? '$' + (c.removal_fee || 600) + ' · Permit: $' + c.permit_fee : '$' + (c.removal_fee || 600) + ' · No permit fee')}</span>
+    </div>
+  `).join('');
+  list.classList.add('open');
+}
+
+function selectCity(city, fee, removalFee) {
+  answers.city = city;
+  answers.permitFee = (fee === null || fee === undefined || fee === 'null') ? null : fee;
+  answers.cityRemovalFee = removalFee || 600;
+  answers.permitSource = 'airtable';
+  const input = document.getElementById('city-input');
+  input.value = city;
+  input.classList.add('has-value');
+  document.getElementById('autocomplete-list').classList.remove('open');
+  document.getElementById('next-4').disabled = false;
+  updateEstimateBar();
+}
+
+function selectCityManual(city) {
+  answers.city = city;
+  answers.permitFee = null;
+  answers.cityRemovalFee = null;
+  answers.permitSource = 'tbd';
+  const input = document.getElementById('city-input');
+  input.value = city;
+  input.classList.add('has-value');
+  document.getElementById('autocomplete-list').classList.remove('open');
+  document.getElementById('next-4').disabled = false;
+  updateEstimateBar();
+}
+
+// City typed but not found in Airtable — use state-level fallback, still allow submission
+function selectCityFallback(city) {
+  answers.city = city;
+  answers.permitFee = null;
+  // State-level fallback pricing: CT base $700, MA base $600
+  answers.cityRemovalFee = answers.state === 'CT' ? 700 : 600;
+  answers.permitSource = 'tbd';
+  const input = document.getElementById('city-input');
+  input.value = city;
+  input.classList.add('has-value');
+  document.getElementById('autocomplete-list').classList.remove('open');
+  document.getElementById('next-4').disabled = false;
+  // Log for Norman to review unknown cities
+  try {
+    const unknown = JSON.parse(localStorage.getItem('jps_unknown_cities') || '[]');
+    const entry = answers.state + ':' + city;
+    if (!unknown.includes(entry)) { unknown.push(entry); localStorage.setItem('jps_unknown_cities', JSON.stringify(unknown)); }
+  } catch(e) {}
+  updateEstimateBar();
+}
+
+function hideAutocompleteSoon() {
+  setTimeout(() => {
+    document.getElementById('autocomplete-list').classList.remove('open');
+  }, 200);
+}
+
+// ──────────────────────────────────────────────
+// ESTIMATE BAR
+// ──────────────────────────────────────────────
+function updateEstimateBar() {
+  const bar = document.getElementById('estimate-bar');
+  if (!answers.location) { bar.classList.remove('visible'); return; }
+  bar.classList.add('visible');
+
+  const BASE = answers.cityRemovalFee || 600;
+  const isRestricted = answers.access === 'restricted';
+  const oilFee = answers.oil === 'half_plus' ? 150 : 0;
+  // CT and RI have no permit fee
+  const permitFee = (answers.state === 'CT' || answers.state === 'RI') ? 0 : (answers.permitFee ?? 0);
+  const low = BASE + oilFee + permitFee;
+  const high = BASE + 600 + oilFee + permitFee;
+
+  const amountEl = document.getElementById('estimate-bar-amount');
+  const noteEl = document.getElementById('estimate-bar-note');
+
+  if (isRestricted) {
+    amountEl.textContent = 'from $' + low.toLocaleString();
+    noteEl.textContent = 'Access surcharge confirmed when we connect';
+  } else if (answers.state === 'MA' && !answers.city) {
+    amountEl.textContent = 'from $600+';
+    noteEl.textContent = 'Select your city for exact price';
+  } else {
+    amountEl.textContent = 'from $' + low.toLocaleString();
+    noteEl.textContent = answers.state ? answers.state + (answers.city && answers.city !== 'Rhode Island' ? ' · ' + answers.city : '') : 'Based on your answers';
+  }
+}
+
+// ──────────────────────────────────────────────
+// PRICING LOGIC
+// ──────────────────────────────────────────────
+function computePricing() {
+  const BASE = answers.cityRemovalFee || 600;
+  const isRestricted = answers.access === 'restricted';
+  const hasExcessOil = answers.oil === 'half_plus';
+  const oilFee = hasExcessOil ? 150 : 0;
+  const permitFee = (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee ?? null);
+
+  // Totals
+  const accessFee = isRestricted ? 600 : 0;
+  const lowTotal = BASE + oilFee + (permitFee ?? 0);
+  const highTotal = isRestricted
+    ? BASE + accessFee + oilFee + (permitFee ?? 0)
+    : BASE + oilFee + (permitFee ?? 0);
+
+  // --- Update UI ---
+
+  // Total hero
+  const totalEl = document.getElementById('results-total-display');
+  const rangeEl = document.getElementById('results-range-display');
+
+  const isFallbackCity = answers.permitSource === 'tbd';
+  if (isRestricted) {
+    totalEl.textContent = 'from $' + lowTotal.toLocaleString();
+    rangeEl.textContent = 'Access surcharge confirmed when we connect — photo helps';
+  } else if (isFallbackCity && answers.state === 'MA') {
+    totalEl.textContent = '$' + (BASE + oilFee);
+    rangeEl.textContent = '+ permit fee — confirmed when we connect';
+  } else if (isFallbackCity) {
+    totalEl.textContent = 'from $' + lowTotal.toLocaleString();
+    rangeEl.textContent = 'Final price confirmed when we connect';
+  } else if (permitFee === null) {
+    totalEl.textContent = '$' + (BASE + oilFee);
+    rangeEl.textContent = '+ permit fee (confirmed when we connect)';
+  } else {
+    totalEl.textContent = '$' + lowTotal.toLocaleString();
+    rangeEl.textContent = '';
+  }
+
+  // Base fee
+  document.getElementById('base-fee-display').textContent = isFallbackCity ? 'from $' + BASE : '$' + BASE;
+  document.getElementById('base-sub').textContent =
+    isFallbackCity
+      ? 'Starting price for ' + answers.city + ' — confirmed when we connect'
+      : answers.location === 'basement'
+        ? 'Basement removal — cutting, safe extraction & disposal'
+        : 'Cutting, safe removal & disposal';
+
+  // Access surcharge line
+  const accessLine = document.getElementById('access-line');
+  if (isRestricted) {
+    accessLine.style.display = 'flex';
+    document.getElementById('access-fee-display').textContent = 'TBD';
+    document.querySelector('#access-line .invoice-row-sub').textContent = 'A photo of the area helps us confirm — we\'ll sort this on the call';
+  } else {
+    accessLine.style.display = 'none';
+  }
+
+  // Excess oil line
+  const oilExcessLine = document.getElementById('oil-excess-line');
+  if (hasExcessOil) {
+    oilExcessLine.style.display = 'flex';
+  } else {
+    oilExcessLine.style.display = 'none';
+  }
+
+  // Permit line
+  const permitLine = document.getElementById('permit-line');
+  const permitSub = document.getElementById('permit-sub');
+  const permitDisplay = document.getElementById('permit-fee-display');
+
+  if (answers.state === 'RI') {
+    permitLine.style.display = 'flex';
+    permitDisplay.textContent = '$0';
+    permitSub.textContent = 'No permit required in Rhode Island';
+    permitDisplay.classList.add('included');
+  } else if (answers.state === 'CT') {
+    // CT: no permit row at all
+    permitLine.style.display = 'none';
+  } else if (permitFee === null) {
+    permitLine.style.display = 'flex';
+    permitDisplay.textContent = 'TBD';
+    permitSub.textContent = 'Permit fee for ' + (answers.city || 'your city') + ' — confirmed when we connect';
+    permitDisplay.classList.remove('included');
+  } else {
+    permitLine.style.display = 'flex';
+    permitDisplay.textContent = '$' + permitFee;
+    permitSub.textContent = 'We pull and pay the ' + answers.city + ' permit on your behalf';
+    permitDisplay.classList.remove('included');
+  }
+
+  // Total line
+  const totalLineEl = document.getElementById('total-display');
+  if (isRestricted) {
+    totalLineEl.textContent = '$' + lowTotal + '–$' + highTotal + '+';
+  } else if (permitFee !== null) {
+    totalLineEl.textContent = '$' + lowTotal;
+  } else {
+    totalLineEl.textContent = '$' + (BASE + oilFee) + ' + permit';
+  }
+
+  // Conditional notes
+  document.getElementById('leak-note').classList.remove('visible');
+  document.getElementById('stairs-note').classList.toggle('visible', answers.exit === 'stairs');
+}
+
+// ──────────────────────────────────────────────
+// WHY EXPAND
+// ──────────────────────────────────────────────
+function toggleWhy(btn) {
+  btn.classList.toggle('open');
+  document.getElementById('why-body').classList.toggle('open');
+}
+
+// ──────────────────────────────────────────────
+// CTA SUBMIT
+// ──────────────────────────────────────────────
+function submitCTA() {
+  const name = document.getElementById('cta-name').value.trim();
+  const phone = document.getElementById('cta-phone').value.trim();
+  const email = document.getElementById('cta-email').value.trim();
+  const note = document.getElementById('cta-note').value.trim();
+  let valid = true;
+
+  // Validate
+  if (!name) {
+    document.getElementById('err-name').classList.add('visible');
+    valid = false;
+  } else {
+    document.getElementById('err-name').classList.remove('visible');
+  }
+  const phoneClean = phone.replace(/\D/g,'');
+  if (phoneClean.length < 10) {
+    document.getElementById('err-phone').classList.add('visible');
+    valid = false;
+  } else {
+    document.getElementById('err-phone').classList.remove('visible');
+  }
+  if (!valid) return;
+
+  // Compute totals for payload
+  const BASE = answers.cityRemovalFee || 600;
+  const isRestricted = answers.access === 'restricted';
+  const oilFee = answers.oil === 'half_plus' ? 150 : 0;
+  const permitFee = (answers.state === 'RI' || answers.state === 'CT') ? 0 : answers.permitFee;
+  const lowTotal = BASE + oilFee + (permitFee ?? 0);
+  const highTotal = isRestricted ? BASE + 600 + oilFee + (permitFee ?? 0) : BASE + oilFee + (permitFee ?? 0);
+
+  const payload = {
+    name, phone, email, note,
+    tank_size: answers.size,
+    location_type: answers.location,
+    exit_type: answers.exit,
+    access_type: answers.access,
+    oil_level: answers.oil,
+    excess_oil_fee: answers.oil === 'half_plus' ? '150' : '0',
+    state: answers.state,
+    city: answers.city,
+    base_removal_fee: BASE,
+    estimated_total_low: lowTotal,
+    estimated_total_high: highTotal,
+    permit_fee: (answers.state === 'RI' || answers.state === 'CT') ? '0' : (permitFee ?? 'TBD'),
+    restricted_access: isRestricted ? 'true' : 'false',
+    stair_removal: answers.exit === 'stairs' ? 'true' : 'false',
+    source: 'estimator_tool'
+  };
+
+  console.log('[Estimator] Submitting to GHL:', payload);
+
+  // Disable button during send
+  const btn = document.querySelector('.btn-cta');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  // Fire GHL webhook
+  const webhookUrl = GHL_WEBHOOK_URL;
+  if (webhookUrl && webhookUrl !== 'PASTE_GHL_WEBHOOK_URL_HERE') {
+    fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(() => showSuccess(name))
+    .catch(err => {
+      console.error('[Estimator] Webhook failed:', err);
+      // Still show success to user — don't punish them for backend issues
+      showSuccess(name);
+    });
+  } else {
+    // Dev mode — skip webhook, show success
+    console.warn('[Estimator] No GHL webhook URL set. Showing success screen in dev mode.');
+    console.log('[Estimator] Payload that would have been sent:', JSON.stringify(payload, null, 2));
+    showSuccess(name);
+  }
+}
+
+function showSuccess(name) {
+  document.getElementById('success-name').textContent = name.split(' ')[0];
+
+  // Time-aware success message
+  const now = new Date();
+  const day = now.getDay();   // 0=Sun, 6=Sat
+  const hour = now.getHours(); // 0-23 local
+  const isBusinessHours = day >= 1 && day <= 5 && hour >= 7 && hour < 17;
+  const bodyEl = document.getElementById('success-body');
+  if (isBusinessHours) {
+    bodyEl.textContent = "We're reviewing your details right now. You'll hear from us within the next few minutes — we'll confirm access and lock in your date.";
+  } else {
+    const nextDay = (day === 5 || day === 6) ? 'Monday' : 'tomorrow';
+    bodyEl.textContent = "Your estimate is saved. We'll be in touch first thing " + nextDay + " morning to confirm access and get you on the schedule.";
+  }
+
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-success').classList.add('active');
+  updateProgressSteps(99);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ──────────────────────────────────────────────
+// INTRO → QUIZ TRANSITION
+// ──────────────────────────────────────────────
+function startEstimator() {
+  document.getElementById('intro-screen').classList.add('hidden');
+  document.getElementById('progress-steps').style.display = 'flex';
+  document.getElementById('quiz-shell').style.display = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ──────────────────────────────────────────────
+// VIEWPORT HEIGHT FIX (iOS Safari includes browser chrome in vh)
+// ──────────────────────────────────────────────
+function setVh() {
+  document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+}
+setVh();
+window.addEventListener('resize', setVh);
+
+// Initialize
+updateProgressSteps(1);
+
+// ──────────────────────────────────────────────
+// ATTRIBUTION CAPTURE
+// ──────────────────────────────────────────────
+(function captureAttribution() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const attr = {
+      gclid:        params.get('gclid')        || '',
+      fbclid:       params.get('fbclid')       || '',
+      utm_source:   params.get('utm_source')   || '',
+      utm_medium:   params.get('utm_medium')   || '',
+      utm_campaign: params.get('utm_campaign') || '',
+      utm_content:  params.get('utm_content')  || '',
+      utm_term:     params.get('utm_term')     || '',
+      landing_page: window.location.href,
+      referrer:     document.referrer || '',
+    };
+    sessionStorage.setItem('jps_attr', JSON.stringify(attr));
+  } catch(e) {}
+})();
+
+function getAttribution() {
+  try { return JSON.parse(sessionStorage.getItem('jps_attr') || '{}'); } catch(e) { return {}; }
+}
+
+// ──────────────────────────────────────────────
+// BOOKING STATE
+// ──────────────────────────────────────────────
+const booking = {
+  firstName: '', lastName: '', phone: '', email: '',
+  address: '', city: '', state: '', zip: '',
+  oilGauge: '',
+  estimatedPrice: 0,
+  selectedSlot: null,
+};
+
+// ──────────────────────────────────────────────
+// SCREEN NAVIGATION (booking extension)
+// ──────────────────────────────────────────────
+function goToScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.getElementById('quiz-shell').classList.add('results-mode');
+  updateProgressSteps(99);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goToCheckout() {
+  // Pre-fill city from quiz if available
+  const cityEl = document.getElementById('book-city');
+  if (cityEl && answers.city && answers.city !== 'Rhode Island') {
+    cityEl.value = answers.city;
+  }
+  booking.state = answers.state || '';
+
+  // Mirror the locked price into checkout heading
+  const priceEl = document.getElementById('checkout-price-display');
+  if (priceEl) {
+    const heroEl = document.getElementById('results-total-display');
+    if (heroEl) priceEl.textContent = heroEl.textContent;
+  }
+
+  goToScreen('checkout');
+}
+
+// ──────────────────────────────────────────────
+// CHECKOUT VALIDATION + SUBMIT
+// ──────────────────────────────────────────────
+function submitCheckout() {
+  // Honeypot check
+  const hp = document.getElementById('book-website');
+  if (hp && hp.value.trim()) {
+    goToScreen('booking-success');
+    document.getElementById('booking-loading').style.display   = 'none';
+    document.getElementById('booking-confirmed').style.display = 'block';
+    document.getElementById('booking-success-name').textContent = 'there';
+    return;
+  }
+
+  const get = id => document.getElementById(id).value.trim();
+  const firstName = get('book-first');
+  const lastName  = get('book-last');
+  const phone     = get('book-phone');
+  const email     = get('book-email');
+  const address   = get('book-address');
+  const city      = get('book-city');
+  const zip       = get('book-zip');
+  const oilGauge  = document.getElementById('book-oil-gauge').value;
+
+  const showErr = (id, show) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('visible', show);
+  };
+
+  const phoneDigits = phone.replace(/\D/g, '');
+  const zipDigits   = zip.replace(/\D/g, '');
+
+  showErr('err-first',      !firstName);
+  showErr('err-last',       !lastName);
+  showErr('err-book-phone', phoneDigits.length < 10);
+  showErr('err-address',    !address);
+  showErr('err-city',       !city);
+  showErr('err-zip',        zipDigits.length < 5);
+  showErr('err-oil-gauge',  !oilGauge);
+
+  if (!firstName || !lastName || phoneDigits.length < 10 ||
+      !address || !city || zipDigits.length < 5 || !oilGauge) return;
+
+  // Save booking state
+  Object.assign(booking, { firstName, lastName, phone, email, address, city, zip, oilGauge,
+    state: answers.state || '' });
+
+  // Compute price from quiz answers
+  const BASE      = answers.cityRemovalFee || 600;
+  const oilFee    = answers.oil === 'half_plus' ? 150 : 0;
+  const permitFee = (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee ?? 0);
+  booking.estimatedPrice = BASE + oilFee + (permitFee || 0);
+
+  // Show dates screen in loading state
+  goToScreen('dates');
+  document.getElementById('dates-loading').style.display = 'block';
+  document.getElementById('dates-content').style.display = 'none';
+  document.getElementById('dates-error').style.display   = 'none';
+
+  // Fire GHL webhook immediately (lead captured even if they drop off)
+  fireLeadWebhook();
+
+  // Fetch available slots from Route Optimizer
+  fetchSlots();
+}
+
+function fireLeadWebhook() {
+  if (!GHL_WEBHOOK_URL || GHL_WEBHOOK_URL.includes('PASTE_')) return;
+  const attr = getAttribution();
+  const payload = {
+    first_name: booking.firstName, last_name: booking.lastName,
+    name: booking.firstName + ' ' + booking.lastName,
+    phone: booking.phone, email: booking.email,
+    address1: booking.address, city: booking.city,
+    state: booking.state, postal_code: booking.zip,
+    tank_size:            answers.size,
+    location_type:        answers.location,
+    exit_type:            answers.exit,
+    access_type:          answers.access,
+    oil_level_pricing:    answers.oil,
+    oil_level_gauge:      booking.oilGauge,
+    excess_oil_fee:       answers.oil === 'half_plus' ? '150' : '0',
+    restricted_access:    answers.access === 'restricted' ? 'true' : 'false',
+    stair_removal:        answers.exit === 'stairs' ? 'true' : 'false',
+    base_removal_fee:     answers.cityRemovalFee || 600,
+    estimated_total:      booking.estimatedPrice,
+    permit_fee:           (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee ?? 'TBD'),
+    source:               'booking_funnel',
+    gclid:        attr.gclid        || '',
+    fbclid:       attr.fbclid       || '',
+    utm_source:   attr.utm_source   || '',
+    utm_medium:   attr.utm_medium   || '',
+    utm_campaign: attr.utm_campaign || '',
+    utm_content:  attr.utm_content  || '',
+    utm_term:     attr.utm_term     || '',
+    landing_page: attr.landing_page || '',
+    referrer:     attr.referrer     || '',
+  };
+  fetch(GHL_WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  }).catch(err => console.error('[Funnel] Lead webhook error:', err));
+}
+
+async function fetchSlots() {
+  try {
+    const resp = await fetch(ROUTE_OPTIMIZER_URL + '/api/public/find-slots', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        address:     booking.address,
+        city:        booking.city,
+        state:       booking.state,
+        zip:         booking.zip,
+        oilLevel:    booking.oilGauge,
+        serviceType: 'OT',
+      }),
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    if (!data.success || !data.slots || !data.slots.length) { showDatesError(); return; }
+    renderSlots(data.slots);
+  } catch(err) {
+    console.error('[Funnel] fetchSlots error:', err);
+    showDatesError();
+  }
+}
+
+function renderSlots(slots) {
+  const container = document.getElementById('slot-cards');
+  container.innerHTML = '';
+  booking.selectedSlot = null;
+  document.getElementById('btn-confirm-booking').disabled = true;
+
+  slots.slice(0, 3).forEach(function(slot) {
+    const card = document.createElement('button');
+    card.className = 'slot-card';
+    card.innerHTML =
+      '<span class="slot-rank">' + (slot.label || 'Option') + '</span>' +
+      '<div class="slot-body">' +
+        '<div class="slot-date">' + (slot.displayDate || slot.date) + '</div>' +
+        '<div class="slot-time">' + slot.time + '</div>' +
+      '</div>' +
+      '<span class="slot-check"></span>';
+    card.addEventListener('click', function() { selectSlot(card, slot); });
+    container.appendChild(card);
+  });
+
+  document.getElementById('dates-loading').style.display = 'none';
+  document.getElementById('dates-content').style.display = 'block';
+}
+
+function selectSlot(card, slot) {
+  document.querySelectorAll('.slot-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  booking.selectedSlot = slot;
+  document.getElementById('btn-confirm-booking').disabled = false;
+}
+
+function showDatesError() {
+  document.getElementById('dates-loading').style.display = 'none';
+  document.getElementById('dates-error').style.display   = 'block';
+}
+
+// ──────────────────────────────────────────────
+// BOOKING CONFIRMATION
+// ──────────────────────────────────────────────
+async function confirmBooking() {
+  if (!booking.selectedSlot) return;
+
+  goToScreen('booking-success');
+  document.getElementById('booking-loading').style.display   = 'block';
+  document.getElementById('booking-confirmed').style.display = 'none';
+  document.getElementById('booking-failed').style.display    = 'none';
+
+  try {
+    const resp = await fetch(ROUTE_OPTIMIZER_URL + '/api/public/book', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firstName:      booking.firstName,
+        lastName:       booking.lastName,
+        phone:          booking.phone,
+        email:          booking.email || undefined,
+        address:        booking.address,
+        city:           booking.city,
+        state:          booking.state,
+        zip:            booking.zip,
+        date:           booking.selectedSlot.date,
+        time:           booking.selectedSlot.time,
+        oilLevel:       booking.oilGauge,
+        serviceType:    'OT',
+        estimatedPrice: booking.estimatedPrice,
+        tankLocation:   answers.location || '',
+        tankAccess:     answers.access   || '',
+      }),
+    });
+    const data = await resp.json();
+    if (data.success) { showBookingConfirmed(data); } else { showBookingFailed(); }
+  } catch(err) {
+    console.error('[Funnel] confirmBooking error:', err);
+    showBookingFailed();
+  }
+}
+
+function showBookingConfirmed(data) {
+  document.getElementById('booking-loading').style.display   = 'none';
+  document.getElementById('booking-confirmed').style.display = 'block';
+
+  const nameEl = document.getElementById('booking-success-name');
+  if (nameEl) nameEl.textContent = booking.firstName || 'there';
+
+  const summaryEl = document.getElementById('booking-summary-box');
+  if (summaryEl && booking.selectedSlot) {
+    const displayDate = (data && data.displayDate)
+      ? data.displayDate
+      : (booking.selectedSlot.displayDate || booking.selectedSlot.date);
+    summaryEl.innerHTML =
+      '<strong>Date:</strong> '    + displayDate + '<br>' +
+      '<strong>Time:</strong> '    + booking.selectedSlot.time + '<br>' +
+      '<strong>Address:</strong> ' + booking.address + ', ' + booking.city + ', ' + booking.state + ' ' + booking.zip + '<br>' +
+      '<strong>Est. price:</strong> $' + booking.estimatedPrice;
+  }
+}
+
+function showBookingFailed() {
+  document.getElementById('booking-loading').style.display = 'none';
+  document.getElementById('booking-failed').style.display  = 'block';
+}
+
+</script>
+</body>
+</html>
