@@ -1232,6 +1232,71 @@
     }
     .stairs-note.visible { display: flex; }
 
+    /* ─── BOOKING REVIEW SCREEN ─── */
+    .review-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      margin-bottom: 12px;
+    }
+    .review-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+      padding: 12px 18px 6px;
+    }
+    .review-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 8px 18px;
+      gap: 12px;
+    }
+    .review-label {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 500;
+      flex-shrink: 0;
+      min-width: 60px;
+    }
+    .review-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      text-align: right;
+    }
+    .review-price {
+      color: var(--brand);
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .review-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 6px 0 2px;
+    }
+    .review-edit-hint {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .review-edit-link {
+      background: none;
+      border: none;
+      color: var(--brand);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 0;
+      text-decoration: underline;
+    }
+
     /* ─── ESTIMATE BAR (fixed bottom) ─── */
     body { padding-bottom: 70px; }
     .estimate-bar {
@@ -1952,7 +2017,7 @@
       <div class="slot-cards" id="slot-cards"></div>
       <div class="nav-row">
         <button class="btn-back" onclick="goToScreen('checkout')">← Back</button>
-        <button class="btn-next" id="btn-confirm-booking" onclick="confirmBooking()" disabled>Confirm This Date →</button>
+        <button class="btn-next" id="btn-confirm-booking" onclick="showReviewScreen()" disabled>Review Booking →</button>
       </div>
     </div>
     <div id="dates-error" style="display:none;padding-top:8px;">
@@ -1965,6 +2030,38 @@
         Call (401) 389-3200 →
       </a>
       <button class="btn-secondary" onclick="goToScreen('checkout')" style="margin-top:10px;">← Try Again</button>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       SCREEN: BOOKING REVIEW (confirm info before API fires)
+  ====================================================== -->
+  <div class="screen" id="screen-booking-review">
+    <div class="step-heading">
+      <h1>Does everything look right?</h1>
+      <p>Take a quick look before we lock in your appointment.</p>
+    </div>
+
+    <div class="review-card">
+      <div class="review-section-label">Your Info</div>
+      <div class="review-row"><span class="review-label">Name</span><span class="review-value" id="rv-name"></span></div>
+      <div class="review-row"><span class="review-label">Phone</span><span class="review-value" id="rv-phone"></span></div>
+      <div class="review-row review-row-email" id="rv-email-row"><span class="review-label">Email</span><span class="review-value" id="rv-email"></span></div>
+      <div class="review-divider"></div>
+      <div class="review-section-label">Job Address</div>
+      <div class="review-row"><span class="review-label">Address</span><span class="review-value" id="rv-address"></span></div>
+      <div class="review-divider"></div>
+      <div class="review-section-label">Appointment</div>
+      <div class="review-row"><span class="review-label">Date</span><span class="review-value" id="rv-date"></span></div>
+      <div class="review-row"><span class="review-label">Time</span><span class="review-value" id="rv-time"></span></div>
+      <div class="review-row"><span class="review-label">Est. Price</span><span class="review-value review-price" id="rv-price"></span></div>
+    </div>
+
+    <p class="review-edit-hint">Need to change something? <button class="review-edit-link" onclick="goToScreen('checkout')">Edit my info</button></p>
+
+    <div class="nav-row" style="margin-top:16px;">
+      <button class="btn-back" onclick="goToScreen('dates')">← Back</button>
+      <button class="btn-next" onclick="confirmBooking()">Confirm & Book →</button>
     </div>
   </div>
 
@@ -3287,6 +3384,30 @@ function showDatesError() {
 }
 
 // ──────────────────────────────────────────────
+// REVIEW SCREEN
+// ──────────────────────────────────────────────
+function showReviewScreen() {
+  if (!booking.selectedSlot) return;
+
+  document.getElementById('rv-name').textContent    = (booking.firstName || '') + ' ' + (booking.lastName || '');
+  document.getElementById('rv-phone').textContent   = booking.phone || '';
+  document.getElementById('rv-address').textContent = [booking.address, booking.city, booking.state, booking.zip].filter(Boolean).join(', ');
+  document.getElementById('rv-date').textContent    = booking.selectedSlot.displayDate || booking.selectedSlot.date || '';
+  document.getElementById('rv-time').textContent    = booking.selectedSlot.time || '';
+  document.getElementById('rv-price').textContent   = booking.estimatedPrice ? '$' + booking.estimatedPrice : '';
+
+  const emailRow = document.getElementById('rv-email-row');
+  if (booking.email) {
+    document.getElementById('rv-email').textContent = booking.email;
+    emailRow.style.display = 'flex';
+  } else {
+    emailRow.style.display = 'none';
+  }
+
+  goToScreen('booking-review');
+}
+
+// ──────────────────────────────────────────────
 // BOOKING CONFIRMATION
 // ──────────────────────────────────────────────
 async function confirmBooking() {
@@ -3320,10 +3441,21 @@ async function confirmBooking() {
         tags:           ['calc-booked'],
       }),
     });
-    const data = await resp.json();
-    if (data.success) { showBookingConfirmed(data); } else { showBookingFailed(); }
+    let data;
+    try { data = await resp.json(); } catch(parseErr) {
+      console.error('[Funnel] confirmBooking — response not JSON. Status:', resp.status);
+      showBookingFailed();
+      return;
+    }
+    console.log('[Funnel] confirmBooking response:', resp.status, data);
+    if (resp.ok && data.success) {
+      showBookingConfirmed(data);
+    } else {
+      console.error('[Funnel] booking failed — server said:', data.message || data.error || JSON.stringify(data));
+      showBookingFailed(data.message || null);
+    }
   } catch(err) {
-    console.error('[Funnel] confirmBooking error:', err);
+    console.error('[Funnel] confirmBooking network error:', err);
     showBookingFailed();
   }
 }
@@ -3348,9 +3480,21 @@ function showBookingConfirmed(data) {
   }
 }
 
-function showBookingFailed() {
+function showBookingFailed(msg) {
   document.getElementById('booking-loading').style.display = 'none';
   document.getElementById('booking-failed').style.display  = 'block';
+  // Surface server message if present (helpful for debugging)
+  if (msg) {
+    const failEl = document.getElementById('booking-failed');
+    const existing = failEl.querySelector('.booking-fail-detail');
+    if (!existing) {
+      const detail = document.createElement('p');
+      detail.className = 'booking-fail-detail';
+      detail.style.cssText = 'color:#6b7280;font-size:0.8rem;margin-top:8px;';
+      detail.textContent = 'Details: ' + msg;
+      failEl.appendChild(detail);
+    }
+  }
 }
 
 
