@@ -3287,6 +3287,7 @@ function fireLeadWebhook() {
     estimated_total:      booking.estimatedPrice,
     permit_fee:           (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee ?? 'TBD'),
     source:               'booking_funnel',
+    created_at:           new Date().toISOString(),
     gclid:        attr.gclid        || '',
     fbclid:       attr.fbclid       || '',
     utm_source:   attr.utm_source   || '',
