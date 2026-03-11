@@ -3167,6 +3167,7 @@ const booking = {
   oilGauge: '',
   estimatedPrice: 0,
   selectedSlot: null,
+  ghlContactId: null,  // populated from Make webhook response
 };
 
 // ──────────────────────────────────────────────
@@ -3257,14 +3258,13 @@ function submitCheckout() {
   document.getElementById('dates-content').style.display = 'none';
   document.getElementById('dates-error').style.display   = 'none';
 
-  // Fire GHL webhook immediately (lead captured even if they drop off)
-  fireLeadWebhook();
-
-  // Fetch available slots from Route Optimizer
-  fetchSlots();
+  // Fire Make webhook + fetch slots in parallel
+  // Webhook awaited so we can capture the contactId before booking
+  fireLeadWebhook();  // async — runs in background, stores contactId when done
+  fetchSlots();       // runs immediately in parallel
 }
 
-function fireLeadWebhook() {
+async function fireLeadWebhook() {
   if (!GHL_WEBHOOK_URL || GHL_WEBHOOK_URL.includes('PASTE_')) return;
   const attr = getAttribution();
   const payload = {
@@ -3298,11 +3298,22 @@ function fireLeadWebhook() {
     landing_page: attr.landing_page || '',
     referrer:     attr.referrer     || '',
   };
-  fetch(GHL_WEBHOOK_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  }).catch(err => console.error('[Funnel] Lead webhook error:', err));
+  try {
+    const resp = await fetch(GHL_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (resp.ok) {
+      const data = await resp.json().catch(() => null);
+      if (data?.contactId) {
+        booking.ghlContactId = data.contactId;
+        console.log('[Funnel] Got contactId from Make:', booking.ghlContactId);
+      }
+    }
+  } catch (err) {
+    console.error('[Funnel] Lead webhook error:', err);
+  }
 }
 
 async function fetchSlots() {
@@ -3441,9 +3452,10 @@ async function confirmBooking() {
         basePrice:      answers.cityRemovalFee || 600,
         permitFee:      (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee || 0),
         oilSurcharge:   answers.oil === 'half_plus' ? 150 : 0,
-        tankLocation:   answers.location || '',
-        exitType:       answers.exit     || '',
-        tankAccess:     answers.access   || '',
+        tankLocation:   answers.location    || '',
+        exitType:       answers.exit        || '',
+        tankAccess:     answers.access      || '',
+        ghlContactId:   booking.ghlContactId || undefined,
         tags:           ['calc-booked'],
       }),
     });
