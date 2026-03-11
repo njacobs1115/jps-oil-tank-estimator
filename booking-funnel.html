@@ -3419,6 +3419,27 @@ async function confirmBooking() {
   document.getElementById('booking-failed').style.display    = 'none';
 
   try {
+    // ── Price breakdown ──────────────────────────────────────────────────
+    // Oil surcharge: $50 if more than 1/4 tank of oil remains
+    const _oilSurcharge = ['1/2', '3/4', 'full'].includes(booking.oilGauge) ? 50 : 0;
+    const _basePrice    = answers.cityRemovalFee || 600;
+    const _permitFee    = (answers.state === 'RI' || answers.state === 'CT')
+                          ? 0
+                          : (answers.permitFee || 0);
+    const _totalPrice   = _basePrice + _permitFee + _oilSurcharge;
+    // Update estimatedPrice to reflect corrected total
+    booking.estimatedPrice = _totalPrice;
+
+    // Exit type label for GHL (only relevant if basement)
+    const _exitLabel = answers.location === 'basement' && answers.exit
+      ? { walkout: 'Walkout', bulkhead: 'Bulkhead', stairs: 'Stairs' }[answers.exit] || answers.exit
+      : '';
+    const _locationLabel = {
+      basement: 'Basement' + (_exitLabel ? ' / ' + _exitLabel : ''),
+      garage:   'Garage',
+      outside:  'Outside',
+    }[answers.location] || (answers.location || '');
+
     const resp = await fetch(ROUTE_OPTIMIZER_URL + '/api/public/book', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -3435,9 +3456,13 @@ async function confirmBooking() {
         time:           booking.selectedSlot.time,
         oilLevel:       booking.oilGauge,
         serviceType:    'OT',
-        estimatedPrice: booking.estimatedPrice,
-        tankLocation:   answers.location || '',
+        estimatedPrice: _totalPrice,
+        tankLocation:   _locationLabel,
         tankAccess:     answers.access   || '',
+        exitType:       answers.exit     || '',
+        basePrice:      _basePrice,
+        permitFee:      _permitFee,
+        oilSurcharge:   _oilSurcharge,
         tags:           ['calc-booked'],
       }),
     });
