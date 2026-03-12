@@ -363,7 +363,7 @@
     .card-badge {
       font-size: 11px;
       font-weight: 700;
-      background: var(--navy);
+      background: var(--orange);
       color: #fff;
       padding: 3px 9px;
       border-radius: 99px;
@@ -446,8 +446,8 @@
 
     /* Continue button: subtle glow pulse when enabled */
     @keyframes btnGlow {
-      0%, 100% { box-shadow: 0 2px 8px rgba(22,163,74,.3); }
-      50%       { box-shadow: 0 4px 22px rgba(22,163,74,.5), 0 0 0 5px rgba(22,163,74,.1); }
+      0%, 100% { box-shadow: 0 2px 8px rgba(232,114,42,.35); }
+      50%       { box-shadow: 0 4px 22px rgba(232,114,42,.55), 0 0 0 5px rgba(232,114,42,.1); }
     }
     .btn-next:not(:disabled) { animation: btnGlow 2.8s ease-in-out infinite; }
 
@@ -606,7 +606,7 @@
       height: 52px;
       border: none;
       border-radius: var(--radius-sm);
-      background: var(--brand);
+      background: var(--orange);
       color: #fff;
       font-size: 15px;
       font-weight: 700;
@@ -614,11 +614,12 @@
       font-family: inherit;
       letter-spacing: 0.1px;
       transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
-      box-shadow: 0 2px 8px rgba(22,163,74,.3);
+      box-shadow: 0 2px 8px rgba(232,114,42,.35);
     }
     .btn-next:hover {
-      background: #15803d;
-      box-shadow: 0 4px 14px rgba(22,163,74,.4);
+      background: var(--orange-dark);
+      box-shadow: 0 4px 14px rgba(232,114,42,.5);
+      transform: translateY(-1px);
     }
     .btn-next:active { transform: scale(0.98); }
     .btn-next:disabled {
