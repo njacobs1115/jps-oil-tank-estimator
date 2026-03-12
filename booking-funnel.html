@@ -396,6 +396,59 @@
       transform: rotate(45deg) translate(-1px, -1px);
     }
 
+    /* ─── CARD ENHANCEMENTS ─── */
+    /* Left accent bar that scales in when selected */
+    .card { position: relative; overflow: hidden; }
+    .card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--brand);
+      transform: scaleY(0);
+      transform-origin: center;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border-radius: 0 2px 2px 0;
+    }
+    .card.selected::before { transform: scaleY(1); }
+
+    /* Selection pop micro-animation */
+    @keyframes cardPop {
+      0%   { box-shadow: var(--shadow-sm); }
+      45%  { box-shadow: 0 0 0 6px rgba(22,163,74,.18), 0 4px 16px rgba(22,163,74,.2); }
+      100% { box-shadow: 0 0 0 3px #bbf7d0; }
+    }
+    .card.selected { animation: cardPop 0.28s ease forwards; }
+
+    /* SVG icon color — inherits from card state */
+    .card-icon svg {
+      width: 20px; height: 20px;
+      display: block;
+      color: var(--text-mid);
+      transition: color var(--transition);
+    }
+    .card.selected .card-icon svg,
+    .card:hover .card-icon svg { color: var(--brand); }
+
+    /* Step slide-in transitions */
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(20px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-20px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .screen.active { animation: slideInRight 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+    .screen.active.slide-back { animation: slideInLeft 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+
+    /* Continue button: subtle glow pulse when enabled */
+    @keyframes btnGlow {
+      0%, 100% { box-shadow: 0 2px 8px rgba(22,163,74,.3); }
+      50%       { box-shadow: 0 4px 22px rgba(22,163,74,.5), 0 0 0 5px rgba(22,163,74,.1); }
+    }
+    .btn-next:not(:disabled) { animation: btnGlow 2.8s ease-in-out infinite; }
+
     /* ─── STATE GRID ─── */
     .state-grid {
       display: grid;
@@ -1566,7 +1619,7 @@
     </div>
     <div class="cards" id="location-cards">
       <button class="card" data-value="basement" onclick="selectLocation(this)">
-        <span class="card-icon">🏠</span>
+        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
         <div class="card-body">
           <div class="card-label">Basement</div>
           <div class="card-sub">Inside the home, below ground level</div>
@@ -1574,7 +1627,7 @@
         <span class="card-check"></span>
       </button>
       <button class="card" id="garage-card" data-value="garage" onclick="selectLocation(this)">
-        <span class="card-icon">🚗</span>
+        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8l10-6 10 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/><line x1="7" y1="13" x2="17" y2="13"/><line x1="7" y1="17" x2="17" y2="17"/></svg></span>
         <div class="card-body">
           <div class="card-label">Garage</div>
           <div class="card-sub">Attached or detached garage</div>
@@ -1582,7 +1635,7 @@
         <span class="card-check"></span>
       </button>
       <button class="card" data-value="outside" onclick="selectLocation(this)">
-        <span class="card-icon">🌿</span>
+        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>
         <div class="card-body">
           <div class="card-label">Outside</div>
           <div class="card-sub">Above ground, exterior of the home</div>
@@ -1606,7 +1659,7 @@
     </div>
     <div class="cards" id="exit-cards">
       <button class="card" data-value="walkout" onclick="selectExit(this)">
-        <span class="card-icon">🚪</span>
+        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 4H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h7"/><polyline points="17 8 21 12 17 16"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>
         <div class="card-body">
           <div class="card-label">Walkout / Ground-level door</div>
           <div class="card-sub">Door opens directly outside — no stairs</div>
@@ -1614,7 +1667,7 @@
         <span class="card-check"></span>
       </button>
       <button class="card" data-value="bulkhead" onclick="selectExit(this)">
-        <span class="card-icon">🔲</span>
+        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="14" width="20" height="6" rx="1"/><line x1="12" y1="14" x2="12" y2="5"/><polyline points="8 9 12 5 16 9"/></svg></span>
         <div class="card-body">
           <div class="card-label">Bulkhead</div>
           <div class="card-sub">Up through an exterior hatch</div>
@@ -1622,7 +1675,7 @@
         <span class="card-check"></span>
       </button>
       <button class="card" data-value="stairs" onclick="selectExit(this)">
-        <span class="card-icon">🪜</span>
+        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 20 4 16 8 16 8 12 12 12 12 8 16 8 16 4 20 4 20 20"/><line x1="4" y1="20" x2="20" y2="20"/></svg></span>
         <div class="card-body">
           <div class="card-label">Up the stairs / through the house</div>
           <div class="card-sub">We handle this regularly — takes a bit more time, that's all</div>
@@ -1646,7 +1699,7 @@
     </div>
     <div class="cards" id="access-cards">
       <button class="card" data-value="open" onclick="selectCard(this,'access')">
-        <span class="card-icon">✅</span>
+        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
         <div class="card-body">
           <div class="card-label">Easy — open and accessible</div>
           <div class="card-sub">Clear path, no obstacles between us and the tank</div>
@@ -1654,7 +1707,7 @@
         <span class="card-check"></span>
       </button>
       <button class="card" data-value="unsure" onclick="selectCard(this,'access')">
-        <span class="card-icon">🤔</span>
+        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
         <div class="card-body">
           <div class="card-label">I'm not sure</div>
           <div class="card-sub">A quick photo when we call clears this up in seconds</div>
@@ -1662,7 +1715,7 @@
         <span class="card-check"></span>
       </button>
       <button class="card" data-value="restricted" onclick="selectCard(this,'access')">
-        <span class="card-icon">⚠️</span>
+        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
         <div class="card-body">
           <div class="card-label">Tight or obstructed</div>
           <div class="card-sub">Behind a wall, crawl space, or cubbyhole — surcharge may apply, always confirmed before we start</div>
@@ -2619,10 +2672,16 @@ function updateProgressSteps(step) {
 }
 
 function goToStep(n) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  // Support '1b' as a special sub-step (still step 1 in the progress bar)
-  const screenId = 'screen-' + n;
-  document.getElementById(screenId).classList.add('active');
+  // Detect forward vs back for slide direction
+  const cur = document.querySelector('.screen.active');
+  const curNum = cur ? parseFloat(cur.id.replace('screen-', '').replace('b', '.5')) : 0;
+  const nextNum = parseFloat(String(n).replace('b', '.5'));
+  const goingBack = nextNum < curNum;
+
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active', 'slide-back'));
+  const next = document.getElementById('screen-' + n);
+  if (goingBack) next.classList.add('slide-back');
+  next.classList.add('active');
   document.getElementById('quiz-shell').classList.remove('results-mode');
   updateProgressSteps(n === '1b' ? 1 : n);
   window.scrollTo({ top: 0, behavior: 'smooth' });
