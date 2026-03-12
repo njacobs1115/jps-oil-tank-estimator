@@ -1177,6 +1177,78 @@
       gap: 10px;
     }
     /* Oil level — 2x2 tile grid */
+    /* ─── OIL OPTION GRID (3-column) ─── */
+    .oil-option-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    .oil-option-card {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 10px;
+      padding: 20px 10px 18px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      min-height: 110px;
+      transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
+      box-shadow: var(--shadow-sm);
+      font-family: inherit;
+    }
+    .oil-option-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--brand);
+      transform: scaleX(0);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .oil-option-card.selected::before { transform: scaleX(1); }
+    .oil-option-card:hover {
+      border-color: #86efac;
+      background: var(--brand-light);
+      box-shadow: 0 0 0 3px #bbf7d0;
+    }
+    .oil-option-card.selected {
+      border-color: var(--brand);
+      background: var(--brand-light);
+      box-shadow: 0 0 0 3px #bbf7d0;
+      animation: cardPop 0.28s ease forwards;
+    }
+    .oil-option-icon {
+      width: 42px; height: 42px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--surface);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      color: var(--text-mid);
+      transition: all var(--transition);
+      flex-shrink: 0;
+    }
+    .oil-option-card:hover .oil-option-icon,
+    .oil-option-card.selected .oil-option-icon {
+      background: var(--brand-mid);
+      border-color: #86efac;
+      color: var(--brand);
+    }
+    .oil-option-icon svg { width: 20px; height: 20px; display: block; }
+    .oil-option-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.25;
+    }
+    .oil-option-card.selected .oil-option-label { color: var(--brand); }
+
     .oil-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -1740,32 +1812,18 @@
       <h1>How much oil is in the tank?</h1>
       <p>What does the gauge on the tank read?</p>
     </div>
-    <div class="cards" id="oil-cards">
-      <button class="card" data-value="quarter" onclick="selectCard(this,'oil')">
-        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></span>
-        <div class="card-body">
-          <div class="card-label">Less than ¼ tank</div>
-          <div class="card-sub">No oil surcharge — included in your price</div>
-        </div>
-        <span class="card-badge">INCLUDED</span>
-        <span class="card-check"></span>
+    <div class="oil-option-grid" id="oil-cards">
+      <button class="oil-option-card" data-value="quarter" onclick="selectCard(this,'oil')">
+        <span class="oil-option-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></span>
+        <div class="oil-option-label">Less than ¼</div>
       </button>
-      <button class="card" data-value="half_plus" onclick="selectCard(this,'oil')">
-        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/><line x1="7" y1="15" x2="17" y2="15"/><line x1="8" y1="18" x2="16" y2="18"/></svg></span>
-        <div class="card-body">
-          <div class="card-label">More than ¼ tank</div>
-          <div class="card-sub">$150 oil removal fee — always confirmed before we start</div>
-        </div>
-        <span class="card-badge" style="background:var(--orange)">+$150</span>
-        <span class="card-check"></span>
+      <button class="oil-option-card" data-value="half_plus" onclick="selectCard(this,'oil')">
+        <span class="oil-option-icon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></span>
+        <div class="oil-option-label">More than ¼</div>
       </button>
-      <button class="card" data-value="no_gauge" onclick="selectCard(this,'oil')">
-        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
-        <div class="card-body">
-          <div class="card-label">I don't know</div>
-          <div class="card-sub">We'll confirm on-site before anything starts</div>
-        </div>
-        <span class="card-check"></span>
+      <button class="oil-option-card" data-value="no_gauge" onclick="selectCard(this,'oil')">
+        <span class="oil-option-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="oil-option-label">I don't know</div>
       </button>
     </div>
     <div class="nav-row">
@@ -1841,14 +1899,14 @@
       <div class="total-amount" id="results-total-display">$600</div>
       <div class="total-range" id="results-range-display"></div>
       <div class="hero-badge">
-        <span>✓</span> Flat rate · No hourly billing · No surprises on job day
+        <span>✓</span> You pay nothing until the job is complete
       </div>
     </div>
 
     <!-- Trust note -->
     <div class="trust-banner">
       <span class="trust-banner-icon">🛡️</span>
-      <span>You don't pay until the tank is gone. The number above is the number on your invoice — no asterisks, no surprises.</span>
+      <span>No upsells. No hidden fees. The number above is the number on your invoice.</span>
     </div>
 
     <!-- Stairs warning (conditional) -->
@@ -1947,10 +2005,10 @@
 
     <!-- CTA — two paths: book now or email estimate -->
     <div class="cta-section">
-      <div class="cta-heading">That&rsquo;s your number. What would you like to do?</div>
+      <div class="cta-heading">This price is yours. Pick your date and we&rsquo;ll handle everything else.</div>
 
       <button class="btn-cta" onclick="goToCheckout()">Book My Removal &mdash; Pick a Date &rarr;</button>
-      <div class="btn-cta-sub">No payment today. Your appointment is locked in instantly.</div>
+      <div class="btn-cta-sub">No payment until the job is complete.</div>
 
       <div style="display:flex;align-items:center;gap:12px;margin:16px 0;">
         <div style="flex:1;height:1px;background:var(--border);"></div>
@@ -1966,10 +2024,16 @@
         We&rsquo;ll send your price in writing &mdash; good for 14 days.
       </div>
 
-      <a href="tel:+14013893200" class="btn-secondary"
-         style="display:flex;align-items:center;justify-content:center;text-decoration:none;margin-top:12px;height:48px;border-radius:var(--radius-sm);border:1.5px solid var(--border);color:var(--muted);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:all var(--transition);">
-        Prefer a call?&nbsp;<span style="color:var(--brand);font-weight:700;">(401) 389-3200</span>
-      </a>
+      <div style="display:flex;gap:10px;margin-top:12px;">
+        <a href="tel:+14013893200"
+           style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;height:48px;border-radius:var(--radius-sm);border:1.5px solid var(--border);color:var(--text-mid);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:all var(--transition);background:var(--bg);">
+          📞 Call
+        </a>
+        <a href="sms:+14013893200"
+           style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;height:48px;border-radius:var(--radius-sm);border:1.5px solid var(--border);color:var(--text-mid);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:all var(--transition);background:var(--bg);">
+          💬 Text
+        </a>
+      </div>
 
       <button class="btn-secondary" onclick="startOver()" style="margin-top:8px;">Start Over</button>
     </div>
@@ -2787,7 +2851,7 @@ function checkStep1Ready() {
 // Generic card select — enables the next button for the current step
 function selectCard(el, type) {
   const screen = el.closest('.screen');
-  screen.querySelectorAll('.cards .card, .oil-tile').forEach(c => c.classList.remove('selected'));
+  screen.querySelectorAll('.cards .card, .oil-tile, .oil-option-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   answers[type] = el.dataset.value;
   const stepNum = screen.dataset.step;
@@ -3041,12 +3105,10 @@ function computePricing() {
   const permitDisplay = document.getElementById('permit-fee-display');
 
   if (answers.state === 'RI') {
-    permitLine.style.display = 'flex';
-    permitDisplay.textContent = '$0';
-    permitSub.textContent = 'No permit required in Rhode Island';
-    permitDisplay.classList.add('included');
+    // RI: no permit — don't mention it
+    permitLine.style.display = 'none';
   } else if (answers.state === 'CT') {
-    // CT: no permit row at all
+    // CT: no permit — don't mention it
     permitLine.style.display = 'none';
   } else if (permitFee === null) {
     permitLine.style.display = 'flex';
