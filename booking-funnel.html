@@ -19,8 +19,10 @@
   <style>
     /* ─── DESIGN TOKENS ─── */
     :root {
-      --navy:         #1a1f2e;   /* primary dark — header, CTA button */
+      --navy:         #1a1f2e;   /* primary dark — header */
       --navy-light:   #252b3b;   /* hover state on dark surfaces */
+      --orange:       #e8722a;   /* brand CTA orange — matches removemyoiltank.com */
+      --orange-dark:  #d4621e;   /* orange hover */
       --brand:        #16a34a;   /* rich green accent — progress bar, checkmarks, selected borders */
       --brand-light:  #f0fdf4;   /* very light green tint for selected card bg */
       --brand-mid:    #dcfce7;   /* slightly deeper tint for borders */
@@ -939,7 +941,7 @@
       height: 58px;
       border: none;
       border-radius: var(--radius-sm);
-      background: var(--navy);
+      background: var(--orange);
       color: #fff;
       font-size: 16px;
       font-weight: 700;
@@ -948,11 +950,12 @@
       letter-spacing: 0.2px;
       margin-top: 4px;
       transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
-      box-shadow: 0 2px 10px rgba(26,31,46,.25);
+      box-shadow: 0 4px 18px rgba(232,114,42,.45);
     }
     .btn-cta:hover {
-      background: var(--navy-light);
-      box-shadow: 0 4px 18px rgba(26,31,46,.3);
+      background: var(--orange-dark);
+      box-shadow: 0 6px 24px rgba(232,114,42,.55);
+      transform: translateY(-1px);
     }
     .btn-cta:active { transform: scale(0.99); }
     .btn-cta:disabled {
@@ -1737,19 +1740,32 @@
       <h1>How much oil is in the tank?</h1>
       <p>What does the gauge on the tank read?</p>
     </div>
-    <div class="oil-grid" id="oil-cards">
-      <button class="oil-tile" data-value="quarter" onclick="selectCard(this,'oil')">
-        <span class="oil-tile-check"></span>
-        <div class="oil-tile-label">Less than ¼</div>
-        <span class="oil-tile-badge">Included</span>
+    <div class="cards" id="oil-cards">
+      <button class="card" data-value="quarter" onclick="selectCard(this,'oil')">
+        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></span>
+        <div class="card-body">
+          <div class="card-label">Less than ¼ tank</div>
+          <div class="card-sub">No oil surcharge — included in your price</div>
+        </div>
+        <span class="card-badge">INCLUDED</span>
+        <span class="card-check"></span>
       </button>
-      <button class="oil-tile" data-value="half_plus" onclick="selectCard(this,'oil')">
-        <span class="oil-tile-check"></span>
-        <div class="oil-tile-label">More than ¼</div>
+      <button class="card" data-value="half_plus" onclick="selectCard(this,'oil')">
+        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/><line x1="7" y1="15" x2="17" y2="15"/><line x1="8" y1="18" x2="16" y2="18"/></svg></span>
+        <div class="card-body">
+          <div class="card-label">More than ¼ tank</div>
+          <div class="card-sub">$150 oil removal fee — always confirmed before we start</div>
+        </div>
+        <span class="card-badge" style="background:var(--orange)">+$150</span>
+        <span class="card-check"></span>
       </button>
-      <button class="oil-tile" data-value="no_gauge" onclick="selectCard(this,'oil')">
-        <span class="oil-tile-check"></span>
-        <div class="oil-tile-label">I don't know</div>
+      <button class="card" data-value="no_gauge" onclick="selectCard(this,'oil')">
+        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="card-body">
+          <div class="card-label">I don't know</div>
+          <div class="card-sub">We'll confirm on-site before anything starts</div>
+        </div>
+        <span class="card-check"></span>
       </button>
     </div>
     <div class="nav-row">
