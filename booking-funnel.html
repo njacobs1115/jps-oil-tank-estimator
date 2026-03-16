@@ -1629,32 +1629,33 @@
 ══════════════════════════════════════ -->
 <div class="intro-screen" id="intro-screen">
   <div class="intro-hero">
-    <div class="intro-eyebrow">Free Instant Estimate</div>
-    <h1 class="intro-headline">Get an honest price on your oil tank removal.</h1>
-    <p class="intro-sub">Insurance requiring it? House under contract? Get your flat-rate price in under 60 seconds — no phone call, no commitment.</p>
-    <button class="btn-intro-start" onclick="startEstimator()">See My Price →</button>
-    <div class="intro-start-sub">4 questions · 60 seconds · no email required</div>
+    <div class="intro-eyebrow">FLAT-RATE PRICE · NO PHONE CALL REQUIRED</div>
+    <h1 class="intro-headline">Your Oil Tank Removed. Permit Pulled. Problem Closed.</h1>
+    <p class="intro-sub">Insurance deadline? House under contract? Get your exact flat-rate price in under 60 seconds — no phone call, no email, no commitment.</p>
+    <button class="btn-intro-start" onclick="startEstimator()">Get My Flat-Rate Price →</button>
+    <div class="intro-start-sub">No email. No sales call. Just your price.</div>
+    <div style="margin-top:12px;font-size:13px;color:var(--text-mid);text-align:center;">★★★★★ Rated 4.9 by 400+ Rhode Island &amp; Massachusetts homeowners</div>
   </div>
   <div class="intro-badges">
     <div class="intro-badge">
       <div class="intro-badge-icon">🏷️</div>
       <div class="intro-badge-text">
-        <div class="intro-badge-title">Flat Rate. No Surprises.</div>
-        <div class="intro-badge-desc">One price covers everything — permits, removal, disposal, and cleanup. What we quote is what you pay.</div>
+        <div class="intro-badge-title">ONE PRICE. EVERYTHING INCLUDED.</div>
+        <div class="intro-badge-desc">Permits, removal, disposal, and full cleanup — all covered. The price you see is the price you pay.</div>
       </div>
     </div>
     <div class="intro-badge">
       <div class="intro-badge-icon">📅</div>
       <div class="intro-badge-text">
-        <div class="intro-badge-title">Most Jobs Done Within the Week.</div>
-        <div class="intro-badge-desc">Closing deadline? Insurance cutoff? We understand urgency. Most jobs are on the schedule within days.</div>
+        <div class="intro-badge-title">MOST JOBS SCHEDULED WITHIN DAYS.</div>
+        <div class="intro-badge-desc">Closing deadline or insurance cutoff? We move fast. Most customers are on the schedule within days.</div>
       </div>
     </div>
     <div class="intro-badge">
       <div class="intro-badge-icon">💰</div>
       <div class="intro-badge-text">
-        <div class="intro-badge-title">You Don't Pay Until It's Gone.</div>
-        <div class="intro-badge-desc">Zero deposit. Not a dollar changes hands until the tank is out of your home and the job is done.</div>
+        <div class="intro-badge-title">$0 DUE UNTIL THE TANK IS GONE.</div>
+        <div class="intro-badge-desc">No deposit. No payment until your tank is physically removed, the job site is clean, and you're satisfied.</div>
       </div>
     </div>
   </div>
@@ -1896,7 +1897,7 @@
 
     <!-- Hero total -->
     <div class="results-hero">
-      <div class="total-label">Your All-In Price</div>
+      <div class="total-label">YOUR FLAT-RATE REMOVAL PRICE</div>
       <div class="total-amount" id="results-total-display">$600</div>
       <div class="total-range" id="results-range-display"></div>
       <div class="hero-badge">
@@ -1907,13 +1908,7 @@
     <!-- Trust note -->
     <div class="trust-banner">
       <span class="trust-banner-icon">🛡️</span>
-      <span>No upsells. No hidden fees. The number above is the number on your invoice.</span>
-    </div>
-
-    <!-- Stairs warning (conditional) -->
-    <div class="stairs-note" id="stairs-note">
-      <span>🪜</span>
-      <span><strong>Stair removal noted.</strong> Navigating stairs and living space adds time. We'll confirm scope on-site — most stair jobs still fall within standard pricing.</span>
+      <span>No upsells. No hidden fees. What you see is what appears on your invoice.</span>
     </div>
 
     <!-- Leak warning (conditional) -->
@@ -1937,14 +1932,6 @@
         <div class="invoice-row-amount" id="base-fee-display">$600</div>
       </div>
 
-      <div class="invoice-row" id="access-line" style="display:none;">
-        <div class="invoice-row-desc">
-          <div class="invoice-row-name">Restricted Access Surcharge</div>
-          <div class="invoice-row-sub">Crawlspace / obstructed — confirmed when we connect</div>
-        </div>
-        <div class="invoice-row-amount" id="access-fee-display">+$600</div>
-      </div>
-
       <div class="invoice-row">
         <div class="invoice-row-desc">
           <div class="invoice-row-name">Oil &amp; Sludge Disposal</div>
@@ -1955,8 +1942,8 @@
 
       <div class="invoice-row" id="oil-excess-line" style="display:none;">
         <div class="invoice-row-desc">
-          <div class="invoice-row-name">Excess Oil Disposal</div>
-          <div class="invoice-row-sub">Tank is more than half full — flat fee, never by the gallon</div>
+          <div class="invoice-row-name">Half-Full Tank Fee</div>
+          <div class="invoice-row-sub">Safe disposal, flat rate — never by the gallon</div>
         </div>
         <div class="invoice-row-amount">+$150</div>
       </div>
@@ -1978,7 +1965,7 @@
     <!-- Why our prices -->
     <div class="why-expand">
       <button class="why-toggle" onclick="toggleWhy(this)">
-        How we price our jobs — and why it's different
+        Why our price is higher than the quote you got from the other guy
         <i class="chevron">▼</i>
       </button>
       <div class="why-body" id="why-body">
@@ -2006,26 +1993,27 @@
 
     <!-- CTA — two paths: book now or email estimate -->
     <div class="cta-section">
-      <div class="cta-heading">Done in a day. Pay when it&rsquo;s gone.</div>
+      <div class="cta-heading">Done in a day. Problem closed.</div>
 
       <button class="btn-cta" onclick="goToCheckout()">Book My Removal &mdash; Pick a Date &rarr;</button>
-      <div class="btn-cta-sub">No payment until the job is complete.</div>
+      <div class="btn-cta-sub">No deposit. No payment until your tank is physically gone.</div>
 
       <div style="display:flex;align-items:center;gap:12px;margin:16px 0;">
         <div style="flex:1;height:1px;background:var(--border);"></div>
-        <span style="font-size:13px;color:var(--muted);white-space:nowrap;">Not ready to book?</span>
+        <span style="font-size:13px;color:var(--muted);white-space:nowrap;">Want this price in writing?</span>
         <div style="flex:1;height:1px;background:var(--border);"></div>
       </div>
 
       <button class="btn-secondary" onclick="goToEstimate()"
         style="width:100%;height:48px;font-size:15px;font-weight:600;">
-        Email Me My Estimate
+        Send My Estimate &rarr;
       </button>
       <div style="text-align:center;font-size:12px;color:var(--muted);margin-top:6px;">
-        We&rsquo;ll send your price in writing &mdash; good for 14 days.
+        We&rsquo;ll send your price in writing &mdash; valid for 14 days.
       </div>
 
-      <div style="display:flex;gap:10px;margin-top:12px;">
+      <div style="text-align:center;font-size:13px;color:var(--text-mid);margin-top:16px;margin-bottom:8px;">Questions? Call or text us directly.</div>
+      <div style="display:flex;gap:10px;">
         <a href="tel:+14013893200"
            style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;height:48px;border-radius:var(--radius-sm);border:1.5px solid var(--border);color:var(--text-mid);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:all var(--transition);background:var(--bg);">
           📞 Call
@@ -2040,6 +2028,35 @@
     </div>
 
   </div><!-- /screen-results -->
+
+  <!-- ══════════════════════════════════════
+       RESTRICTED ACCESS SCREEN
+  ══════════════════════════════════════ -->
+  <div class="screen" id="screen-restricted">
+    <div class="results-hero">
+      <div class="total-label">ONE MORE STEP</div>
+      <div style="font-size:22px;font-weight:700;color:var(--text);margin:12px 0 0;line-height:1.3;">We need a quick look before we can give you a price.</div>
+    </div>
+
+    <div class="trust-banner">
+      <span>Tight access jobs are still very doable — we handle them regularly. But we need to see the setup before we can lock in a number. Send us a couple of photos and we'll come back with a firm price, usually within a few hours.</span>
+    </div>
+
+    <div class="cta-section">
+      <a href="sms:+14013893200?body=Hi%2C%20I%20have%20a%20tight%20access%20oil%20tank%20removal%20job%20and%20would%20like%20to%20send%20photos%20for%20a%20price."
+         class="btn-cta"
+         style="display:flex;align-items:center;justify-content:center;text-decoration:none;">
+        Send Us Photos &mdash; Get Your Price &rarr;
+      </a>
+      <div class="btn-cta-sub">No commitment. We'll review and reply same day.</div>
+
+      <div style="text-align:center;margin-top:20px;font-size:14px;color:var(--text-mid);">
+        Prefer to talk it through? <a href="tel:+14013893200" style="color:var(--text-mid);font-weight:600;">Call or Text (401) 389-3200</a>
+      </div>
+
+      <button class="btn-secondary" onclick="startOver()" style="margin-top:16px;">Start Over</button>
+    </div>
+  </div><!-- /screen-restricted -->
 
   <!-- ══════════════════════════════════════
        SUCCESS SCREEN
@@ -2780,13 +2797,20 @@ function continueFromStep1() {
 function showResults() {
   if (!answers.state) return;
   if (answers.state === 'MA' && !answers.city) return;
-  computePricing();
+
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-results').classList.add('active');
   document.getElementById('quiz-shell').classList.add('results-mode');
   updateProgressSteps(99);
   document.getElementById('estimate-bar').classList.remove('visible');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (answers.access === 'restricted') {
+    document.getElementById('screen-restricted').classList.add('active');
+    return;
+  }
+
+  computePricing();
+  document.getElementById('screen-results').classList.add('active');
 }
 
 function startOver() {
@@ -3010,20 +3034,15 @@ function updateEstimateBar() {
   bar.classList.add('visible');
 
   const BASE = answers.cityRemovalFee || 600;
-  const isRestricted = answers.access === 'restricted';
   const oilFee = answers.oil === 'half_plus' ? 150 : 0;
   // CT and RI have no permit fee
   const permitFee = (answers.state === 'CT' || answers.state === 'RI') ? 0 : (answers.permitFee ?? 0);
   const low = BASE + oilFee + permitFee;
-  const high = BASE + 600 + oilFee + permitFee;
 
   const amountEl = document.getElementById('estimate-bar-amount');
   const noteEl = document.getElementById('estimate-bar-note');
 
-  if (isRestricted) {
-    amountEl.textContent = 'from $' + low.toLocaleString();
-    noteEl.textContent = 'Access surcharge confirmed when we connect';
-  } else if (answers.state === 'MA' && !answers.city) {
+  if (answers.state === 'MA' && !answers.city) {
     amountEl.textContent = 'from $600+';
     noteEl.textContent = 'Select your city for exact price';
   } else {
@@ -3037,17 +3056,13 @@ function updateEstimateBar() {
 // ──────────────────────────────────────────────
 function computePricing() {
   const BASE = answers.cityRemovalFee || 600;
-  const isRestricted = answers.access === 'restricted';
   const hasExcessOil = answers.oil === 'half_plus';
   const oilFee = hasExcessOil ? 150 : 0;
   const permitFee = (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee ?? null);
 
   // Totals
-  const accessFee = isRestricted ? 600 : 0;
   const lowTotal = BASE + oilFee + (permitFee ?? 0);
-  const highTotal = isRestricted
-    ? BASE + accessFee + oilFee + (permitFee ?? 0)
-    : BASE + oilFee + (permitFee ?? 0);
+  const highTotal = BASE + oilFee + (permitFee ?? 0);
 
   // --- Update UI ---
 
@@ -3056,10 +3071,7 @@ function computePricing() {
   const rangeEl = document.getElementById('results-range-display');
 
   const isFallbackCity = answers.permitSource === 'tbd';
-  if (isRestricted) {
-    totalEl.textContent = 'from $' + lowTotal.toLocaleString();
-    rangeEl.textContent = 'Access surcharge confirmed when we connect — photo helps';
-  } else if (isFallbackCity && answers.state === 'MA') {
+  if (isFallbackCity && answers.state === 'MA') {
     totalEl.textContent = '$' + (BASE + oilFee);
     rangeEl.textContent = '+ permit fee — confirmed when we connect';
   } else if (isFallbackCity) {
@@ -3081,16 +3093,6 @@ function computePricing() {
       : answers.location === 'basement'
         ? 'Basement removal — cutting, safe extraction & disposal'
         : 'Cutting, safe removal & disposal';
-
-  // Access surcharge line
-  const accessLine = document.getElementById('access-line');
-  if (isRestricted) {
-    accessLine.style.display = 'flex';
-    document.getElementById('access-fee-display').textContent = 'TBD';
-    document.querySelector('#access-line .invoice-row-sub').textContent = 'A photo of the area helps us confirm — we\'ll sort this on the call';
-  } else {
-    accessLine.style.display = 'none';
-  }
 
   // Excess oil line
   const oilExcessLine = document.getElementById('oil-excess-line');
@@ -3125,9 +3127,7 @@ function computePricing() {
 
   // Total line
   const totalLineEl = document.getElementById('total-display');
-  if (isRestricted) {
-    totalLineEl.textContent = '$' + lowTotal + '–$' + highTotal + '+';
-  } else if (permitFee !== null) {
+  if (permitFee !== null) {
     totalLineEl.textContent = '$' + lowTotal;
   } else {
     totalLineEl.textContent = '$' + (BASE + oilFee) + ' + permit';
@@ -3135,7 +3135,6 @@ function computePricing() {
 
   // Conditional notes
   document.getElementById('leak-note').classList.remove('visible');
-  document.getElementById('stairs-note').classList.toggle('visible', answers.exit === 'stairs');
 }
 
 // ──────────────────────────────────────────────
@@ -3174,11 +3173,10 @@ function submitCTA() {
 
   // Compute totals for payload
   const BASE = answers.cityRemovalFee || 600;
-  const isRestricted = answers.access === 'restricted';
   const oilFee = answers.oil === 'half_plus' ? 150 : 0;
   const permitFee = (answers.state === 'RI' || answers.state === 'CT') ? 0 : answers.permitFee;
   const lowTotal = BASE + oilFee + (permitFee ?? 0);
-  const highTotal = isRestricted ? BASE + 600 + oilFee + (permitFee ?? 0) : BASE + oilFee + (permitFee ?? 0);
+  const highTotal = BASE + oilFee + (permitFee ?? 0);
 
   const payload = {
     name, phone, email, note,
@@ -3194,7 +3192,7 @@ function submitCTA() {
     estimated_total_low: lowTotal,
     estimated_total_high: highTotal,
     permit_fee: (answers.state === 'RI' || answers.state === 'CT') ? '0' : (permitFee ?? 'TBD'),
-    restricted_access: isRestricted ? 'true' : 'false',
+    restricted_access: 'false',
     stair_removal: answers.exit === 'stairs' ? 'true' : 'false',
     source: 'estimator_tool'
   };
