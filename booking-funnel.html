@@ -2012,7 +2012,24 @@
         We&rsquo;ll send your price in writing &mdash; valid for 14 days.
       </div>
 
-      <div style="text-align:center;font-size:13px;color:var(--text-mid);margin-top:16px;margin-bottom:8px;">Questions? Call or text us directly.</div>
+      <div style="margin-top:20px;padding:14px 16px;background:#f9fafb;border-radius:var(--radius-sm);border:1px solid var(--border);text-align:center;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Multiple tanks, or a tank with a boiler?</div>
+        <div style="font-size:12px;color:var(--text-mid);margin-bottom:10px;">Boilers require a photo to quote. Give us a quick call or text and we&rsquo;ll take care of it.</div>
+        <div style="display:flex;gap:8px;">
+          <a href="tel:+14013893200"
+             onclick="pushDataLayer({ event: 'call_clicked', location: 'edge_case_prompt', price: booking.estimatedPrice, city: answers.city || answers.state, state: answers.state })"
+             style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;height:40px;border-radius:var(--radius-sm);border:1.5px solid var(--border);color:var(--text-mid);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;background:var(--bg);">
+            📞 Call
+          </a>
+          <a href="sms:+14013893200"
+             onclick="pushDataLayer({ event: 'text_clicked', location: 'edge_case_prompt', price: booking.estimatedPrice, city: answers.city || answers.state, state: answers.state })"
+             style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;height:40px;border-radius:var(--radius-sm);border:1.5px solid var(--border);color:var(--text-mid);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;background:var(--bg);">
+            💬 Text
+          </a>
+        </div>
+      </div>
+
+      <div style="text-align:center;font-size:13px;color:var(--text-mid);margin-top:16px;margin-bottom:8px;">Other questions? Call or text anytime.</div>
       <div style="display:flex;gap:10px;">
         <a href="tel:+14013893200"
            onclick="pushDataLayer({ event: 'call_clicked', location: 'results_screen', price: booking.estimatedPrice, city: answers.city || answers.state, state: answers.state })"
