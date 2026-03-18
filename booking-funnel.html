@@ -2015,10 +2015,12 @@
       <div style="text-align:center;font-size:13px;color:var(--text-mid);margin-top:16px;margin-bottom:8px;">Questions? Call or text us directly.</div>
       <div style="display:flex;gap:10px;">
         <a href="tel:+14013893200"
+           onclick="pushDataLayer({ event: 'call_clicked', location: 'results_screen', price: booking.estimatedPrice, city: answers.city || answers.state, state: answers.state })"
            style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;height:48px;border-radius:var(--radius-sm);border:1.5px solid var(--border);color:var(--text-mid);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:all var(--transition);background:var(--bg);">
           📞 Call
         </a>
         <a href="sms:+14013893200"
+           onclick="pushDataLayer({ event: 'text_clicked', location: 'results_screen', price: booking.estimatedPrice, city: answers.city || answers.state, state: answers.state })"
            style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;height:48px;border-radius:var(--radius-sm);border:1.5px solid var(--border);color:var(--text-mid);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:all var(--transition);background:var(--bg);">
           💬 Text
         </a>
@@ -3367,6 +3369,8 @@ function goToScreen(name) {
 }
 
 function goToCheckout() {
+  // GTM: customer clicked "Book My Removal" — committed enough to enter their info
+  pushDataLayer({ event: 'checkout_started', price: booking.estimatedPrice, state: answers.state, city: answers.city || answers.state });
   // Pre-fill city from quiz if available
   const cityEl = document.getElementById('book-city');
   if (cityEl && answers.city && answers.city !== 'Rhode Island') {
@@ -3442,6 +3446,23 @@ function submitCheckout() {
   document.getElementById('dates-loading').style.display = 'block';
   document.getElementById('dates-content').style.display = 'none';
   document.getElementById('dates-error').style.display   = 'none';
+
+  // GTM: info submitted — GHL contact created at this point, lead is captured
+  const attr = getAttribution();
+  pushDataLayer({
+    event:          'info_submitted',
+    value:          booking.estimatedPrice,
+    city:           booking.city,
+    state:          booking.state,
+    gclid:          attr.gclid        || undefined,
+    utm_source:     attr.utm_source   || undefined,
+    utm_medium:     attr.utm_medium   || undefined,
+    utm_campaign:   attr.utm_campaign || undefined,
+    enhanced_email: booking.email     || undefined,
+    enhanced_phone: booking.phone     || undefined,
+    enhanced_first: booking.firstName || undefined,
+    enhanced_last:  booking.lastName  || undefined,
+  });
 
   // Fire Make webhook + fetch slots in parallel
   // Webhook awaited so we can capture the contactId before booking
@@ -3551,6 +3572,8 @@ function renderSlots(slots) {
   container.innerHTML = '';
   booking.selectedSlot = null;
   document.getElementById('btn-confirm-booking').disabled = true;
+  // GTM: appointment slots loaded — customer is one click from booking
+  pushDataLayer({ event: 'dates_shown', slot_count: slots.length, price: booking.estimatedPrice, city: booking.city, state: booking.state });
 
   slots.slice(0, 3).forEach(function(slot) {
     const card = document.createElement('button');
