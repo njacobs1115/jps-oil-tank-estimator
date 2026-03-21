@@ -2160,7 +2160,7 @@
   <div class="screen" id="screen-dates">
     <div class="loading-wrap" id="dates-loading">
       <div class="spinner"></div>
-      <div class="loading-text" id="dates-loading-text">Finding the best open dates near you…</div>
+      <div class="loading-text" id="dates-loading-text">Finding Next Available Appt…</div>
     </div>
     <div id="dates-content" style="display:none;">
       <div class="step-heading">
@@ -3445,6 +3445,7 @@ function submitCheckout() {
   document.getElementById('dates-loading').style.display = 'block';
   document.getElementById('dates-content').style.display = 'none';
   document.getElementById('dates-error').style.display   = 'none';
+  document.getElementById('dates-loading-text').textContent = 'Finding Next Available Appt…';
 
   // GTM: info submitted — GHL contact created at this point, lead is captured
   const attr = getAttribution();
