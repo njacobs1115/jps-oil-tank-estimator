@@ -2031,20 +2031,6 @@
         </div>
       </div>
 
-      <div style="text-align:center;font-size:13px;color:var(--text-mid);margin-top:16px;margin-bottom:8px;">Other questions? Call or text anytime.</div>
-      <div style="display:flex;gap:10px;">
-        <a href="tel:+14013893200"
-           onclick="pushDataLayer({ event: 'funnel_call_clicked', location: 'results_screen', price: booking.estimatedPrice, city: answers.city || answers.state, state: answers.state })"
-           style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;height:48px;border-radius:var(--radius-sm);border:1.5px solid var(--border);color:var(--text-mid);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:all var(--transition);background:var(--bg);">
-          📞 Call
-        </a>
-        <a href="sms:+14013893200"
-           onclick="pushDataLayer({ event: 'funnel_text_clicked', location: 'results_screen', price: booking.estimatedPrice, city: answers.city || answers.state, state: answers.state })"
-           style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;height:48px;border-radius:var(--radius-sm);border:1.5px solid var(--border);color:var(--text-mid);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:all var(--transition);background:var(--bg);">
-          💬 Text
-        </a>
-      </div>
-
       <button class="btn-secondary" onclick="startOver()" style="margin-top:8px;">Start Over</button>
     </div>
 
