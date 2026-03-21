@@ -2019,12 +2019,12 @@
         <div style="font-size:12px;color:var(--text-mid);margin-bottom:10px;">Boilers require a photo to quote. Give us a quick call or text and we&rsquo;ll take care of it.</div>
         <div style="display:flex;gap:8px;">
           <a href="tel:+14013893200"
-             onclick="pushDataLayer({ event: 'call_clicked', location: 'edge_case_prompt', price: booking.estimatedPrice, city: answers.city || answers.state, state: answers.state })"
+             onclick="pushDataLayer({ event: 'funnel_call_clicked', location: 'edge_case_prompt', price: booking.estimatedPrice, city: answers.city || answers.state, state: answers.state })"
              style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;height:40px;border-radius:var(--radius-sm);border:1.5px solid var(--border);color:var(--text-mid);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;background:var(--bg);">
             📞 Call
           </a>
           <a href="sms:+14013893200"
-             onclick="pushDataLayer({ event: 'text_clicked', location: 'edge_case_prompt', price: booking.estimatedPrice, city: answers.city || answers.state, state: answers.state })"
+             onclick="pushDataLayer({ event: 'funnel_text_clicked', location: 'edge_case_prompt', price: booking.estimatedPrice, city: answers.city || answers.state, state: answers.state })"
              style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;height:40px;border-radius:var(--radius-sm);border:1.5px solid var(--border);color:var(--text-mid);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;background:var(--bg);">
             💬 Text
           </a>
@@ -2034,12 +2034,12 @@
       <div style="text-align:center;font-size:13px;color:var(--text-mid);margin-top:16px;margin-bottom:8px;">Other questions? Call or text anytime.</div>
       <div style="display:flex;gap:10px;">
         <a href="tel:+14013893200"
-           onclick="pushDataLayer({ event: 'call_clicked', location: 'results_screen', price: booking.estimatedPrice, city: answers.city || answers.state, state: answers.state })"
+           onclick="pushDataLayer({ event: 'funnel_call_clicked', location: 'results_screen', price: booking.estimatedPrice, city: answers.city || answers.state, state: answers.state })"
            style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;height:48px;border-radius:var(--radius-sm);border:1.5px solid var(--border);color:var(--text-mid);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:all var(--transition);background:var(--bg);">
           📞 Call
         </a>
         <a href="sms:+14013893200"
-           onclick="pushDataLayer({ event: 'text_clicked', location: 'results_screen', price: booking.estimatedPrice, city: answers.city || answers.state, state: answers.state })"
+           onclick="pushDataLayer({ event: 'funnel_text_clicked', location: 'results_screen', price: booking.estimatedPrice, city: answers.city || answers.state, state: answers.state })"
            style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;height:48px;border-radius:var(--radius-sm);border:1.5px solid var(--border);color:var(--text-mid);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:all var(--transition);background:var(--bg);">
           💬 Text
         </a>
@@ -2867,7 +2867,7 @@ function showResults() {
   // GTM: price shown — key engagement event, also fires enhanced conversion data
   const attr = getAttribution();
   pushDataLayer({
-    event:        'price_shown',
+    event:        'funnel_price_shown',
     price:        booking.estimatedPrice,
     city:         answers.city || answers.state,
     state:        answers.state,
@@ -3389,7 +3389,7 @@ function goToScreen(name) {
 
 function goToCheckout() {
   // GTM: customer clicked "Book My Removal" — committed enough to enter their info
-  pushDataLayer({ event: 'checkout_started', price: booking.estimatedPrice, state: answers.state, city: answers.city || answers.state });
+  pushDataLayer({ event: 'funnel_checkout_started', price: booking.estimatedPrice, state: answers.state, city: answers.city || answers.state });
   // Pre-fill city from quiz if available
   const cityEl = document.getElementById('book-city');
   if (cityEl && answers.city && answers.city !== 'Rhode Island') {
@@ -3469,7 +3469,7 @@ function submitCheckout() {
   // GTM: info submitted — GHL contact created at this point, lead is captured
   const attr = getAttribution();
   pushDataLayer({
-    event:          'info_submitted',
+    event:          'funnel_info_submitted',
     value:          booking.estimatedPrice,
     city:           booking.city,
     state:          booking.state,
@@ -3592,7 +3592,7 @@ function renderSlots(slots) {
   booking.selectedSlot = null;
   document.getElementById('btn-confirm-booking').disabled = true;
   // GTM: appointment slots loaded — customer is one click from booking
-  pushDataLayer({ event: 'dates_shown', slot_count: slots.length, price: booking.estimatedPrice, city: booking.city, state: booking.state });
+  pushDataLayer({ event: 'funnel_dates_shown', slot_count: slots.length, price: booking.estimatedPrice, city: booking.city, state: booking.state });
 
   slots.slice(0, 3).forEach(function(slot) {
     const card = document.createElement('button');
@@ -3712,7 +3712,7 @@ function showBookingConfirmed(data) {
   // GTM: conversion event — booking confirmed, pass value + gclid for Google Ads
   const attr = getAttribution();
   pushDataLayer({
-    event:            'booking_confirmed',
+    event:            'funnel_booking_confirmed',
     value:            booking.estimatedPrice,
     currency:         'USD',
     city:             booking.city,
@@ -3747,7 +3747,7 @@ function showBookingFailed(msg) {
   document.getElementById('booking-loading').style.display = 'none';
   document.getElementById('booking-failed').style.display  = 'block';
   // GTM: booking failed — surface in GA4 so we know when the funnel breaks
-  pushDataLayer({ event: 'booking_failed', reason: msg || 'unknown' });
+  pushDataLayer({ event: 'funnel_booking_failed', reason: msg || 'unknown' });
   alertFunnelError('confirmBooking', msg || 'unknown');
   // Surface server message if present (helpful for debugging)
   if (msg) {
