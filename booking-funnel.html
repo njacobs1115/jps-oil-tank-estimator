@@ -2039,21 +2039,21 @@
   ══════════════════════════════════════ -->
   <div class="screen" id="screen-restricted">
     <div class="results-hero">
-      <div class="total-label">ONE MORE STEP</div>
-      <div style="font-size:22px;font-weight:700;color:var(--text);margin:12px 0 0;line-height:1.3;">Photos Needed To Quote</div>
+      <div class="total-label">YOU'RE ALMOST THERE</div>
+      <div style="font-size:22px;font-weight:700;color:var(--text);margin:12px 0 0;line-height:1.3;">We've Got Your Info — Just Need Photos</div>
     </div>
 
     <div class="trust-banner">
-      <span>Tight access jobs are still very doable — we handle them regularly. But we need to see photos of the specific situation before we can lock in a price. Text us a couple of photos and we'll come back with a firm price, usually within a few minutes.</span>
+      <span>Tight access jobs are still very doable — we handle them regularly. We have your info and will be in touch shortly. To lock in your price, just text us a couple of photos of the access situation and we'll come back with a firm number, usually within a few minutes.</span>
     </div>
 
     <div class="cta-section">
       <a href="sms:+14013893200?body=Hi%2C%20I%20have%20a%20tight%20access%20oil%20tank%20removal%20job%20and%20would%20like%20to%20send%20photos%20for%20a%20price."
          class="btn-cta"
          style="display:flex;align-items:center;justify-content:center;text-decoration:none;">
-        Send Us Photos &mdash; Get Your Price &rarr;
+        Text Us Photos Now &rarr;
       </a>
-      <div class="btn-cta-sub">No commitment. We'll review and reply same day.</div>
+      <div class="btn-cta-sub">We'll review and reply with your firm price within minutes.</div>
 
       <div style="text-align:center;margin-top:20px;font-size:14px;color:var(--text-mid);">
         Prefer to talk it through? <a href="tel:+14013893200" style="color:var(--text-mid);font-weight:600;">Call or Text (401) 389-3200</a>
@@ -2841,11 +2841,6 @@ function showResults() {
   document.getElementById('estimate-bar').classList.remove('visible');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  if (answers.access === 'restricted') {
-    document.getElementById('screen-restricted').classList.add('active');
-    return;
-  }
-
   computePricing();
   document.getElementById('screen-results').classList.add('active');
   // GTM: price shown — key engagement event, also fires enhanced conversion data
@@ -3466,6 +3461,13 @@ function submitCheckout() {
     enhanced_first: booking.firstName || undefined,
     enhanced_last:  booking.lastName  || undefined,
   });
+
+  // Restricted access — capture the lead, then ask for photos instead of showing dates
+  if (answers.access === 'restricted') {
+    fireLeadWebhook();  // still capture the contact in GHL
+    goToScreen('restricted');
+    return;
+  }
 
   // Fire Make webhook + fetch slots in parallel
   // Webhook awaited so we can capture the contactId before booking
