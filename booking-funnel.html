@@ -2268,8 +2268,8 @@
 // GHL WEBHOOK — swap in real URL before launch
 // ──────────────────────────────────────────────
 const GHL_WEBHOOK_URL      = 'https://hook.us1.make.com/n9xtdy5aok4e62wpat9gydco3lef9b26';
-// Fires when customer wants an estimate emailed — Make creates contact + sends estimate
-const ESTIMATE_WEBHOOK_URL = 'PASTE_ESTIMATE_WEBHOOK_URL_HERE';
+// Fires when customer wants an estimate emailed — Make creates contact + sends estimate email
+const ESTIMATE_WEBHOOK_URL = 'https://hook.us1.make.com/6rlasg7osyc7qpdya3xc1d788kc64t3a';
 const ROUTE_OPTIMIZER_URL = 'https://route-optimizer-jps.onrender.com';
 
 // ──────────────────────────────────────────────
@@ -3733,6 +3733,57 @@ function showBookingFailed(msg) {
 
 
 // ── ESTIMATE PATH ─────────────────────────────────────────────────────────
+// Build the HTML email body for the estimate — all formatting logic lives here, not in Make
+function buildEstimateEmail(firstName, address, city, state, zip) {
+  var basePrice   = answers.cityRemovalFee || 600;
+  var oilFee      = answers.oil === 'half_plus' ? 150 : 0;
+  var permitFee   = (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee || 0);
+  var total       = booking.estimatedPrice;
+  var location    = answers.location || 'Basement';
+  var bookingUrl  = window.location.origin + window.location.pathname;
+
+  var oilRow = oilFee > 0
+    ? '<tr style="border-top:1px solid #e0e0e0;"><td style="padding:14px 20px;font-size:15px;color:#333;">Excess Oil Disposal</td><td style="padding:14px 20px;font-size:15px;color:#333;text-align:right;">$' + oilFee + '</td></tr>'
+    : '';
+
+  var permitRow = permitFee > 0
+    ? '<tr style="border-top:1px solid #e0e0e0;"><td style="padding:14px 20px;font-size:15px;color:#333;">Permit Fee (' + city + ', ' + state + ')</td><td style="padding:14px 20px;font-size:15px;color:#333;text-align:right;">$' + permitFee + '</td></tr>'
+    : '';
+
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,sans-serif;">'
+    + '<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;padding:40px 0;"><tr><td align="center">'
+    + '<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">'
+    + '<tr><td style="background:#1a1a2e;padding:28px 40px;text-align:center;">'
+    + '<p style="margin:0;color:#ffffff;font-size:22px;font-weight:bold;letter-spacing:1px;">RemoveMyOilTank.com</p>'
+    + '<p style="margin:6px 0 0;color:#aaaacc;font-size:13px;">Jacobs Property Solutions &middot; RI &amp; MA</p>'
+    + '</td></tr>'
+    + '<tr><td style="padding:32px 40px 20px;">'
+    + '<p style="margin:0 0 8px;font-size:18px;font-weight:bold;color:#1a1a2e;">Hi ' + firstName + ',</p>'
+    + '<p style="margin:0;font-size:15px;color:#444;line-height:1.6;">Here\'s your oil tank removal estimate for:<br><strong>' + address + ', ' + city + ', ' + state + ' ' + zip + '</strong></p>'
+    + '</td></tr>'
+    + '<tr><td style="padding:0 40px 28px;">'
+    + '<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e0e0e0;border-radius:6px;overflow:hidden;">'
+    + '<tr style="background:#f8f8f8;"><td style="padding:10px 20px;font-size:12px;color:#888;font-weight:bold;text-transform:uppercase;letter-spacing:0.5px;">Description</td><td style="padding:10px 20px;font-size:12px;color:#888;font-weight:bold;text-transform:uppercase;letter-spacing:0.5px;text-align:right;">Amount</td></tr>'
+    + '<tr style="border-top:1px solid #e0e0e0;"><td style="padding:14px 20px;font-size:15px;color:#333;">Oil Tank Removal (' + location + ')</td><td style="padding:14px 20px;font-size:15px;color:#333;text-align:right;">$' + basePrice + '</td></tr>'
+    + oilRow
+    + permitRow
+    + '<tr style="background:#1a1a2e;"><td style="padding:16px 20px;font-size:16px;font-weight:bold;color:#ffffff;">Estimated Total</td><td style="padding:16px 20px;font-size:20px;font-weight:bold;color:#ffffff;text-align:right;">$' + total + '</td></tr>'
+    + '</table>'
+    + '<p style="margin:10px 0 0;font-size:12px;color:#999;">* Based on info provided. Final price confirmed on-site. No surprises.</p>'
+    + '</td></tr>'
+    + '<tr><td style="padding:0 40px 36px;text-align:center;">'
+    + '<a href="' + bookingUrl + '" style="display:inline-block;background:#e63946;color:#ffffff;font-size:16px;font-weight:bold;padding:15px 44px;border-radius:6px;text-decoration:none;">Book My Removal Online</a>'
+    + '<p style="margin:18px 0 0;font-size:14px;color:#666;">Questions? Call or text <strong>(401) 270-5423</strong></p>'
+    + '</td></tr>'
+    + '<tr><td style="background:#f8f8f8;border-top:1px solid #e0e0e0;padding:20px 40px;text-align:center;">'
+    + '<p style="margin:0;font-size:12px;color:#aaa;">Jacobs Property Solutions &middot; Warwick, RI &middot; 400+ Five-Star Reviews</p>'
+    + '</td></tr>'
+    + '</table></td></tr></table></body></html>';
+
+  var subject = 'Your Oil Tank Removal Estimate \u2014 $' + total;
+  return { html: html, subject: subject };
+}
+
 function goToEstimate() {
   var cityEl = document.getElementById('est-city');
   if (cityEl && answers.city && answers.city !== 'Rhode Island') {
@@ -3775,6 +3826,8 @@ async function submitEstimate() {
   btn.disabled = true;
   btn.textContent = 'Sending...';
 
+  var estimateEmail = buildEstimateEmail(firstName, address, city, answers.state || '', zip);
+
   var payload = {
     firstName:      firstName,
     lastName:       lastName,
@@ -3786,6 +3839,11 @@ async function submitEstimate() {
     zip:            zip,
     tankLocation:   answers.location || '',
     estimatedPrice: booking.estimatedPrice,
+    baseRemovalFee: answers.cityRemovalFee || 600,
+    excessOilFee:   answers.oil === 'half_plus' ? 150 : 0,
+    permitFee:      (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee || 0),
+    email_subject:  estimateEmail.subject,
+    email_html:     estimateEmail.html,
     tags:           ['calc-estimate'],
     utm_source:     attr.utm_source   || '',
     utm_medium:     attr.utm_medium   || '',
@@ -3794,15 +3852,11 @@ async function submitEstimate() {
   };
 
   try {
-    if (!ESTIMATE_WEBHOOK_URL || ESTIMATE_WEBHOOK_URL.indexOf('PASTE_') === 0) {
-      console.warn('[Funnel] ESTIMATE_WEBHOOK_URL not configured — skipping in dev mode');
-    } else {
-      await fetch(ESTIMATE_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-    }
+    await fetch(ESTIMATE_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
   } catch(err) {
     console.error('[Funnel] estimate webhook error:', err);
     // Don't block the user — still show confirmation
