@@ -2039,27 +2039,23 @@
   ══════════════════════════════════════ -->
   <div class="screen" id="screen-restricted">
     <div class="results-hero">
-      <div class="total-label">YOU'RE ALMOST THERE</div>
-      <div style="font-size:22px;font-weight:700;color:var(--text);margin:12px 0 0;line-height:1.3;">We've Got Your Info — Just Need Photos</div>
+      <div class="total-label">ALMOST THERE</div>
+      <div style="font-size:24px;font-weight:700;color:var(--text);margin:12px 0 0;line-height:1.3;">We just need a couple of photos — and you'll have a price in minutes.</div>
     </div>
 
     <div class="trust-banner">
-      <span>Tight access jobs are still very doable — we handle them regularly. We have your info and will be in touch shortly. To lock in your price, just text us a couple of photos of the access situation and we'll come back with a firm number, usually within a few minutes.</span>
+      <span>Tight access jobs are still very doable — we do them regularly. We just need to see the access situation before we can lock in a number. Text us 1–2 photos and we'll reply with a firm price fast.</span>
     </div>
 
     <div class="cta-section">
-      <a href="sms:+14013893200?body=Hi%2C%20I%20have%20a%20tight%20access%20oil%20tank%20removal%20job%20and%20would%20like%20to%20send%20photos%20for%20a%20price."
+      <a href="sms:+14013893200?body=Hi%2C%20I%20need%20an%20oil%20tank%20removed%20but%20have%20a%20tight%20access%20situation.%20Sending%20photos%20now."
          class="btn-cta"
-         style="display:flex;align-items:center;justify-content:center;text-decoration:none;">
-        Text Us Photos Now &rarr;
+         style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;">
+        📸 Text Us Photos Now &rarr;
       </a>
-      <div class="btn-cta-sub">We'll review and reply with your firm price within minutes.</div>
+      <div class="btn-cta-sub">Opens your texts. We reply with your price — usually within minutes.</div>
 
-      <div style="text-align:center;margin-top:20px;font-size:14px;color:var(--text-mid);">
-        Prefer to talk it through? <a href="tel:+14013893200" style="color:var(--text-mid);font-weight:600;">Call or Text (401) 389-3200</a>
-      </div>
-
-      <button class="btn-secondary" onclick="startOver()" style="margin-top:16px;">Start Over</button>
+      <button class="btn-secondary" onclick="startOver()" style="margin-top:24px;">Start Over</button>
     </div>
   </div><!-- /screen-restricted -->
 
@@ -2841,6 +2837,11 @@ function showResults() {
   document.getElementById('estimate-bar').classList.remove('visible');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
+  if (answers.access === 'restricted') {
+    document.getElementById('screen-restricted').classList.add('active');
+    return;
+  }
+
   computePricing();
   document.getElementById('screen-results').classList.add('active');
   // GTM: price shown — key engagement event, also fires enhanced conversion data
@@ -3461,13 +3462,6 @@ function submitCheckout() {
     enhanced_first: booking.firstName || undefined,
     enhanced_last:  booking.lastName  || undefined,
   });
-
-  // Restricted access — capture the lead, then ask for photos instead of showing dates
-  if (answers.access === 'restricted') {
-    fireLeadWebhook();  // still capture the contact in GHL
-    goToScreen('restricted');
-    return;
-  }
 
   // Fire Make webhook + fetch slots in parallel
   // Webhook awaited so we can capture the contactId before booking
