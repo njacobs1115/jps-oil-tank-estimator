@@ -2271,8 +2271,6 @@ const GHL_WEBHOOK_URL      = 'https://hook.us1.make.com/n9xtdy5aok4e62wpat9gydco
 // Fires when customer wants an estimate emailed — Make creates contact + sends estimate
 const ESTIMATE_WEBHOOK_URL = 'PASTE_ESTIMATE_WEBHOOK_URL_HERE';
 const ROUTE_OPTIMIZER_URL = 'https://route-optimizer-jps.onrender.com';
-// Error alerting — Make webhook that sends Norman an SMS when the funnel breaks
-const ERROR_ALERT_URL      = 'PASTE_ERROR_ALERT_WEBHOOK_HERE';
 
 // ──────────────────────────────────────────────
 // TRACKING HELPERS
@@ -2292,17 +2290,6 @@ function pushDataLayer(obj) {
   }
 }
 
-// Fire an SMS alert to Norman when the funnel hits a hard failure
-function alertFunnelError(context, detail) {
-  if (!ERROR_ALERT_URL || ERROR_ALERT_URL.includes('PASTE_')) return;
-  try {
-    fetch(ERROR_ALERT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ context, detail, url: window.location.href, ts: new Date().toISOString() }),
-    });
-  } catch(e) { /* silent — don't break the funnel trying to report a break */ }
-}
 
 // ──────────────────────────────────────────────
 // STATE
@@ -3560,7 +3547,7 @@ async function fetchSlots() {
       console.warn('[Funnel] fetchSlots attempt ' + attempt + ' failed:', err.message);
       if (attempt === 3) {
         console.error('[Funnel] All fetchSlots attempts failed.');
-        alertFunnelError('fetchSlots', err.message);
+
         showDatesError();
       }
     }
@@ -3729,7 +3716,7 @@ function showBookingFailed(msg) {
   document.getElementById('booking-failed').style.display  = 'block';
   // GTM: booking failed — surface in GA4 so we know when the funnel breaks
   pushDataLayer({ event: 'funnel_booking_failed', reason: msg || 'unknown' });
-  alertFunnelError('confirmBooking', msg || 'unknown');
+
   // Surface server message if present (helpful for debugging)
   if (msg) {
     const failEl = document.getElementById('booking-failed');
