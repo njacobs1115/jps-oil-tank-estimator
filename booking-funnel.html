@@ -3979,6 +3979,28 @@ async function submitEstimate() {
   goToScreen('estimate-sent');
 }
 
+// ──────────────────────────────────────────────
+// IFRAME AUTO-RESIZE
+// When embedded in a cross-origin iframe, report the document height to the
+// parent page via postMessage so the parent can resize the iframe to fit.
+// ──────────────────────────────────────────────
+(function () {
+  if (window.self === window.top) return; // not in an iframe, nothing to do
+
+  function reportHeight() {
+    const h = document.documentElement.scrollHeight;
+    window.parent.postMessage({ type: 'funnel_resize', height: h }, '*');
+  }
+
+  // Report on load
+  reportHeight();
+
+  // Report whenever content height changes (step transitions, form expansion, etc.)
+  if (window.ResizeObserver) {
+    new ResizeObserver(reportHeight).observe(document.body);
+  }
+}());
+
 </script>
 
 </body>

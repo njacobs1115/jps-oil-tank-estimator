@@ -62,7 +62,7 @@ body {
 
 #jps-funnel-frame {
 	width: 100%;
-	min-height: 100vh;
+	height: 100vh; /* initial height — grows via postMessage resize */
 	border: none;
 	display: block;
 }
@@ -86,9 +86,21 @@ body {
 	'use strict';
 	window.addEventListener( 'message', function ( e ) {
 		if ( e.origin !== 'https://njacobs1115.github.io' ) { return; }
-		if ( ! e.data || e.data.type !== 'funnel_dataLayer_event' ) { return; }
-		window.dataLayer = window.dataLayer || [];
-		window.dataLayer.push( e.data.payload );
+		if ( ! e.data ) { return; }
+
+		// GTM event bridge
+		if ( e.data.type === 'funnel_dataLayer_event' ) {
+			window.dataLayer = window.dataLayer || [];
+			window.dataLayer.push( e.data.payload );
+		}
+
+		// Auto-resize iframe to fit funnel content
+		if ( e.data.type === 'funnel_resize' ) {
+			var frame = document.getElementById( 'jps-funnel-frame' );
+			if ( frame && e.data.height ) {
+				frame.style.height = e.data.height + 'px';
+			}
+		}
 	} );
 }() );
 </script>
