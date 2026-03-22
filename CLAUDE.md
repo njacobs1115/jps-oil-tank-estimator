@@ -18,6 +18,7 @@
 ## Key External Services
 - **Route Optimizer API**: https://route-optimizer-jps.onrender.com (appointment slots)
 - **Make/GHL Webhook**: Lead capture to GoHighLevel CRM
+- **Make Estimate Webhook**: Sends estimate emails via Gmail (scenario: "Estimator - Email Estimate")
 - **Airtable**: Source of truth for city pricing data (synced to hardcoded arrays monthly)
 
 ## Code Conventions
@@ -25,3 +26,5 @@
 - Pricing logic uses `answers.oil` (from pricing step cards)
 - Oil gauge values use `booking.oilGauge` (from checkout dropdown) — mapped via `apiOilLevel()` for Route Optimizer API calls
 - GHL webhook expects capitalized gauge values (`Empty`, `Full`, etc.)
+- **Estimate flow** uses `buildEstimateEmail()` which computes its own total from `answers.*` — does NOT use `booking.estimatedPrice` (that's only set in the checkout/booking flow)
+- **Important**: `submitEstimate()` and `submitCheckout()` are separate paths — don't assume state from one exists in the other
