@@ -66,7 +66,33 @@ body {
 	border: none;
 	display: block;
 }
+
+#jps-intro {
+	max-width: 640px;
+	margin: 40px auto 8px;
+	padding: 0 20px;
+	font-family: inherit;
+}
+
+#jps-intro h1 {
+	font-size: 1.6rem;
+	font-weight: 700;
+	margin: 0 0 10px;
+	color: #1a1a1a;
+}
+
+#jps-intro p {
+	font-size: 1rem;
+	color: #444;
+	margin: 0;
+	line-height: 1.5;
+}
 </style>
+
+<div id="jps-intro">
+	<h1>How Much Does Oil Tank Removal Cost?</h1>
+	<p>Get an instant price estimate below. JPS charges a flat rate with no hidden fees — oil disposal included, fully insured. Serving Rhode Island, Massachusetts, and Connecticut.</p>
+</div>
 
 <iframe
 	id="jps-funnel-frame"
