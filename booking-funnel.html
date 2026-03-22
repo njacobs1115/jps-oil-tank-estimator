@@ -3914,6 +3914,8 @@ async function submitEstimate() {
   btn.disabled = true;
   btn.textContent = 'Sending...';
 
+  var attr = getAttribution();
+
   try {
     var estimateEmail = buildEstimateEmail(firstName, address, city, answers.state || '', zip);
 
