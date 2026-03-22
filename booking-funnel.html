@@ -2360,17 +2360,17 @@ const ROUTE_OPTIMIZER_URL = 'https://route-optimizer-jps.onrender.com';
 // TRACKING HELPERS
 // ──────────────────────────────────────────────
 
-// Push to GTM dataLayer. Works whether funnel is embedded in iframe or inline.
+// Push to GTM dataLayer. Works whether funnel is standalone or embedded in a cross-origin iframe.
 function pushDataLayer(obj) {
-  try {
-    // If inside an iframe, push to parent page's dataLayer so GTM picks it up
-    const target = (window !== window.top) ? window.top : window;
-    target.dataLayer = target.dataLayer || [];
-    target.dataLayer.push(obj);
-  } catch(e) {
-    // Cross-origin iframe — push to own dataLayer as fallback
+  if (window.self === window.top) {
+    // Not in an iframe (direct access / staging) — push to own dataLayer
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push(obj);
+  } else {
+    // Inside a cross-origin iframe — relay to parent page via postMessage.
+    // postMessage is always allowed cross-origin (unlike direct window.top access).
+    // The parent page listener validates the origin and forwards to its GTM dataLayer.
+    window.parent.postMessage({ type: 'funnel_dataLayer_event', payload: obj }, '*');
   }
 }
 
