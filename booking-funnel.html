@@ -3914,40 +3914,43 @@ async function submitEstimate() {
   btn.disabled = true;
   btn.textContent = 'Sending...';
 
-  var estimateEmail = buildEstimateEmail(firstName, address, city, answers.state || '', zip);
-
-  var payload = {
-    firstName:      firstName,
-    lastName:       lastName,
-    email:          email,
-    phone:          phone,
-    address:        address,
-    city:           city,
-    state:          answers.state || '',
-    zip:            zip,
-    tankLocation:   answers.location || '',
-    estimatedPrice: booking.estimatedPrice,
-    baseRemovalFee: answers.cityRemovalFee || 600,
-    excessOilFee:   answers.oil === 'half_plus' ? 150 : 0,
-    permitFee:      (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee || 0),
-    email_subject:  estimateEmail.subject,
-    email_html:     estimateEmail.html,
-    tags:           ['calc-estimate'],
-    utm_source:     attr.utm_source   || '',
-    utm_medium:     attr.utm_medium   || '',
-    utm_campaign:   attr.utm_campaign || '',
-    landing_page:   attr.landing_page || '',
-  };
-
   try {
+    var estimateEmail = buildEstimateEmail(firstName, address, city, answers.state || '', zip);
+
+    var payload = {
+      firstName:      firstName,
+      lastName:       lastName,
+      email:          email,
+      phone:          phone,
+      address:        address,
+      city:           city,
+      state:          answers.state || '',
+      zip:            zip,
+      tankLocation:   answers.location || '',
+      estimatedPrice: booking.estimatedPrice,
+      baseRemovalFee: answers.cityRemovalFee || 600,
+      excessOilFee:   answers.oil === 'half_plus' ? 150 : 0,
+      permitFee:      (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee || 0),
+      email_subject:  estimateEmail.subject,
+      email_html:     estimateEmail.html,
+      tags:           ['calc-estimate'],
+      utm_source:     attr.utm_source   || '',
+      utm_medium:     attr.utm_medium   || '',
+      utm_campaign:   attr.utm_campaign || '',
+      landing_page:   attr.landing_page || '',
+    };
+
+    var controller = new AbortController();
+    var timeout = setTimeout(function() { controller.abort(); }, 10000);
     await fetch(ESTIMATE_WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
   } catch(err) {
     console.error('[Funnel] estimate webhook error:', err);
-    // Don't block the user — still show confirmation
   }
 
   document.getElementById('estimate-sent-name').textContent    = firstName;
