@@ -3826,7 +3826,7 @@ function buildEstimateEmail(firstName, address, city, state, zip) {
   var basePrice   = answers.cityRemovalFee || 600;
   var oilFee      = answers.oil === 'half_plus' ? 150 : 0;
   var permitFee   = (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee || 0);
-  var total       = booking.estimatedPrice;
+  var total       = basePrice + oilFee + permitFee;
   var location    = answers.location || 'Basement';
   var bookingUrl  = window.location.origin + window.location.pathname;
 
@@ -3869,7 +3869,7 @@ function buildEstimateEmail(firstName, address, city, state, zip) {
     + '</table></td></tr></table></body></html>';
 
   var subject = 'Your Oil Tank Removal Estimate \u2014 $' + total;
-  return { html: html, subject: subject };
+  return { html: html, subject: subject, total: total };
 }
 
 function goToEstimate() {
@@ -3929,7 +3929,7 @@ async function submitEstimate() {
       state:          answers.state || '',
       zip:            zip,
       tankLocation:   answers.location || '',
-      estimatedPrice: booking.estimatedPrice,
+      estimatedPrice: estimateEmail.total,
       baseRemovalFee: answers.cityRemovalFee || 600,
       excessOilFee:   answers.oil === 'half_plus' ? 150 : 0,
       permitFee:      (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee || 0),
@@ -3957,7 +3957,7 @@ async function submitEstimate() {
 
   document.getElementById('estimate-sent-name').textContent    = firstName;
   document.getElementById('estimate-sent-email').textContent   = email;
-  document.getElementById('estimate-sent-price').textContent   = '$' + booking.estimatedPrice;
+  document.getElementById('estimate-sent-price').textContent   = '$' + estimateEmail.total;
   document.getElementById('estimate-sent-address').textContent = address + ', ' + city + ', ' + (answers.state || '') + ' ' + zip;
   goToScreen('estimate-sent');
 }
