@@ -3511,12 +3511,15 @@ async function fireLeadWebhook() {
 
 async function fetchSlots() {
   const loadingText = document.getElementById('dates-loading-text');
+  // API expects lowercase: 'empty','1/8','1/4','1/2','3/4','full'
+  var oilMap = { 'Empty': 'empty', 'Full': 'full', "I don't know": '1/4' };
+  var oilLevel = oilMap[booking.oilGauge] || booking.oilGauge;
   const payload = JSON.stringify({
     address:     booking.address,
     city:        booking.city,
     state:       booking.state,
     zip:         booking.zip,
-    oilLevel:    booking.oilGauge,
+    oilLevel:    oilLevel,
     serviceType: 'OT',
   });
 
