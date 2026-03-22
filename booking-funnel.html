@@ -1917,6 +1917,12 @@
       <span><strong>Heads up:</strong> Contamination cleanup is separate and not included in this estimate. We'll assess on-site and connect you with certified remediation partners if needed — pricing depends on scope.</span>
     </div>
 
+    <!-- Access warning (conditional — shown when unsure) -->
+    <div class="leak-note" id="access-note">
+      <span class="leak-note-icon">⚠️</span>
+      <span><strong>Access note:</strong> This price assumes the tank is fully accessible. Since you're unsure, please <a href="sms:+14013893200?body=Hi%2C%20I%20need%20an%20oil%20tank%20removed%20but%20I%27m%20not%20sure%20about%20the%20access.%20Sending%20photos%20now." style="color:inherit;font-weight:600;">text us 1&ndash;2 photos</a> and we&rsquo;ll confirm your price before you book.</span>
+    </div>
+
     <!-- Invoice-style breakdown -->
     <div class="invoice">
       <div class="invoice-header">
@@ -3253,6 +3259,7 @@ function computePricing() {
 
   // Conditional notes
   document.getElementById('leak-note').classList.remove('visible');
+  document.getElementById('access-note').classList.toggle('visible', answers.access === 'unsure');
 }
 
 // ──────────────────────────────────────────────
