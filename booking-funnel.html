@@ -3509,17 +3509,18 @@ async function fireLeadWebhook() {
   }
 }
 
+// Map dropdown gauge values to Route Optimizer API enum: 'empty','1/8','1/4','1/2','3/4','full'
+var oilGaugeToApi = { 'Empty': 'empty', 'Full': 'full', "I don't know": '1/4' };
+function apiOilLevel() { return oilGaugeToApi[booking.oilGauge] || booking.oilGauge; }
+
 async function fetchSlots() {
   const loadingText = document.getElementById('dates-loading-text');
-  // API expects lowercase: 'empty','1/8','1/4','1/2','3/4','full'
-  var oilMap = { 'Empty': 'empty', 'Full': 'full', "I don't know": '1/4' };
-  var oilLevel = oilMap[booking.oilGauge] || booking.oilGauge;
   const payload = JSON.stringify({
     address:     booking.address,
     city:        booking.city,
     state:       booking.state,
     zip:         booking.zip,
-    oilLevel:    oilLevel,
+    oilLevel:    apiOilLevel(),
     serviceType: 'OT',
   });
 
@@ -3645,7 +3646,7 @@ async function confirmBooking() {
         zip:            booking.zip,
         date:           booking.selectedSlot.date,
         time:           booking.selectedSlot.time,
-        oilLevel:       booking.oilGauge,
+        oilLevel:       apiOilLevel(),
         serviceType:    'OT',
         estimatedPrice: booking.estimatedPrice,
         basePrice:      answers.cityRemovalFee || 600,
