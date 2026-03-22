@@ -1911,12 +1911,6 @@
       <span>No upsells. No hidden fees. What you see is what appears on your invoice.</span>
     </div>
 
-    <!-- Leak warning (conditional) -->
-    <div class="leak-note" id="leak-note">
-      <span class="leak-note-icon">🚨</span>
-      <span><strong>Heads up:</strong> Contamination cleanup is separate and not included in this estimate. We'll assess on-site and connect you with certified remediation partners if needed — pricing depends on scope.</span>
-    </div>
-
     <!-- Access warning (conditional — shown when unsure) -->
     <div class="leak-note" id="access-note">
       <span class="leak-note-icon">⚠️</span>
@@ -3258,7 +3252,6 @@ function computePricing() {
   }
 
   // Conditional notes
-  document.getElementById('leak-note').classList.remove('visible');
   document.getElementById('access-note').classList.toggle('visible', answers.access === 'unsure');
 }
 
