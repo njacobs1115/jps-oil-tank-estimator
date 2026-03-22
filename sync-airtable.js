@@ -20,8 +20,8 @@ if (!AIRTABLE_TOKEN) {
 
 const BASE_ID = 'appUscw3WgCDWkRt9';
 const TABLES = [
-  { name: 'Massachusetts', state: 'MA', hasPermitFee: true },
-  { name: 'Connecticut',   state: 'CT', hasPermitFee: false },
+  { name: 'Massachusetts Pricing', state: 'MA', hasPermitFee: true },
+  { name: 'Connecticut Pricing',   state: 'CT', hasPermitFee: false },
 ];
 
 const HTML_FILE = path.join(__dirname, 'booking-funnel.html');
