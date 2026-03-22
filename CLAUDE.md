@@ -11,6 +11,10 @@
 - Single HTML file (`booking-funnel.html`) with all CSS/JS inline
 - City pricing data is hardcoded in the HTML, synced monthly from Airtable via GitHub Action
 
+## TODO for Norman
+- [ ] Add `AIRTABLE_API_TOKEN` secret to GitHub repo: https://github.com/njacobs1115/jps-oil-tank-estimator/settings/secrets/actions — paste your Airtable PAT (needs `data.records:read` scope on base `appUscw3WgCDWkRt9`)
+- [ ] After adding the secret, go to Actions tab → "Sync Airtable City Pricing" → "Run workflow" to do the first sync and fix stale prices (e.g. Groton CT)
+
 ## Key External Services
 - **Route Optimizer API**: https://route-optimizer-jps.onrender.com (appointment slots)
 - **Make/GHL Webhook**: Lead capture to GoHighLevel CRM
