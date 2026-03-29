@@ -3988,7 +3988,8 @@ async function submitEstimate() {
   if (window.self === window.top) return; // not in an iframe, nothing to do
 
   function reportHeight() {
-    const h = document.documentElement.scrollHeight;
+    const active = document.querySelector('.screen.active, .intro-screen:not(.hidden)');
+    const h = active ? Math.ceil(active.getBoundingClientRect().height) : document.documentElement.scrollHeight;
     window.parent.postMessage({ type: 'funnel_resize', height: h }, '*');
   }
 
