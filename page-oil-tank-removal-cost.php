@@ -73,6 +73,7 @@ body {
 	id="jps-funnel-frame"
 	src="https://njacobs1115.github.io/jps-oil-tank-estimator/booking-funnel.html"
 	title="Oil Tank Removal Cost Estimator"
+	scrolling="no"
 ></iframe>
 
 <script>
