@@ -46,6 +46,8 @@ html,
 body {
 	margin: 0 !important;
 	padding: 0 !important;
+	overflow-y: auto !important;
+	height: auto !important;
 }
 
 #pagewrap,
