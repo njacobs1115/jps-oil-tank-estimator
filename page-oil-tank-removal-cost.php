@@ -119,8 +119,8 @@ body {
 	scrolling="no"
 ></iframe>
 
-<div style="background:#1a1f2e;text-align:center;padding:18px 20px;margin-top:-4px;">
-	<p style="margin:0;font-size:15px;color:rgba(255,255,255,.6);font-family:'Open Sans',sans-serif;">Not ready to book yet? Here's everything you need to know.</p>
+<div style="background:var(--jps-warm-bg);padding:32px 20px 0;text-align:center;">
+	<p style="margin:0 auto;max-width:680px;font-size:15px;color:var(--jps-text-mid);font-family:'Open Sans',sans-serif;">Not ready to book yet? Here's everything you need to know.</p>
 </div>
 
 <div id="jps-seo-content">
