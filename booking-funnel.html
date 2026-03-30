@@ -3989,7 +3989,7 @@ async function submitEstimate() {
 
   function reportHeight() {
     const active = document.querySelector('.intro-screen:not(.hidden), .screen.active');
-    const h = active ? Math.ceil(active.getBoundingClientRect().height) : document.documentElement.scrollHeight;
+    const h = active ? Math.ceil(active.getBoundingClientRect().bottom) : document.documentElement.scrollHeight;
     window.parent.postMessage({ type: 'funnel_resize', height: h }, '*');
   }
 
