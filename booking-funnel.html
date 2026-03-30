@@ -3988,8 +3988,10 @@ async function submitEstimate() {
   if (window.self === window.top) return; // not in an iframe, nothing to do
 
   function reportHeight() {
-    const active = document.querySelector('.intro-screen:not(.hidden), .screen.active');
-    const h = active ? Math.ceil(active.getBoundingClientRect().bottom) : document.documentElement.scrollHeight;
+    // Use scrollHeight: hidden screens are display:none so they don't inflate this.
+    // scrollHeight includes body padding-bottom (70px) which reserves space for the
+    // fixed estimate bar — prevents it from covering the Continue button.
+    const h = document.documentElement.scrollHeight;
     window.parent.postMessage({ type: 'funnel_resize', height: h }, '*');
   }
 
