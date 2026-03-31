@@ -2143,7 +2143,7 @@
         <option value="1/2">½ Full</option>
         <option value="3/4">¾ Full</option>
         <option value="Full">Full — gauge reads F</option>
-        <option value="I don't know">I don't know</option>
+        <option value="I dont know">I don't know</option>
       </select>
       <div class="field-error" id="err-oil-gauge">Please select the oil level.</div>
     </div>
@@ -3594,7 +3594,7 @@ async function fireLeadWebhook() {
 }
 
 // Map dropdown gauge values to Route Optimizer API enum: 'empty','1/8','1/4','1/2','3/4','full'
-var oilGaugeToApi = { 'Empty': 'empty', 'Full': 'full', "I don't know": '1/4' };
+var oilGaugeToApi = { 'Empty': 'empty', 'Full': 'full', "I dont know": '1/4' };
 function apiOilLevel() { return oilGaugeToApi[booking.oilGauge] || booking.oilGauge; }
 
 async function fetchSlots() {
