@@ -3586,10 +3586,57 @@ async function fireLeadWebhook() {
       if (data?.contactId) {
         booking.ghlContactId = data.contactId;
         console.log('[Funnel] Got contactId from Make:', booking.ghlContactId);
+        return; // Make succeeded — fallback not needed
       }
     }
+    // Make returned non-ok or no contactId — activate fallback
+    console.warn('[Funnel] Make webhook did not return a contactId — activating capture-lead fallback');
+    await captureLeadFallback();
   } catch (err) {
     console.error('[Funnel] Lead webhook error:', err);
+    await captureLeadFallback();
+  }
+}
+
+// Called when Make fails. Creates GHL contact directly via Route Optimizer
+// so the lead is captured even if the customer abandons. Tags contact with
+// funnel-error so Norman's GHL workflow fires automatically.
+async function captureLeadFallback() {
+  try {
+    const resp = await fetch(ROUTE_OPTIMIZER_URL + '/api/public/capture-lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firstName:      booking.firstName,
+        lastName:       booking.lastName,
+        phone:          booking.phone,
+        email:          booking.email || undefined,
+        address:        booking.address,
+        city:           booking.city,
+        state:          booking.state,
+        zip:            booking.zip,
+        oilLevel:       apiOilLevel(),
+        tankLocation:   answers.location ? answers.location.charAt(0).toUpperCase() + answers.location.slice(1) : answers.location,
+        exitType:       answers.exit     ? answers.exit.charAt(0).toUpperCase()     + answers.exit.slice(1)     : answers.exit,
+        tankAccess:     answers.access === 'standard' ? 'Yes' : answers.access === 'restricted' ? 'No' : 'Unsure',
+        estimatedPrice: booking.estimatedPrice,
+        basePrice:      answers.cityRemovalFee || 600,
+        permitFee:      (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee ?? 0),
+        oilSurcharge:   answers.oil === 'half_plus' ? 150 : 0,
+        serviceType:    'OT',
+      }),
+    });
+    if (resp.ok) {
+      const data = await resp.json().catch(() => null);
+      if (data?.contactId) {
+        booking.ghlContactId = data.contactId;
+        console.log('[Funnel] capture-lead fallback succeeded, contactId:', booking.ghlContactId);
+      }
+    } else {
+      console.error('[Funnel] capture-lead fallback failed, status:', resp.status);
+    }
+  } catch (err) {
+    console.error('[Funnel] capture-lead fallback error:', err);
   }
 }
 
