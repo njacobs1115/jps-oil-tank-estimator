@@ -2349,12 +2349,11 @@
 
 <script>
 // ──────────────────────────────────────────────
-// GHL WEBHOOK — swap in real URL before launch
-// ──────────────────────────────────────────────
-const GHL_WEBHOOK_URL      = 'https://hook.us1.make.com/n9xtdy5aok4e62wpat9gydco3lef9b26';
-// Fires when customer wants an estimate emailed — Make creates contact + sends estimate email
-const ESTIMATE_WEBHOOK_URL = 'https://hook.us1.make.com/6rlasg7osyc7qpdya3xc1d788kc64t3a';
-const ROUTE_OPTIMIZER_URL = 'https://route-optimizer-jps.onrender.com';
+// Make webhook URLs are proxied through Route Optimizer — never hardcode Make URLs in public repos
+// ──────────────────────────────────────────────────────────────────────────────────────────────
+const ROUTE_OPTIMIZER_URL  = 'https://route-optimizer-jps.onrender.com';
+const GHL_WEBHOOK_URL      = `${ROUTE_OPTIMIZER_URL}/api/public/funnel-lead`;
+const ESTIMATE_WEBHOOK_URL = `${ROUTE_OPTIMIZER_URL}/api/public/funnel-estimate`;
 
 // ──────────────────────────────────────────────
 // TRACKING HELPERS
