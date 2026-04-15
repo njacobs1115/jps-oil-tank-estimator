@@ -1,3 +1,25 @@
+# Booking Funnel — Reading Guide
+> Read this section first, every session. Then continue to the project context below.
+
+## Session Start — Read in This Order
+1. **`next_session.md`** (this repo root) — open items from last session
+2. **`last_session.md`** (this repo root) — what was done last session
+3. **The rest of this file** — project context, code conventions, external services
+
+## Key URLs & IDs
+- **Live funnel:** removemyoiltank.com/oil-tank-removal-cost
+- **GA4:** G-SN22KH6SF1 | **GTM:** GTM-T39Z96C (v79 live, workspace 113)
+- **Book webhook (Make):** scenario 4603576 | **Estimate webhook (Make):** scenario 4629605
+- **Ads conversion:** "Funnel - Booking Confirmed" | ID: 852463092 | Label: RHHyCJ6tj40cEPrpYD
+- **Route Optimizer API:** https://route-optimizer-jps.onrender.com
+
+## Hard Rules
+- `submitEstimate()` and `submitCheckout()` are separate code paths — do not assume state from one exists in the other
+- Pricing logic uses `answers.oil` (pricing step cards), booking uses `booking.oilGauge` (checkout dropdown)
+- `buildEstimateEmail()` computes its own total from `answers.*` — does NOT use `booking.estimatedPrice`
+
+---
+
 # CLAUDE.md — Project Preferences & Context
 
 ## Decision Principles
