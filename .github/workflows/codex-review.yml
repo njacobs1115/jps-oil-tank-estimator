@@ -27,23 +27,39 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           python3 << 'EOF'
-          import os, json, urllib.request
+          import os, json, urllib.request, sys
 
           diff = open("pr_diff.txt").read()[:15000]
 
+          if not diff.strip():
+              print("No diff found — skipping review.")
+              sys.exit(0)
+
+          prompt = """Review this pull request diff. Return ONLY valid JSON in this exact format:
+{
+  "verdict": "APPROVE" or "REQUEST_CHANGES",
+  "summary": "One sentence overview of what this PR does.",
+  "issues": ["issue 1", "issue 2"],
+  "risk_level": "LOW", "MEDIUM", or "HIGH"
+}
+
+Rules:
+- verdict = REQUEST_CHANGES if there are any security issues, bugs, risky changes, or poor practices
+- verdict = APPROVE only if the code is clean, safe, and well-structured
+- issues = empty array [] if none found
+- Be strict. Flag anything that could cause a production problem.
+
+Diff:
+""" + diff
+
           payload = {
               "model": "gpt-4o",
-              "messages": [{
-                  "role": "user",
-                  "content": (
-                      "Review the pull request diff for code quality, security issues, "
-                      "and adherence to standard coding practices. Flag any risky changes "
-                      "and provide a brief summary.\n\nDiff:\n" + diff
-                  )
-              }],
-              "max_tokens": 1000
+              "messages": [{"role": "user", "content": prompt}],
+              "max_tokens": 800,
+              "response_format": {"type": "json_object"}
           }
 
           req = urllib.request.Request(
@@ -58,19 +74,52 @@ jobs:
           try:
               with urllib.request.urlopen(req) as resp:
                   result = json.loads(resp.read())
-              review = result["choices"][0]["message"]["content"]
+              raw = result["choices"][0]["message"]["content"]
+              review = json.loads(raw)
           except Exception as e:
-              review = f"⚠️ Codex review failed: {e}\n\nEnsure `OPENAI_API_KEY` is set in repository secrets."
+              print(f"Codex call failed: {e}", file=sys.stderr)
+              sys.exit(1)
 
-          body = "## 🤖 Codex PR Review\n\n" + review
+          verdict   = review.get("verdict", "REQUEST_CHANGES")
+          summary   = review.get("summary", "No summary provided.")
+          issues    = review.get("issues", [])
+          risk      = review.get("risk_level", "UNKNOWN")
 
-          comment_payload = json.dumps({"body": body}).encode()
+          risk_emoji = {"LOW": "🟢", "MEDIUM": "🟡", "HIGH": "🔴"}.get(risk, "⚪")
+          verdict_emoji = "✅" if verdict == "APPROVE" else "🚫"
+
+          body_lines = [
+              f"## {verdict_emoji} Codex PR Review — {verdict}",
+              "",
+              f"**Risk Level:** {risk_emoji} {risk}",
+              f"**Summary:** {summary}",
+          ]
+
+          if issues:
+              body_lines += ["", "**Issues found:**"]
+              for i in issues:
+                  body_lines.append(f"- {i}")
+          else:
+              body_lines += ["", "**No issues found.**"]
+
+          if verdict == "REQUEST_CHANGES":
+              body_lines += ["", "---", "_Resolve the issues above, then push a new commit to re-trigger this review._"]
+
+          body = "\n".join(body_lines)
+
+          # Submit formal GitHub review (APPROVE or REQUEST_CHANGES)
+          review_payload = json.dumps({
+              "commit_id": os.environ["HEAD_SHA"],
+              "body": body,
+              "event": verdict  # "APPROVE" or "REQUEST_CHANGES"
+          }).encode()
+
           pr_number = os.environ["PR_NUMBER"]
-          repo = os.environ["REPO"]
+          repo      = os.environ["REPO"]
 
-          comment_req = urllib.request.Request(
-              f"https://api.github.com/repos/{repo}/issues/{pr_number}/comments",
-              data=comment_payload,
+          review_req = urllib.request.Request(
+              f"https://api.github.com/repos/{repo}/pulls/{pr_number}/reviews",
+              data=review_payload,
               headers={
                   "Content-Type": "application/json",
                   "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
@@ -78,6 +127,10 @@ jobs:
               }
           )
 
-          with urllib.request.urlopen(comment_req) as resp:
-              print("Review posted successfully.")
+          with urllib.request.urlopen(review_req) as resp:
+              print(f"Review submitted: {verdict} | Risk: {risk}")
+
+          if verdict == "REQUEST_CHANGES":
+              print("Failing workflow — issues must be resolved before merge.")
+              sys.exit(1)
           EOF
