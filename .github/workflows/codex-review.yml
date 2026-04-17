@@ -76,11 +76,10 @@ jobs:
           issues  = review.get("issues", [])
           risk    = review.get("risk_level", "UNKNOWN")
 
-          risk_emoji    = {"LOW": "u0001F7E2" if risk == "LOW" else "u0001F7E1" if risk == "MEDIUM" else "u0001F534"}.get(risk, "u26AA")
-          verdict_emoji = "u2705" if verdict == "APPROVE" else "u1F6AB"
+          verdict_label = "APPROVED" if verdict == "APPROVE" else "CHANGES REQUIRED"
 
           lines = [
-              "## " + verdict_emoji + " Codex PR Review - " + verdict,
+              "## Codex PR Review: " + verdict_label,
               "",
               "**Risk Level:** " + risk,
               "**Summary:** " + summary,
