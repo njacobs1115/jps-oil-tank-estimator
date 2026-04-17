@@ -1,0 +1,83 @@
+name: Codex PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  codex-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get PR diff
+        run: |
+          git diff origin/${{ github.base_ref }}...HEAD > pr_diff.txt
+
+      - name: Run Codex Review
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          python3 << 'EOF'
+          import os, json, urllib.request
+
+          diff = open("pr_diff.txt").read()[:15000]
+
+          payload = {
+              "model": "gpt-4o",
+              "messages": [{
+                  "role": "user",
+                  "content": (
+                      "Review the pull request diff for code quality, security issues, "
+                      "and adherence to standard coding practices. Flag any risky changes "
+                      "and provide a brief summary.\n\nDiff:\n" + diff
+                  )
+              }],
+              "max_tokens": 1000
+          }
+
+          req = urllib.request.Request(
+              "https://api.openai.com/v1/chat/completions",
+              data=json.dumps(payload).encode(),
+              headers={
+                  "Content-Type": "application/json",
+                  "Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}"
+              }
+          )
+
+          try:
+              with urllib.request.urlopen(req) as resp:
+                  result = json.loads(resp.read())
+              review = result["choices"][0]["message"]["content"]
+          except Exception as e:
+              review = f"⚠️ Codex review failed: {e}\n\nEnsure `OPENAI_API_KEY` is set in repository secrets."
+
+          body = "## 🤖 Codex PR Review\n\n" + review
+
+          comment_payload = json.dumps({"body": body}).encode()
+          pr_number = os.environ["PR_NUMBER"]
+          repo = os.environ["REPO"]
+
+          comment_req = urllib.request.Request(
+              f"https://api.github.com/repos/{repo}/issues/{pr_number}/comments",
+              data=comment_payload,
+              headers={
+                  "Content-Type": "application/json",
+                  "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
+                  "Accept": "application/vnd.github+json"
+              }
+          )
+
+          with urllib.request.urlopen(comment_req) as resp:
+              print("Review posted successfully.")
+          EOF
