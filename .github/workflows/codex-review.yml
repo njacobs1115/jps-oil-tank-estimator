@@ -76,13 +76,13 @@ jobs:
           issues  = review.get("issues", [])
           risk    = review.get("risk_level", "UNKNOWN")
 
-          risk_emoji    = {"LOW": "🟢", "MEDIUM": "🟡", "HIGH": "🔴"}.get(risk, "⚪")
-          verdict_emoji = "✅" if verdict == "APPROVE" else "🚫"
+          risk_emoji    = {"LOW": "u0001F7E2" if risk == "LOW" else "u0001F7E1" if risk == "MEDIUM" else "u0001F534"}.get(risk, "u26AA")
+          verdict_emoji = "u2705" if verdict == "APPROVE" else "u1F6AB"
 
           lines = [
-              "## " + verdict_emoji + " Codex PR Review — " + verdict,
+              "## " + verdict_emoji + " Codex PR Review - " + verdict,
               "",
-              "**Risk Level:** " + risk_emoji + " " + risk,
+              "**Risk Level:** " + risk,
               "**Summary:** " + summary,
           ]
           if issues:
@@ -94,14 +94,10 @@ jobs:
 
           body = "\n".join(lines)
 
-          comment_payload = json.dumps({
-              "commit_id": os.environ["HEAD_SHA"],
-              "body": body,
-              "event": verdict
-          }).encode()
+          comment_payload = json.dumps({"body": body}).encode()
 
-          review_req = urllib.request.Request(
-              "https://api.github.com/repos/" + os.environ["REPO"] + "/pulls/" + os.environ["PR_NUMBER"] + "/reviews",
+          comment_req = urllib.request.Request(
+              "https://api.github.com/repos/" + os.environ["REPO"] + "/issues/" + os.environ["PR_NUMBER"] + "/comments",
               data=comment_payload,
               headers={
                   "Content-Type": "application/json",
@@ -110,11 +106,11 @@ jobs:
               }
           )
 
-          with urllib.request.urlopen(review_req) as resp:
-              print("Review submitted: " + verdict + " | Risk: " + risk)
+          with urllib.request.urlopen(comment_req) as resp:
+              print("Review posted: " + verdict + " | Risk: " + risk)
 
           if verdict == "REQUEST_CHANGES":
-              print("Failing workflow — issues must be resolved before merge.")
+              print("Issues found - failing status check. Merge is blocked.")
               sys.exit(1)
           PYEOF
 
@@ -124,5 +120,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: python3 review.py
