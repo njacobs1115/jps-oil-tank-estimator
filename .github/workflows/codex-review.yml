@@ -18,42 +18,34 @@ jobs:
           fetch-depth: 0
 
       - name: Get PR diff
-        run: |
-          git diff origin/${{ github.base_ref }}...HEAD > pr_diff.txt
+        run: git diff origin/${{ github.base_ref }}...HEAD > pr_diff.txt
 
-      - name: Run Codex Review
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          REPO: ${{ github.repository }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      - name: Write review script
         run: |
-          python3 << 'EOF'
+          cat > review.py << 'PYEOF'
           import os, json, urllib.request, sys
 
           diff = open("pr_diff.txt").read()[:15000]
 
           if not diff.strip():
-              print("No diff found — skipping review.")
+              print("No diff found — skipping.")
               sys.exit(0)
 
-          prompt = """Review this pull request diff. Return ONLY valid JSON in this exact format:
-{
-  "verdict": "APPROVE" or "REQUEST_CHANGES",
-  "summary": "One sentence overview of what this PR does.",
-  "issues": ["issue 1", "issue 2"],
-  "risk_level": "LOW", "MEDIUM", or "HIGH"
-}
-
-Rules:
-- verdict = REQUEST_CHANGES if there are any security issues, bugs, risky changes, or poor practices
-- verdict = APPROVE only if the code is clean, safe, and well-structured
-- issues = empty array [] if none found
-- Be strict. Flag anything that could cause a production problem.
-
-Diff:
-""" + diff
+          prompt = (
+              "Review this pull request diff. Return ONLY valid JSON in this exact format:\n"
+              "{\n"
+              '  "verdict": "APPROVE" or "REQUEST_CHANGES",\n'
+              '  "summary": "One sentence overview.",\n'
+              '  "issues": ["issue 1", "issue 2"],\n'
+              '  "risk_level": "LOW", "MEDIUM", or "HIGH"\n'
+              "}\n\n"
+              "Rules:\n"
+              "- verdict = REQUEST_CHANGES if there are security issues, bugs, risky changes, or poor practices\n"
+              "- verdict = APPROVE only if the code is clean, safe, and well-structured\n"
+              "- issues = [] if none found\n"
+              "- Be strict. Flag anything that could cause a production problem.\n\n"
+              "Diff:\n" + diff
+          )
 
           payload = {
               "model": "gpt-4o",
@@ -67,70 +59,70 @@ Diff:
               data=json.dumps(payload).encode(),
               headers={
                   "Content-Type": "application/json",
-                  "Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}"
+                  "Authorization": "Bearer " + os.environ["OPENAI_API_KEY"]
               }
           )
 
           try:
               with urllib.request.urlopen(req) as resp:
                   result = json.loads(resp.read())
-              raw = result["choices"][0]["message"]["content"]
-              review = json.loads(raw)
+              review = json.loads(result["choices"][0]["message"]["content"])
           except Exception as e:
-              print(f"Codex call failed: {e}", file=sys.stderr)
+              print("Codex call failed: " + str(e), file=sys.stderr)
               sys.exit(1)
 
-          verdict   = review.get("verdict", "REQUEST_CHANGES")
-          summary   = review.get("summary", "No summary provided.")
-          issues    = review.get("issues", [])
-          risk      = review.get("risk_level", "UNKNOWN")
+          verdict = review.get("verdict", "REQUEST_CHANGES")
+          summary = review.get("summary", "No summary.")
+          issues  = review.get("issues", [])
+          risk    = review.get("risk_level", "UNKNOWN")
 
-          risk_emoji = {"LOW": "🟢", "MEDIUM": "🟡", "HIGH": "🔴"}.get(risk, "⚪")
+          risk_emoji    = {"LOW": "🟢", "MEDIUM": "🟡", "HIGH": "🔴"}.get(risk, "⚪")
           verdict_emoji = "✅" if verdict == "APPROVE" else "🚫"
 
-          body_lines = [
-              f"## {verdict_emoji} Codex PR Review — {verdict}",
+          lines = [
+              "## " + verdict_emoji + " Codex PR Review — " + verdict,
               "",
-              f"**Risk Level:** {risk_emoji} {risk}",
-              f"**Summary:** {summary}",
+              "**Risk Level:** " + risk_emoji + " " + risk,
+              "**Summary:** " + summary,
           ]
-
           if issues:
-              body_lines += ["", "**Issues found:**"]
-              for i in issues:
-                  body_lines.append(f"- {i}")
+              lines += ["", "**Issues found:**"] + ["- " + i for i in issues]
           else:
-              body_lines += ["", "**No issues found.**"]
-
+              lines += ["", "**No issues found.**"]
           if verdict == "REQUEST_CHANGES":
-              body_lines += ["", "---", "_Resolve the issues above, then push a new commit to re-trigger this review._"]
+              lines += ["", "---", "_Fix the issues above and push a new commit to re-trigger this review._"]
 
-          body = "\n".join(body_lines)
+          body = "\n".join(lines)
 
-          # Submit formal GitHub review (APPROVE or REQUEST_CHANGES)
-          review_payload = json.dumps({
+          comment_payload = json.dumps({
               "commit_id": os.environ["HEAD_SHA"],
               "body": body,
-              "event": verdict  # "APPROVE" or "REQUEST_CHANGES"
+              "event": verdict
           }).encode()
 
-          pr_number = os.environ["PR_NUMBER"]
-          repo      = os.environ["REPO"]
-
           review_req = urllib.request.Request(
-              f"https://api.github.com/repos/{repo}/pulls/{pr_number}/reviews",
-              data=review_payload,
+              "https://api.github.com/repos/" + os.environ["REPO"] + "/pulls/" + os.environ["PR_NUMBER"] + "/reviews",
+              data=comment_payload,
               headers={
                   "Content-Type": "application/json",
-                  "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
+                  "Authorization": "Bearer " + os.environ["GH_TOKEN"],
                   "Accept": "application/vnd.github+json"
               }
           )
 
           with urllib.request.urlopen(review_req) as resp:
-              print(f"Review submitted: {verdict} | Risk: {risk}")
+              print("Review submitted: " + verdict + " | Risk: " + risk)
 
           if verdict == "REQUEST_CHANGES":
               print("Failing workflow — issues must be resolved before merge.")
               sys.exit(1)
-          EOF
+          PYEOF
+
+      - name: Run Codex Review
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python3 review.py
