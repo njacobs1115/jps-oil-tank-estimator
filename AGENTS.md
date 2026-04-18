@@ -87,3 +87,27 @@ All funnel-related tags use funnel- prefix:
 - funnel-booking-failure
 - funnel-booking-success
 - funnel-test
+
+
+---
+
+## PR Review Brief Requirement
+
+For any PR touching booking logic, rescue logic, alerts, synthetic tests, GHL integration, Telegram integration, or customer-facing funnel behavior:
+
+The PR description must include:
+- what changed
+- why it changed
+- risk area
+- checks run
+- check results
+- known risks or follow-up items
+
+The PR must explicitly ask Codex to review for:
+- customer-facing false confirmations
+- Step 3 rescue behavior
+- Step 5 intent preservation before booking webhook
+- rescue path independence from GHL alone
+- secret, token, webhook, or internal endpoint exposure
+- regressions in ACK handling
+- regressions in orphan sweeper scoping
