@@ -2173,6 +2173,11 @@
         <button class="btn-next" id="btn-confirm-booking" onclick="showReviewScreen()" disabled>Review Booking →</button>
       </div>
     </div>
+    <!-- dates-error: intentionally no Try Again button per funnel-rescue spec.
+     Rescue is server-side (GHL tag triggers Kelly outreach). Retry loops
+     were removed because they restart the API call that already failed,
+     creating duplicate contacts. Customer is contacted via SMS instead.
+     Phone number below is the secondary self-serve fallback. -->
     <div id="dates-error" style="display:none;padding-top:8px;">
       <div class="step-heading">
         <p>Our scheduling system hit a snag, but we’ve saved your info. Kelly will text you shortly to get you booked.</p>
@@ -3466,7 +3471,7 @@ function submitCheckout() {
     document.getElementById('booking-loading').style.display   = 'none';
     document.getElementById('booking-confirmed').style.display = 'block';
     const honeyNameEl = document.getElementById('booking-success-name');
-    if (honeyNameEl) honeyNameEl.textContent = 'there';
+    if (honeyNameEl) honeyNameEl.textContent = 'there'; // null guard intentional: element may not exist in all screen states
     return;
   }
 
