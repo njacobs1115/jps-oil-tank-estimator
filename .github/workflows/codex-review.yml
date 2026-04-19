@@ -28,24 +28,49 @@ jobs:
           diff = open("pr_diff.txt").read()[:15000]
 
           if not diff.strip():
-              print("No diff found — skipping.")
+              print("No diff found - skipping.")
               sys.exit(0)
 
-          prompt = (
-              "Review this pull request diff. Return ONLY valid JSON in this exact format:\n"
-              "{\n"
-              '  "verdict": "APPROVE" or "REQUEST_CHANGES",\n'
-              '  "summary": "One sentence overview.",\n'
-              '  "issues": ["issue 1", "issue 2"],\n'
-              '  "risk_level": "LOW", "MEDIUM", or "HIGH"\n'
-              "}\n\n"
-              "Rules:\n"
-              "- verdict = REQUEST_CHANGES if there are security issues, bugs, risky changes, or poor practices\n"
-              "- verdict = APPROVE only if the code is clean, safe, and well-structured\n"
-              "- issues = [] if none found\n"
-              "- Be strict. Flag anything that could cause a production problem.\n\n"
-              "Diff:\n" + diff
-          )
+          prompt = """Review this pull request diff for a production system. Return ONLY valid JSON in this exact format:
+          {
+            "verdict": "APPROVE" or "REQUEST_CHANGES",
+            "summary": "One sentence overview.",
+            "issues": ["issue 1", "issue 2"],
+            "risk_level": "LOW", "MEDIUM", or "HIGH"
+          }
+
+          You are reviewing ONLY the risk introduced by this PR. Judge the ADDED and MODIFIED code in this diff, not the general quality of the repo. Do NOT fail a PR for unchanged context, deleted lines, pre-existing code outside the changed lines, or credential-related variable names that are merely referenced.
+
+          REQUEST_CHANGES only if this PR newly introduces one or more concrete, material risks such as:
+          - a hardcoded secret, token, password, API key, private key, session secret, or credential added in code or config
+          - sensitive data newly exposed to clients, logs, error responses, or public files
+          - an auth bypass, missing auth on a sensitive route, missing signature verification, missing permission check, or trust of unvalidated user input on a privileged path
+          - command injection, SQL injection, path traversal, SSRF, unsafe deserialization, or comparable exploitable input-handling bug
+          - a false-success state where critical failure is newly hidden or misreported as success
+          - removal or breakage of an existing safety-critical check, timeout, validation, or verification step
+          - a network call added to a critical path with no timeout where hanging would materially break the workflow
+          - a newly introduced write/update/delete action against external systems without the verification/guardrails required by the surrounding spec
+
+          APPROVE for everything else, including:
+          - environment variable usage such as os.getenv(...), process.env, secrets.* , env.*, EnvironmentFile, or similar secure configuration references
+          - variable names like GITHUB_TOKEN, GMAIL_USER, GMAIL_APP_PASSWORD, SECRET_KEY, API_KEY, etc. when they are read from environment/config rather than hardcoded
+          - deleted insecure code or deleted hardcoded values; removing a secret is a fix, not a failure
+          - unchanged context lines shown in the diff
+          - refactors, formatting, renames, comments, docs, or operational changes that do not introduce concrete exploitable risk
+          - speculative concerns like "it is unclear whether..." or "might be insecure" without a specific added line and a specific exploit path
+          - style issues, architecture opinions, missing tests, or "could be cleaner" feedback
+          - pre-existing repo problems not introduced by this PR
+
+          Hard rules:
+          - Do not fail the PR for a secret string that appears only in a removed line.
+          - Do not fail the PR because a diff contains credential-related env var names.
+          - Do not fail the PR for secure secret sourcing from environment/config.
+          - Every issue must point to a specific changed line or clearly described added behavior in this PR.
+          - If you cannot identify a concrete newly introduced risk, verdict must be APPROVE.
+          - issues must be [] when verdict is APPROVE.
+
+          Diff:
+          """ + diff
 
           payload = {
               "model": "gpt-4o",
