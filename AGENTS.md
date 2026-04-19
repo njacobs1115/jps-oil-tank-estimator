@@ -1,37 +1,32 @@
-# AGENTS.md
+# Booking Funnel — Agent Guide
 
-## Booking Funnel Critical Review Rules
+## What This Repo Is
+Public-facing JPS oil tank estimator and booking funnel. This is live customer-facing infrastructure and must be treated as such.
 
-These rules govern all PRs touching the booking funnel (Route-Optimizer-JPS, jps-oil-tank-estimator, jps-command-center). Codex enforces these during review.
+## Read First
+1. `next_session.md`
+2. `last_session.md`
+3. `README.md`
+4. `CLAUDE.md`
 
----
+## Merge Lane
+- Critical approval repo.
+- Branch -> PR -> `codex-review` + `adversarial-review`.
+- Green PRs still wait for approval before merge.
 
-### Non-negotiable rules
+## Hard Rules
 - Never allow a customer-facing false confirmation.
-- Step 3 date-fetch failure must preserve the lead and trigger the defined rescue path.
-- Step 5 booking failure must preserve the intended booking details before attempting the final booking webhook.
-- Never expose secrets, webhook URLs, tokens, or internal system details to the frontend or customer-facing copy.
-- Do not change customer-facing rescue language unless explicitly requested.
-- Do not remove or weaken synthetic testing, Telegram alerts, or failure logging without explicit approval.
+- `submitEstimate()` and `submitCheckout()` are separate paths. Do not assume shared state.
+- Preserve the rescue path for date-fetch or booking failures.
+- Before any final booking webhook attempt, persist the intended booking payload to the existing GHL contact.
+- Never expose secrets, webhook URLs, or internal system details to the frontend.
+- Do not weaken GTM/GA4/Ads tracking, Telegram alerts, or failure logging without explicit approval.
 
----
+## Step 5 Requirement
+Required persisted fields before booking: requested date, requested time, service, address, name, phone, email, and `funnel_request_id`. If intent preservation fails, do not proceed to booking.
 
-### Step 5 requirement
-Before the final booking webhook is attempted, the system must persist the intended booking payload to the existing GHL contact. This is non-negotiable and must happen on every booking attempt, success or failure.
-
-Required fields:
-- requested_date
-- requested_time
-- service
-- address
-- name
-- phone
-- email
-- funnel_request_id
-
-Prefer structured custom fields plus a human-readable contact note containing the same data.
-
-If intent-preservation write fails: do NOT proceed to booking webhook. Execute rescue path.
+## Sensitive Areas
+- `booking-funnel.html`, webhook payloads, pricing logic, tracking events, rescue behavior, and any customer-facing copy around failure states.
 
 ---
 
