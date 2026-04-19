@@ -1,0 +1,218 @@
+name: Adversarial Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  adversarial-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get PR diff
+        run: git diff origin/${{ github.base_ref }}...HEAD > pr_diff.txt
+
+      - name: Write adversarial review script
+        run: |
+          cat > adversarial_review.py << 'PYEOF'
+          import json, os, re, sys, urllib.request
+
+          diff = open("pr_diff.txt", "r", encoding="utf-8").read()[:18000]
+
+          if not diff.strip():
+              print("No diff found - skipping.")
+              sys.exit(0)
+
+          changed_paths = []
+          for line in diff.splitlines():
+              match = re.match(r"diff --git a/(.+?) b/(.+)$", line)
+              if match:
+                  changed_paths.append(match.group(2))
+
+          protected_prefixes = (
+              ".github/workflows/",
+              "deploy/",
+              "infra/",
+          )
+          protected_exact = {
+              "docker-compose.yml",
+              "Dockerfile",
+          }
+          protected_hits = [
+              path for path in changed_paths
+              if path.startswith(protected_prefixes) or path in protected_exact
+          ]
+
+          if protected_hits:
+              review = {
+                  "decision": "ESCALATE",
+                  "risk_bucket": "PROTECTED",
+                  "summary": "This PR touches protected automation or deployment paths.",
+                  "findings": [
+                      "Protected path changed: " + path for path in protected_hits
+                  ],
+                  "reasons": [
+                      "Protected-path changes are never allowed through the low-risk fast lane."
+                  ],
+              }
+              with open("adversarial_review.json", "w", encoding="utf-8") as f:
+                  json.dump(review, f)
+              lines = [
+                  "## Adversarial Review: ESCALATED",
+                  "",
+                  "**Risk Bucket:** PROTECTED",
+                  "**Summary:** This PR touches protected automation or deployment paths.",
+                  "",
+                  "**Findings:**",
+              ] + ["- Protected path changed: " + path for path in protected_hits] + [
+                  "",
+                  "---",
+                  "_This PR left the fast lane and needs manual attention._",
+              ]
+              with open("adversarial_comment.md", "w", encoding="utf-8") as f:
+                  f.write("\n".join(lines))
+              sys.exit(0)
+
+          prompt = """You are an adversarial pull request reviewer for a production automation repo.
+          Your job is to look for realistic failure modes, unsafe automation, and policy bypasses.
+
+          Return ONLY valid JSON in this exact format:
+          {
+            "decision": "AUTO_APPROVE" or "ESCALATE",
+            "risk_bucket": "LOW_RISK", "SENSITIVE", or "PROTECTED",
+            "summary": "One sentence summary.",
+            "findings": ["finding 1", "finding 2"],
+            "reasons": ["reason 1", "reason 2"]
+          }
+
+          Core policy:
+          - AUTO_APPROVE is allowed ONLY for low-risk PRs that do not touch protected areas and do not introduce realistic exploitability or silent operational breakage.
+          - ESCALATE for anything that touches protected areas, changes deployment/CI policy, alters auth/secrets/webhooks/external writes, or creates ambiguity about safety.
+
+          Treat these as PROTECTED and always ESCALATE:
+          - .github/workflows/, deployment config, infrastructure automation
+          - auth, secrets, env var loading, token handling
+          - webhooks, routing, externally triggered writes, customer data handling
+          - payment logic, booking logic, lead routing, background automation with live side effects
+
+          Treat these as SENSITIVE and ESCALATE unless obviously harmless:
+          - API parameter changes
+          - data model / parsing changes
+          - time/date logic
+          - retries/timeouts/error handling
+          - anything that can silently corrupt reports or summaries
+
+          APPROVAL rules:
+          - If this is docs-only, formatting-only, copy-only, comments-only, or isolated presentation/report wording with no protected-path impact, AUTO_APPROVE.
+          - If you are unsure, choose ESCALATE.
+          - Findings must be concrete and tied to changed behavior in this PR.
+          - If AUTO_APPROVE, findings should usually be [].
+
+          Diff:
+          """ + diff
+
+          payload = {
+              "model": "gpt-4o",
+              "messages": [{"role": "user", "content": prompt}],
+              "max_tokens": 1000,
+              "response_format": {"type": "json_object"},
+          }
+
+          req = urllib.request.Request(
+              "https://api.openai.com/v1/chat/completions",
+              data=json.dumps(payload).encode(),
+              headers={
+                  "Content-Type": "application/json",
+                  "Authorization": "Bearer " + os.environ["OPENAI_API_KEY"],
+              },
+          )
+
+          try:
+              with urllib.request.urlopen(req, timeout=90) as resp:
+                  result = json.loads(resp.read())
+          except Exception as e:
+              print("Adversarial review call failed: " + str(e), file=sys.stderr)
+              sys.exit(1)
+
+          content = result["choices"][0]["message"]["content"].strip()
+          if "```json" in content:
+              content = content.split("```json", 1)[1].split("```", 1)[0].strip()
+          elif "```" in content:
+              content = content.split("```", 1)[1].split("```", 1)[0].strip()
+
+          try:
+              review = json.loads(content)
+          except Exception as e:
+              print("Adversarial review JSON parse failed: " + str(e), file=sys.stderr)
+              print(content, file=sys.stderr)
+              sys.exit(1)
+
+          decision = review.get("decision", "ESCALATE")
+          bucket = review.get("risk_bucket", "PROTECTED")
+          summary = review.get("summary", "No summary.")
+          findings = review.get("findings", [])
+          reasons = review.get("reasons", [])
+
+          with open("adversarial_review.json", "w", encoding="utf-8") as f:
+              json.dump(
+                  {
+                      "decision": decision,
+                      "risk_bucket": bucket,
+                      "summary": summary,
+                      "findings": findings,
+                      "reasons": reasons,
+                  },
+                  f,
+              )
+
+          label = "AUTO-APPROVED" if decision == "AUTO_APPROVE" else "ESCALATED"
+          lines = [
+              "## Adversarial Review: " + label,
+              "",
+              "**Risk Bucket:** " + bucket,
+              "**Summary:** " + summary,
+          ]
+          if reasons:
+              lines += ["", "**Reasons:**"] + ["- " + r for r in reasons]
+          if findings:
+              lines += ["", "**Findings:**"] + ["- " + f for f in findings]
+          else:
+              lines += ["", "**Findings:**", "- No concrete findings."]
+          if decision != "AUTO_APPROVE":
+              lines += ["", "---", "_This PR left the fast lane and needs manual attention._"]
+
+          with open("adversarial_comment.md", "w", encoding="utf-8") as f:
+              f.write("\n".join(lines))
+          PYEOF
+
+      - name: Run adversarial review
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python3 adversarial_review.py
+
+      - name: Post adversarial review comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh pr comment "$PR_NUMBER" --repo "$REPO" --body-file adversarial_comment.md
+
+      - name: Block escalated PRs
+        run: |
+          python3 - <<'PYEOF'
+          import json, sys
+          review = json.load(open("adversarial_review.json", "r", encoding="utf-8"))
+          if review.get("decision") == "AUTO_APPROVE":
+              sys.exit(0)
+          print("Adversarial review escalated this PR. Blocking merge.")
+          sys.exit(1)
+          PYEOF
