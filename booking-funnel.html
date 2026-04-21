@@ -2173,16 +2173,16 @@
         <button class="btn-next" id="btn-confirm-booking" onclick="showReviewScreen()" disabled>Review Booking →</button>
       </div>
     </div>
+    <!-- dates-error: intentionally no Try Again button per funnel-rescue spec.
+     Rescue is server-side (GHL tag triggers Kelly outreach). Retry loops
+     were removed because they restart the API call that already failed,
+     creating duplicate contacts. Customer is contacted via SMS instead.
+     Phone number below is the secondary self-serve fallback. -->
     <div id="dates-error" style="display:none;padding-top:8px;">
       <div class="step-heading">
-        <h1>Couldn’t load available dates.</h1>
-        <p>No worries — call us and we’ll get you on the schedule in 2 minutes.</p>
+        <p>Our scheduling system hit a snag, but we’ve saved your info. Kelly will text you shortly to get you booked.</p>
+        <p style="margin-top:12px;font-size:0.9em;color:#666;">Didn’t hear from us within 2 hours? Call <a href="tel:+14013893200" style="color:inherit;font-weight:600;">(401) 389-3200</a> — we’ll get you on the schedule.</p>
       </div>
-      <a href="tel:+14013893200" class="btn-cta"
-         style="display:block;text-align:center;text-decoration:none;line-height:58px;border-radius:var(--radius-sm);">
-        Call (401) 389-3200 →
-      </a>
-      <button class="btn-secondary" onclick="goToScreen('checkout')" style="margin-top:10px;">← Try Again</button>
     </div>
   </div>
 
@@ -2229,8 +2229,8 @@
     <div id="booking-confirmed" style="display:none;">
       <div class="success-wrap">
         <div class="success-icon">📅</div>
-        <div class="success-heading">You’re on the schedule, <span id="booking-success-name">there</span>!</div>
-        <div class="success-body">Your oil tank removal is confirmed. We’ll send you a service agreement and all the details shortly.</div>
+        <div class="success-heading">Your appointment request has been received.</div>
+        <div class="success-body">You’ll receive a confirmation text shortly with your appointment details. Thank you and enjoy the rest of your day!</div>
         <div class="booking-summary" id="booking-summary-box"></div>
         <div class="success-detail">
           We arrive, pump the tank, cut it up, and haul everything away — all in one visit.
@@ -3470,7 +3470,8 @@ function submitCheckout() {
     goToScreen('booking-success');
     document.getElementById('booking-loading').style.display   = 'none';
     document.getElementById('booking-confirmed').style.display = 'block';
-    document.getElementById('booking-success-name').textContent = 'there';
+    const honeyNameEl = document.getElementById('booking-success-name');
+    if (honeyNameEl) honeyNameEl.textContent = 'there'; // null guard intentional: element may not exist in all screen states
     return;
   }
 
