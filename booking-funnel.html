@@ -495,6 +495,33 @@
       font-weight: 600;
     }
 
+    /* ─── CHECKOUT STATE SELECTOR ─── */
+    .checkout-state-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .checkout-state-btn {
+      padding: 12px 8px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      color: var(--text-mid);
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all var(--transition);
+      text-align: center;
+    }
+    .checkout-state-btn:hover { border-color: var(--brand); color: var(--brand); }
+    .checkout-state-btn.selected {
+      border-color: var(--brand);
+      background: var(--brand-light);
+      color: var(--brand);
+    }
+
     /* ─── CITY INPUT ─── */
     .city-wrap { margin-top: 4px; }
     .city-wrap label {
@@ -2134,6 +2161,33 @@
     </div>
 
     <div class="form-field">
+      <label>State *</label>
+      <div class="checkout-state-grid">
+        <button type="button" class="checkout-state-btn" data-value="RI" onclick="onCheckoutStateChange(this)">Rhode Island</button>
+        <button type="button" class="checkout-state-btn" data-value="MA" onclick="onCheckoutStateChange(this)">Massachusetts</button>
+        <button type="button" class="checkout-state-btn" data-value="CT" onclick="onCheckoutStateChange(this)">Connecticut</button>
+      </div>
+      <div class="field-error" id="err-checkout-state">Please select your state.</div>
+    </div>
+
+    <div class="form-field" id="checkout-city-wrap" style="display:none;">
+      <label for="checkout-city-input">City / Town *</label>
+      <div class="city-input-wrap">
+        <input
+          type="text"
+          id="checkout-city-input"
+          class="city-input"
+          placeholder="Start typing your city..."
+          autocomplete="off"
+          oninput="onCheckoutCityInput(this)"
+          onblur="hideCheckoutAutocompleteSoon()"
+        />
+        <div class="autocomplete-list" id="checkout-autocomplete-list"></div>
+      </div>
+      <div class="field-error" id="err-checkout-city">Please select your city. This determines your permit fee.</div>
+    </div>
+
+    <div class="form-field">
       <label for="book-oil-gauge">Oil Level (exact gauge reading) *</label>
       <select id="book-oil-gauge">
         <option value="" disabled selected>Select what the gauge reads...</option>
@@ -3146,6 +3200,101 @@ function hideAutocompleteSoon() {
 }
 
 // ──────────────────────────────────────────────
+// CHECKOUT STATE + CITY (inline at checkout form)
+// ──────────────────────────────────────────────
+function onCheckoutStateChange(el) {
+  document.querySelectorAll('.checkout-state-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  const newState = el.dataset.value;
+
+  // Reset city/permit data when state changes — stale data from prior selection must not persist
+  answers.city = null;
+  answers.permitFee = null;
+  answers.cityRemovalFee = null;
+  const ci = document.getElementById('checkout-city-input');
+  if (ci) { ci.value = ''; ci.classList.remove('has-value'); }
+  const acList = document.getElementById('checkout-autocomplete-list');
+  if (acList) acList.classList.remove('open');
+
+  answers.state = newState;
+  booking.state = newState;
+
+  const cityWrap = document.getElementById('checkout-city-wrap');
+  if (newState === 'MA' || newState === 'CT') {
+    cityWrap.style.display = 'block';
+  } else {
+    cityWrap.style.display = 'none';
+  }
+
+  updateEstimateBar();
+}
+
+function onCheckoutCityInput(input) {
+  const q = input.value.trim().toLowerCase();
+  const list = document.getElementById('checkout-autocomplete-list');
+  if (q.length < 2) { list.classList.remove('open'); return; }
+
+  const matches = cityData.filter(c =>
+    c.state === answers.state && c.city.toLowerCase().startsWith(q)
+  ).slice(0, 8);
+
+  if (!matches.length) {
+    const escaped = input.value.trim().replace(/'/g, "\\'");
+    list.innerHTML = `<div class="autocomplete-item" onclick="selectCheckoutCityFallback('${escaped}')"><span>${input.value.trim()}, ${answers.state}</span><span class="fee-hint">Confirm at booking</span></div>`;
+    list.classList.add('open');
+    return;
+  }
+
+  list.innerHTML = matches.map(c => {
+    const escapedCity = c.city.replace(/'/g, "\\'");
+    const feeVal = c.permit_fee !== undefined ? c.permit_fee : 'null';
+    const hint = c.state === 'CT'
+      ? '$' + (c.removal_fee || 600) + ' flat rate'
+      : (c.permit_fee !== null && c.permit_fee > 0
+          ? '$' + (c.removal_fee || 600) + ' - Permit: $' + c.permit_fee
+          : '$' + (c.removal_fee || 600) + ' - No permit fee');
+    return `<div class="autocomplete-item" onclick="selectCheckoutCity('${escapedCity}', ${feeVal}, ${c.removal_fee || 600})"><span>${c.city}, ${c.state}</span><span class="fee-hint">${hint}</span></div>`;
+  }).join('');
+  list.classList.add('open');
+}
+
+function selectCheckoutCity(city, fee, removalFee) {
+  answers.city = city;
+  answers.permitFee = (fee === null || fee === undefined || fee === 'null') ? null : fee;
+  answers.cityRemovalFee = removalFee || 600;
+  answers.permitSource = 'airtable';
+  const input = document.getElementById('checkout-city-input');
+  input.value = city + ', ' + answers.state;
+  input.classList.add('has-value');
+  document.getElementById('checkout-autocomplete-list').classList.remove('open');
+  updateEstimateBar();
+}
+
+function selectCheckoutCityFallback(city) {
+  answers.city = city;
+  answers.permitFee = null;
+  answers.cityRemovalFee = answers.state === 'CT' ? 700 : 600;
+  answers.permitSource = 'tbd';
+  const input = document.getElementById('checkout-city-input');
+  input.value = city + ', ' + answers.state;
+  input.classList.add('has-value');
+  document.getElementById('checkout-autocomplete-list').classList.remove('open');
+  updateEstimateBar();
+}
+
+function hideCheckoutAutocompleteSoon() {
+  setTimeout(() => {
+    const list = document.getElementById('checkout-autocomplete-list');
+    if (list) list.classList.remove('open');
+    // If text was typed but no selection made from dropdown, use fallback
+    const input = document.getElementById('checkout-city-input');
+    if (input && input.value.trim() && !input.classList.contains('has-value')) {
+      selectCheckoutCityFallback(input.value.trim().split(',')[0].trim());
+    }
+  }, 200);
+}
+
+// ──────────────────────────────────────────────
 // ESTIMATE BAR
 // ──────────────────────────────────────────────
 function updateEstimateBar() {
@@ -3450,6 +3599,24 @@ function goToCheckout() {
   }
   booking.state = answers.state || '';
 
+  // Pre-select checkout state button from quiz answer
+  document.querySelectorAll('.checkout-state-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.value === answers.state);
+  });
+
+  // Show checkout city selector if MA (required for permit fee) or CT (required for pricing)
+  const checkoutCityWrap = document.getElementById('checkout-city-wrap');
+  if (answers.state === 'MA' || answers.state === 'CT') {
+    checkoutCityWrap.style.display = 'block';
+    // Pre-fill if city already selected in quiz
+    if (answers.city) {
+      const ci = document.getElementById('checkout-city-input');
+      if (ci) { ci.value = answers.city + ', ' + answers.state; ci.classList.add('has-value'); }
+    }
+  } else {
+    checkoutCityWrap.style.display = 'none';
+  }
+
   // Mirror the locked price into checkout heading
   const priceEl = document.getElementById('checkout-price-display');
   if (priceEl) {
@@ -3485,6 +3652,10 @@ function submitCheckout() {
   const zip       = get('book-zip');
   const oilGauge  = document.getElementById('book-oil-gauge').value;
 
+  // Read confirmed state from checkout state selector
+  const checkoutStateBtn = document.querySelector('.checkout-state-btn.selected');
+  const checkoutState    = checkoutStateBtn ? checkoutStateBtn.dataset.value : '';
+
   const showErr = (id, show) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('visible', show);
@@ -3493,22 +3664,29 @@ function submitCheckout() {
   const phoneDigits = phone.replace(/\D/g, '');
   const zipDigits   = zip.replace(/\D/g, '');
 
-  showErr('err-first',      !firstName);
-  showErr('err-last',       !lastName);
-  showErr('err-book-phone', phoneDigits.length < 10);
-  showErr('err-address',    !address);
-  showErr('err-city',       !city);
-  showErr('err-zip',        zipDigits.length < 5);
-  showErr('err-oil-gauge',  !oilGauge);
+  const needsCity = checkoutState === 'MA' && !answers.city;
+
+  showErr('err-first',          !firstName);
+  showErr('err-last',           !lastName);
+  showErr('err-book-phone',     phoneDigits.length < 10);
+  showErr('err-address',        !address);
+  showErr('err-city',           !city);
+  showErr('err-zip',            zipDigits.length < 5);
+  showErr('err-oil-gauge',      !oilGauge);
+  showErr('err-checkout-state', !checkoutState);
+  showErr('err-checkout-city',  needsCity);
 
   if (!firstName || !lastName || phoneDigits.length < 10 ||
-      !address || !city || zipDigits.length < 5 || !oilGauge) return;
+      !address || !city || zipDigits.length < 5 || !oilGauge || !checkoutState || needsCity) return;
+
+  // Apply confirmed checkout state (may differ from quiz if customer corrected it)
+  answers.state = checkoutState;
 
   // Save booking state
   Object.assign(booking, { firstName, lastName, phone, email, address, city, zip, oilGauge,
-    state: answers.state || '' });
+    state: checkoutState });
 
-  // Compute price from quiz answers
+  // Compute price from quiz answers (answers.state now reflects checkout confirmation)
   const BASE      = answers.cityRemovalFee || 600;
   const oilFee    = answers.oil === 'half_plus' ? 150 : 0;
   const permitFee = (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee ?? 0);
@@ -3624,8 +3802,8 @@ async function captureLeadFallback() {
         tankAccess:     answers.access === 'standard' ? 'Yes' : answers.access === 'restricted' ? 'No' : 'Unsure',
         estimatedPrice: booking.estimatedPrice,
         basePrice:      answers.cityRemovalFee || 600,
-        permitFee:      (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee ?? 0),
-        oilSurcharge:   answers.oil === 'half_plus' ? 150 : 0,
+        ...(answers.permitFee > 0 ? { permitFee: answers.permitFee } : {}),
+        ...(answers.oil === 'half_plus' ? { oilSurcharge: 150 } : {}),
         serviceType:    'OT',
       }),
     });
@@ -3791,8 +3969,8 @@ async function confirmBooking() {
         serviceType:    'OT',
         estimatedPrice: booking.estimatedPrice,
         basePrice:      answers.cityRemovalFee || 600,
-        permitFee:      (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee || 0),
-        oilSurcharge:   answers.oil === 'half_plus' ? 150 : 0,
+        ...(answers.permitFee > 0 ? { permitFee: answers.permitFee } : {}),
+        ...(answers.oil === 'half_plus' ? { oilSurcharge: 150 } : {}),
         tankLocation:   answers.location    || '',
         exitType:       answers.exit        || '',
         tankAccess:     answers.access      || '',
