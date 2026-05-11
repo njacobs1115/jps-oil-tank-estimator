@@ -13,10 +13,20 @@
 - **Ads conversion:** "Funnel - Booking Confirmed" | ID: 852463092 | Label: RHHyCJ6tj40cEPrpYD
 - **Route Optimizer API:** https://route-optimizer-jps.onrender.com
 
+## Current Live State - 2026-05-10
+- PR `#29` is merged and deployed to GitHub Pages.
+- Live behavior includes quote-state mismatch protection at checkout.
+- Checkout does not ask for state again. It uses the quote state from step 4.
+- Before date lookup, checkout city/ZIP is compared against the quote state.
+- If the address appears to be in a different state, the customer stays on checkout and sees a warning. They can correct city/ZIP in place or return to step 4.
+- This fix intentionally does not touch routing logic, Maps/API logic, slot ranking, booking confirmation, webhook URLs, GHL payload fields, Telegram/rescue logic, pricing formula, or tracking events.
+
 ## Hard Rules
 - `submitEstimate()` and `submitCheckout()` are separate code paths — do not assume state from one exists in the other
 - Pricing logic uses `answers.oil` (pricing step cards), booking uses `booking.oilGauge` (checkout dropdown)
 - `buildEstimateEmail()` computes its own total from `answers.*` — does NOT use `booking.estimatedPrice`
+- Do not reintroduce a second checkout state/city selector unless Norman explicitly asks for that UX.
+- For quote-state/address mismatch work, preserve conversion: warn and let the customer correct the address or update the quote state; do not silently mutate pricing state.
 
 ---
 

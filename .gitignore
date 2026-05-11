@@ -1,1 +1,7 @@
-node_modules/\ntest-report/
+node_modules/
+test-report/
+.codex/*.json
+.agents/
+.claude/CLAUDE.md
+.claude/skills/
+gauntlet_logs/
