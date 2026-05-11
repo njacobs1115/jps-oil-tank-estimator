@@ -936,6 +936,38 @@
     }
     .field-error.visible { display: block; }
 
+    .quote-state-warning {
+      display: none;
+      margin: 10px 0 14px;
+      padding: 14px 16px;
+      border: 1.5px solid #fed7aa;
+      border-radius: var(--radius-sm);
+      background: #fff7ed;
+      color: #7c2d12;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .quote-state-warning.visible { display: block; }
+    .quote-state-warning strong { color: #431407; }
+    .quote-state-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .quote-state-actions button {
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid #fb923c;
+      background: #fff;
+      color: #7c2d12;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
     /* ─── CTA BUTTON — dark navy for premium feel ─── */
     .btn-cta {
       width: 100%;
@@ -2122,14 +2154,22 @@
     <div class="form-row">
       <div class="form-field">
         <label for="book-city">City *</label>
-        <input type="text" id="book-city" name="city" placeholder="Cranston" autocomplete="address-level2" />
+        <input type="text" id="book-city" name="city" placeholder="Cranston" autocomplete="address-level2" oninput="hideQuoteStateWarning()" />
         <div class="field-error" id="err-city">City required.</div>
       </div>
       <div class="form-field">
         <label for="book-zip">ZIP Code *</label>
         <input type="text" id="book-zip" name="zip" placeholder="02920" inputmode="numeric"
-          autocomplete="postal-code" maxlength="5" />
+          autocomplete="postal-code" maxlength="5" oninput="hideQuoteStateWarning()" />
         <div class="field-error" id="err-zip">5-digit ZIP required.</div>
+      </div>
+    </div>
+
+    <div class="quote-state-warning" id="quote-state-warning">
+      <div id="quote-state-warning-text"></div>
+      <div class="quote-state-actions">
+        <button type="button" onclick="focusCheckoutAddress()">Correct address</button>
+        <button type="button" onclick="goToStep(4)">Update quote state</button>
       </div>
     </div>
 
@@ -3146,6 +3186,56 @@ function hideAutocompleteSoon() {
 }
 
 // ──────────────────────────────────────────────
+// CHECKOUT ADDRESS / QUOTE STATE CONSISTENCY
+// ──────────────────────────────────────────────
+const STATE_NAMES = { RI: 'Rhode Island', MA: 'Massachusetts', CT: 'Connecticut' };
+
+function detectStateFromZip(zip) {
+  const digits = String(zip || '').replace(/\D/g, '');
+  if (digits.length < 3) return null;
+  const prefix = parseInt(digits.slice(0, 3), 10);
+  if (prefix >= 28 && prefix <= 29) return 'RI';
+  if (prefix >= 10 && prefix <= 27) return 'MA';
+  if (prefix >= 60 && prefix <= 69) return 'CT';
+  return null;
+}
+
+function detectStateFromCity(city) {
+  const normalized = String(city || '').trim().toLowerCase();
+  if (!normalized) return null;
+  const matches = cityData.filter(c => c.city.toLowerCase() === normalized);
+  const states = [...new Set(matches.map(c => c.state))];
+  return states.length === 1 ? states[0] : null;
+}
+
+function getCheckoutAddressState(city, zip) {
+  return detectStateFromZip(zip) || detectStateFromCity(city);
+}
+
+function showQuoteStateWarning(expectedState, detectedState) {
+  const warning = document.getElementById('quote-state-warning');
+  const text = document.getElementById('quote-state-warning-text');
+  if (!warning || !text) return;
+  const expectedName = STATE_NAMES[expectedState] || expectedState;
+  const detectedName = STATE_NAMES[detectedState] || detectedState || 'a different state';
+  text.innerHTML = '<strong>You were quoted for ' + expectedName + '.</strong> This address looks like ' + detectedName + '. Please confirm your address. A different state may affect price.';
+  warning.classList.add('visible');
+}
+
+function hideQuoteStateWarning() {
+  const warning = document.getElementById('quote-state-warning');
+  if (warning) warning.classList.remove('visible');
+}
+
+function focusCheckoutAddress() {
+  hideQuoteStateWarning();
+  const cityEl = document.getElementById('book-city');
+  const zipEl = document.getElementById('book-zip');
+  const target = zipEl && !zipEl.value.trim() ? zipEl : cityEl;
+  if (target) target.focus();
+}
+
+// ──────────────────────────────────────────────
 // ESTIMATE BAR
 // ──────────────────────────────────────────────
 function updateEstimateBar() {
@@ -3449,6 +3539,7 @@ function goToCheckout() {
     cityEl.value = answers.city;
   }
   booking.state = answers.state || '';
+  hideQuoteStateWarning();
 
   // Mirror the locked price into checkout heading
   const priceEl = document.getElementById('checkout-price-display');
@@ -3493,16 +3584,23 @@ function submitCheckout() {
   const phoneDigits = phone.replace(/\D/g, '');
   const zipDigits   = zip.replace(/\D/g, '');
 
-  showErr('err-first',      !firstName);
-  showErr('err-last',       !lastName);
-  showErr('err-book-phone', phoneDigits.length < 10);
-  showErr('err-address',    !address);
-  showErr('err-city',       !city);
-  showErr('err-zip',        zipDigits.length < 5);
-  showErr('err-oil-gauge',  !oilGauge);
+  showErr('err-first',          !firstName);
+  showErr('err-last',           !lastName);
+  showErr('err-book-phone',     phoneDigits.length < 10);
+  showErr('err-address',        !address);
+  showErr('err-city',           !city);
+  showErr('err-zip',            zipDigits.length < 5);
+  showErr('err-oil-gauge',      !oilGauge);
 
   if (!firstName || !lastName || phoneDigits.length < 10 ||
       !address || !city || zipDigits.length < 5 || !oilGauge) return;
+
+  const checkoutAddressState = getCheckoutAddressState(city, zip);
+  if (checkoutAddressState && answers.state && checkoutAddressState !== answers.state) {
+    showQuoteStateWarning(answers.state, checkoutAddressState);
+    return;
+  }
+  hideQuoteStateWarning();
 
   // Save booking state
   Object.assign(booking, { firstName, lastName, phone, email, address, city, zip, oilGauge,
@@ -3624,8 +3722,8 @@ async function captureLeadFallback() {
         tankAccess:     answers.access === 'standard' ? 'Yes' : answers.access === 'restricted' ? 'No' : 'Unsure',
         estimatedPrice: booking.estimatedPrice,
         basePrice:      answers.cityRemovalFee || 600,
-        permitFee:      (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee ?? 0),
-        oilSurcharge:   answers.oil === 'half_plus' ? 150 : 0,
+        ...(answers.permitFee > 0 ? { permitFee: answers.permitFee } : {}),
+        ...(answers.oil === 'half_plus' ? { oilSurcharge: 150 } : {}),
         serviceType:    'OT',
       }),
     });
@@ -3791,8 +3889,8 @@ async function confirmBooking() {
         serviceType:    'OT',
         estimatedPrice: booking.estimatedPrice,
         basePrice:      answers.cityRemovalFee || 600,
-        permitFee:      (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee || 0),
-        oilSurcharge:   answers.oil === 'half_plus' ? 150 : 0,
+        ...(answers.permitFee > 0 ? { permitFee: answers.permitFee } : {}),
+        ...(answers.oil === 'half_plus' ? { oilSurcharge: 150 } : {}),
         tankLocation:   answers.location    || '',
         exitType:       answers.exit        || '',
         tankAccess:     answers.access      || '',
