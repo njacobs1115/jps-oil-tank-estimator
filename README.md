@@ -54,8 +54,18 @@ Live at: `route-optimizer-jps.onrender.com`
 4. **State & City** — RI (no city needed), MA (city autocomplete), CT (city autocomplete)
 
 → **Results screen** — itemized invoice, live price, "How we price our jobs" expandable, social proof
-→ **CTA form** — name, phone, email, notes. Button: "Lock In This Price →"
-→ **Success screen** — time-aware: M-F 7am–5pm = "you'll hear from us in the next few minutes", after hours = "first thing [day] morning"
+→ **Checkout form** — name, phone, email, address, exact oil gauge, then date lookup
+→ **Booking review + success screen** — customer reviews selected slot, then booking confirmation/rescue behavior handles success or failure
+
+### Checkout Quote-State Protection
+
+The state selected during the quote is the quote state. Checkout does not ask the customer to pick state again.
+
+Before date lookup, `submitCheckout()` compares the checkout city/ZIP against the quoted state using local RI/MA/CT ZIP-prefix and city-table detection. If the checkout address appears to be in a different state, the funnel stays on checkout and shows a plain warning:
+
+> You were quoted for [state]. This address looks like [state]. Please confirm your address. A different state may affect price.
+
+The customer can correct city/ZIP in place or return to step 4 to update the quote state. This protects pricing accuracy without changing routing logic, Maps/API behavior, slot ranking, booking confirmation, webhook URLs, GHL payload fields, Telegram/rescue logic, pricing formula, or tracking events.
 
 ### UX Principles Baked In
 - **No scroll required on any quiz step** — each screen fits the viewport. Results screen can scroll.
@@ -75,30 +85,29 @@ Live at: `route-optimizer-jps.onrender.com`
 | Unknown city | Soft fallback — state default price, keeps lead in funnel, logs to `jps_unknown_cities` in localStorage |
 
 ### City Data
-373 MA cities + 70 CT cities hardcoded into `cityData` array in `index.html` — no runtime API calls, instant load. Rebuild with `build-citydata.js` if pricing changes.
+373 MA cities + 70 CT cities hardcoded into `cityData` array in `booking-funnel.html` — no runtime API calls, instant load. Rebuild with `sync-airtable.js` if pricing changes.
 
-### GHL Webhook
-`const GHL_WEBHOOK_URL` near line ~1700 of `index.html`. **Currently a placeholder — Norman needs to paste the real GHL webhook URL before this is fully live.**
+### GHL / Route Optimizer Integration
 
-Payload includes: `name, phone, email, note, location_type, exit_type, access_type, oil_level, excess_oil_fee, state, city, base_removal_fee, estimated_total_low, estimated_total_high, permit_fee, restricted_access, stair_removal, source: "estimator_tool"`
+The live booking funnel uses Route Optimizer public endpoints for lead capture, date lookup, and booking. Do not expose secrets or webhook URLs in frontend changes. Keep booking confirmation, rescue behavior, Telegram alerts, and GHL payload fields intact unless explicitly approved.
 
 ---
 
 ## Open Items — Pick Up Here Next Session
 
-1. **GHL webhook URL** — paste real URL into `const GHL_WEBHOOK_URL` in index.html. Nothing fires to GHL without this.
-2. **Desktop spacing** — Norman wants desktop layout tighter/better spaced. CSS media query work, no separate file needed.
-3. **Copy polish** — Norman is reviewing wording throughout. He may have notes.
-4. **Embed on removemyoiltank.com/estimate** — currently standalone on GitHub Pages only.
-5. **Phase 2 — Route Optimizer oil constraints** — separate agent working on this. Once done, wire estimator success screen to booking UI.
+1. **GHL workflow** — Norman to build trigger on `funnel-error` tag -> SMS/email Norman with contact name + phone + price.
+2. **End-to-end rescue test** — after GHL workflow exists, intentionally break Make or use an approved safe test path and confirm `funnel-error` contact lands in GHL with all required fields.
+3. **Internal links** — add links from relevant site pages to `/oil-tank-removal-cost`.
+4. **Ads destination** — point ads to new URL only after rescue path is proven.
+5. **Airtable pricing sync** — add/verify `AIRTABLE_API_TOKEN`, run sync workflow, and confirm stale prices are repaired.
 
 ---
 
-## Phase 2 — Customer Self-Booking (NOT YET BUILT)
+## Customer Self-Booking (LIVE)
 
 ### Architecture — Important, Read Before Building
 
-**Do NOT redirect after the webhook.** Fire-and-forget webhook → redirect = race condition. GHL hasn't created the contact yet when the Route Optimizer tries to load it. Breaks intermittently, hard to debug.
+**Do NOT redirect after the webhook.** Fire-and-forget webhook -> redirect = race condition. GHL may not have created the contact yet when the Route Optimizer tries to load it. Breaks intermittently, hard to debug.
 
 **The right approach: single POST to Route Optimizer backend.**
 
@@ -126,7 +135,7 @@ No API keys in the browser. No race conditions. One round trip.
 | `oil_level: "half_plus"` | Block days at disposal capacity |
 | `access_type: "restricted"` | Longer time buffer per slot |
 
-These are already in the GHL webhook payload — Route Optimizer just needs to read them from the GHL contact record.
+These values are already part of the booking flow. Do not change Route Optimizer constraints from this repo unless the Route Optimizer side is reviewed at the same time.
 
 ### Customer-Facing UI Principles
 - One decision at a time: "Here are 3 dates. Pick one."
@@ -141,7 +150,7 @@ These are already in the GHL webhook payload — Route Optimizer just needs to r
 | Layer | What | Where |
 |---|---|---|
 | Estimator | Single HTML file | GitHub Pages (this repo) |
-| City pricing | Hardcoded array in index.html | Rebuilt from Airtable when prices change |
+| City pricing | Hardcoded array in `booking-funnel.html` | Rebuilt from Airtable with `sync-airtable.js` |
 | Lead capture | GHL webhook | GHL location `3bkvnPQV7Lj7BZp5dbjr` |
 | Booking engine | Route Optimizer backend | Render — `route-optimizer-jps.onrender.com` |
 | CRM + automations | GoHighLevel | GHL |
@@ -153,10 +162,15 @@ These are already in the GHL webhook payload — Route Optimizer just needs to r
 
 | File | Purpose |
 |---|---|
-| `index.html` | The entire app — HTML, CSS, JS in one file |
-| `build-citydata.js` | Node script to rebuild `cityData` from Airtable export |
-| `citydata-output.js` | Generated city array (paste into index.html) |
-| `patch2.js`, `patch3.js` | One-time patches — already applied, kept for reference |
+| `AGENTS.md` | Shared agent rules, protected funnel invariants, and review requirements |
+| `CLAUDE.md` | Claude/session operating context and current live guardrails |
+| `CURRENT_STATE.md` | Current live status, IDs, pending work, and latest deployed change |
+| `BRAND.md` | Visual identity and customer-facing design rules |
+| `booking-funnel.html` | The live booking funnel — HTML, CSS, JS in one file |
+| `index.html` | Older estimator/static entry kept for reference |
+| `sync-airtable.js` | Node script to refresh `cityData` from Airtable |
+| `last_session.md` | Most recent session closeout |
+| `next_session.md` | Next-session starting point and open items |
 
 ---
 
@@ -166,7 +180,7 @@ GitHub Pages auto-deploys from `master`. Push → live in ~1 minute.
 
 ```bash
 export PATH="$PATH:/c/Program Files/GitHub CLI"
-git add index.html
+git add booking-funnel.html
 git commit -m "description"
 git push origin master
 ```
