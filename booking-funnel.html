@@ -495,33 +495,6 @@
       font-weight: 600;
     }
 
-    /* ─── CHECKOUT STATE SELECTOR ─── */
-    .checkout-state-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-top: 6px;
-    }
-    .checkout-state-btn {
-      padding: 12px 8px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      background: var(--bg);
-      color: var(--text-mid);
-      font-size: 14px;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      transition: all var(--transition);
-      text-align: center;
-    }
-    .checkout-state-btn:hover { border-color: var(--brand); color: var(--brand); }
-    .checkout-state-btn.selected {
-      border-color: var(--brand);
-      background: var(--brand-light);
-      color: var(--brand);
-    }
-
     /* ─── CITY INPUT ─── */
     .city-wrap { margin-top: 4px; }
     .city-wrap label {
@@ -962,6 +935,38 @@
       font-weight: 500;
     }
     .field-error.visible { display: block; }
+
+    .quote-state-warning {
+      display: none;
+      margin: 10px 0 14px;
+      padding: 14px 16px;
+      border: 1.5px solid #fed7aa;
+      border-radius: var(--radius-sm);
+      background: #fff7ed;
+      color: #7c2d12;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .quote-state-warning.visible { display: block; }
+    .quote-state-warning strong { color: #431407; }
+    .quote-state-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .quote-state-actions button {
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid #fb923c;
+      background: #fff;
+      color: #7c2d12;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
 
     /* ─── CTA BUTTON — dark navy for premium feel ─── */
     .btn-cta {
@@ -2149,42 +2154,23 @@
     <div class="form-row">
       <div class="form-field">
         <label for="book-city">City *</label>
-        <input type="text" id="book-city" name="city" placeholder="Cranston" autocomplete="address-level2" />
+        <input type="text" id="book-city" name="city" placeholder="Cranston" autocomplete="address-level2" oninput="hideQuoteStateWarning()" />
         <div class="field-error" id="err-city">City required.</div>
       </div>
       <div class="form-field">
         <label for="book-zip">ZIP Code *</label>
         <input type="text" id="book-zip" name="zip" placeholder="02920" inputmode="numeric"
-          autocomplete="postal-code" maxlength="5" />
+          autocomplete="postal-code" maxlength="5" oninput="hideQuoteStateWarning()" />
         <div class="field-error" id="err-zip">5-digit ZIP required.</div>
       </div>
     </div>
 
-    <div class="form-field">
-      <label>State *</label>
-      <div class="checkout-state-grid">
-        <button type="button" class="checkout-state-btn" data-value="RI" onclick="onCheckoutStateChange(this)">Rhode Island</button>
-        <button type="button" class="checkout-state-btn" data-value="MA" onclick="onCheckoutStateChange(this)">Massachusetts</button>
-        <button type="button" class="checkout-state-btn" data-value="CT" onclick="onCheckoutStateChange(this)">Connecticut</button>
+    <div class="quote-state-warning" id="quote-state-warning">
+      <div id="quote-state-warning-text"></div>
+      <div class="quote-state-actions">
+        <button type="button" onclick="focusCheckoutAddress()">Correct address</button>
+        <button type="button" onclick="goToStep(4)">Update quote state</button>
       </div>
-      <div class="field-error" id="err-checkout-state">Please select your state.</div>
-    </div>
-
-    <div class="form-field" id="checkout-city-wrap" style="display:none;">
-      <label for="checkout-city-input">City / Town *</label>
-      <div class="city-input-wrap">
-        <input
-          type="text"
-          id="checkout-city-input"
-          class="city-input"
-          placeholder="Start typing your city..."
-          autocomplete="off"
-          oninput="onCheckoutCityInput(this)"
-          onblur="hideCheckoutAutocompleteSoon()"
-        />
-        <div class="autocomplete-list" id="checkout-autocomplete-list"></div>
-      </div>
-      <div class="field-error" id="err-checkout-city">Please select your city. This determines your permit fee.</div>
     </div>
 
     <div class="form-field">
@@ -3200,98 +3186,53 @@ function hideAutocompleteSoon() {
 }
 
 // ──────────────────────────────────────────────
-// CHECKOUT STATE + CITY (inline at checkout form)
+// CHECKOUT ADDRESS / QUOTE STATE CONSISTENCY
 // ──────────────────────────────────────────────
-function onCheckoutStateChange(el) {
-  document.querySelectorAll('.checkout-state-btn').forEach(b => b.classList.remove('selected'));
-  el.classList.add('selected');
-  const newState = el.dataset.value;
+const STATE_NAMES = { RI: 'Rhode Island', MA: 'Massachusetts', CT: 'Connecticut' };
 
-  // Reset city/permit data when state changes — stale data from prior selection must not persist
-  answers.city = null;
-  answers.permitFee = null;
-  answers.cityRemovalFee = null;
-  const ci = document.getElementById('checkout-city-input');
-  if (ci) { ci.value = ''; ci.classList.remove('has-value'); }
-  const acList = document.getElementById('checkout-autocomplete-list');
-  if (acList) acList.classList.remove('open');
-
-  answers.state = newState;
-  booking.state = newState;
-
-  const cityWrap = document.getElementById('checkout-city-wrap');
-  if (newState === 'MA' || newState === 'CT') {
-    cityWrap.style.display = 'block';
-  } else {
-    cityWrap.style.display = 'none';
-  }
-
-  updateEstimateBar();
+function detectStateFromZip(zip) {
+  const digits = String(zip || '').replace(/\D/g, '');
+  if (digits.length < 3) return null;
+  const prefix = parseInt(digits.slice(0, 3), 10);
+  if (prefix >= 28 && prefix <= 29) return 'RI';
+  if (prefix >= 10 && prefix <= 27) return 'MA';
+  if (prefix >= 60 && prefix <= 69) return 'CT';
+  return null;
 }
 
-function onCheckoutCityInput(input) {
-  const q = input.value.trim().toLowerCase();
-  const list = document.getElementById('checkout-autocomplete-list');
-  if (q.length < 2) { list.classList.remove('open'); return; }
-
-  const matches = cityData.filter(c =>
-    c.state === answers.state && c.city.toLowerCase().startsWith(q)
-  ).slice(0, 8);
-
-  if (!matches.length) {
-    const escaped = input.value.trim().replace(/'/g, "\\'");
-    list.innerHTML = `<div class="autocomplete-item" onclick="selectCheckoutCityFallback('${escaped}')"><span>${input.value.trim()}, ${answers.state}</span><span class="fee-hint">Confirm at booking</span></div>`;
-    list.classList.add('open');
-    return;
-  }
-
-  list.innerHTML = matches.map(c => {
-    const escapedCity = c.city.replace(/'/g, "\\'");
-    const feeVal = c.permit_fee !== undefined ? c.permit_fee : 'null';
-    const hint = c.state === 'CT'
-      ? '$' + (c.removal_fee || 600) + ' flat rate'
-      : (c.permit_fee !== null && c.permit_fee > 0
-          ? '$' + (c.removal_fee || 600) + ' - Permit: $' + c.permit_fee
-          : '$' + (c.removal_fee || 600) + ' - No permit fee');
-    return `<div class="autocomplete-item" onclick="selectCheckoutCity('${escapedCity}', ${feeVal}, ${c.removal_fee || 600})"><span>${c.city}, ${c.state}</span><span class="fee-hint">${hint}</span></div>`;
-  }).join('');
-  list.classList.add('open');
+function detectStateFromCity(city) {
+  const normalized = String(city || '').trim().toLowerCase();
+  if (!normalized) return null;
+  const matches = cityData.filter(c => c.city.toLowerCase() === normalized);
+  const states = [...new Set(matches.map(c => c.state))];
+  return states.length === 1 ? states[0] : null;
 }
 
-function selectCheckoutCity(city, fee, removalFee) {
-  answers.city = city;
-  answers.permitFee = (fee === null || fee === undefined || fee === 'null') ? null : fee;
-  answers.cityRemovalFee = removalFee || 600;
-  answers.permitSource = 'airtable';
-  const input = document.getElementById('checkout-city-input');
-  input.value = city + ', ' + answers.state;
-  input.classList.add('has-value');
-  document.getElementById('checkout-autocomplete-list').classList.remove('open');
-  updateEstimateBar();
+function getCheckoutAddressState(city, zip) {
+  return detectStateFromZip(zip) || detectStateFromCity(city);
 }
 
-function selectCheckoutCityFallback(city) {
-  answers.city = city;
-  answers.permitFee = null;
-  answers.cityRemovalFee = answers.state === 'CT' ? 700 : 600;
-  answers.permitSource = 'tbd';
-  const input = document.getElementById('checkout-city-input');
-  input.value = city + ', ' + answers.state;
-  input.classList.add('has-value');
-  document.getElementById('checkout-autocomplete-list').classList.remove('open');
-  updateEstimateBar();
+function showQuoteStateWarning(expectedState, detectedState) {
+  const warning = document.getElementById('quote-state-warning');
+  const text = document.getElementById('quote-state-warning-text');
+  if (!warning || !text) return;
+  const expectedName = STATE_NAMES[expectedState] || expectedState;
+  const detectedName = STATE_NAMES[detectedState] || detectedState || 'a different state';
+  text.innerHTML = '<strong>You were quoted for ' + expectedName + '.</strong> This address looks like ' + detectedName + '. Please confirm your address. A different state may affect price.';
+  warning.classList.add('visible');
 }
 
-function hideCheckoutAutocompleteSoon() {
-  setTimeout(() => {
-    const list = document.getElementById('checkout-autocomplete-list');
-    if (list) list.classList.remove('open');
-    // If text was typed but no selection made from dropdown, use fallback
-    const input = document.getElementById('checkout-city-input');
-    if (input && input.value.trim() && !input.classList.contains('has-value')) {
-      selectCheckoutCityFallback(input.value.trim().split(',')[0].trim());
-    }
-  }, 200);
+function hideQuoteStateWarning() {
+  const warning = document.getElementById('quote-state-warning');
+  if (warning) warning.classList.remove('visible');
+}
+
+function focusCheckoutAddress() {
+  hideQuoteStateWarning();
+  const cityEl = document.getElementById('book-city');
+  const zipEl = document.getElementById('book-zip');
+  const target = zipEl && !zipEl.value.trim() ? zipEl : cityEl;
+  if (target) target.focus();
 }
 
 // ──────────────────────────────────────────────
@@ -3598,24 +3539,7 @@ function goToCheckout() {
     cityEl.value = answers.city;
   }
   booking.state = answers.state || '';
-
-  // Pre-select checkout state button from quiz answer
-  document.querySelectorAll('.checkout-state-btn').forEach(b => {
-    b.classList.toggle('selected', b.dataset.value === answers.state);
-  });
-
-  // Show checkout city selector if MA (required for permit fee) or CT (required for pricing)
-  const checkoutCityWrap = document.getElementById('checkout-city-wrap');
-  if (answers.state === 'MA' || answers.state === 'CT') {
-    checkoutCityWrap.style.display = 'block';
-    // Pre-fill if city already selected in quiz
-    if (answers.city) {
-      const ci = document.getElementById('checkout-city-input');
-      if (ci) { ci.value = answers.city + ', ' + answers.state; ci.classList.add('has-value'); }
-    }
-  } else {
-    checkoutCityWrap.style.display = 'none';
-  }
+  hideQuoteStateWarning();
 
   // Mirror the locked price into checkout heading
   const priceEl = document.getElementById('checkout-price-display');
@@ -3652,10 +3576,6 @@ function submitCheckout() {
   const zip       = get('book-zip');
   const oilGauge  = document.getElementById('book-oil-gauge').value;
 
-  // Read confirmed state from checkout state selector
-  const checkoutStateBtn = document.querySelector('.checkout-state-btn.selected');
-  const checkoutState    = checkoutStateBtn ? checkoutStateBtn.dataset.value : '';
-
   const showErr = (id, show) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('visible', show);
@@ -3664,8 +3584,6 @@ function submitCheckout() {
   const phoneDigits = phone.replace(/\D/g, '');
   const zipDigits   = zip.replace(/\D/g, '');
 
-  const needsCity = checkoutState === 'MA' && !answers.city;
-
   showErr('err-first',          !firstName);
   showErr('err-last',           !lastName);
   showErr('err-book-phone',     phoneDigits.length < 10);
@@ -3673,20 +3591,22 @@ function submitCheckout() {
   showErr('err-city',           !city);
   showErr('err-zip',            zipDigits.length < 5);
   showErr('err-oil-gauge',      !oilGauge);
-  showErr('err-checkout-state', !checkoutState);
-  showErr('err-checkout-city',  needsCity);
 
   if (!firstName || !lastName || phoneDigits.length < 10 ||
-      !address || !city || zipDigits.length < 5 || !oilGauge || !checkoutState || needsCity) return;
+      !address || !city || zipDigits.length < 5 || !oilGauge) return;
 
-  // Apply confirmed checkout state (may differ from quiz if customer corrected it)
-  answers.state = checkoutState;
+  const checkoutAddressState = getCheckoutAddressState(city, zip);
+  if (checkoutAddressState && answers.state && checkoutAddressState !== answers.state) {
+    showQuoteStateWarning(answers.state, checkoutAddressState);
+    return;
+  }
+  hideQuoteStateWarning();
 
   // Save booking state
   Object.assign(booking, { firstName, lastName, phone, email, address, city, zip, oilGauge,
-    state: checkoutState });
+    state: answers.state || '' });
 
-  // Compute price from quiz answers (answers.state now reflects checkout confirmation)
+  // Compute price from quiz answers
   const BASE      = answers.cityRemovalFee || 600;
   const oilFee    = answers.oil === 'half_plus' ? 150 : 0;
   const permitFee = (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee ?? 0);
