@@ -2414,6 +2414,7 @@ function pushDataLayer(obj) {
   }
 }
 
+let fallbackFunnelRequestId = null;
 function getFunnelRequestId() {
   try {
     let id = sessionStorage.getItem('jps_funnel_request_id');
@@ -2426,7 +2427,10 @@ function getFunnelRequestId() {
     }
     return id;
   } catch(e) {
-    return 'fr_' + String(Date.now()) + '-' + Math.random().toString(36).slice(2);
+    if (!fallbackFunnelRequestId) {
+      fallbackFunnelRequestId = 'fr_' + String(Date.now()) + '-' + Math.random().toString(36).slice(2);
+    }
+    return fallbackFunnelRequestId;
   }
 }
 
