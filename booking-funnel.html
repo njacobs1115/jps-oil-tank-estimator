@@ -2394,6 +2394,7 @@
 const ROUTE_OPTIMIZER_URL  = 'https://route-optimizer-jps.onrender.com';
 const GHL_WEBHOOK_URL      = `${ROUTE_OPTIMIZER_URL}/api/public/funnel-lead`;
 const ESTIMATE_WEBHOOK_URL = `${ROUTE_OPTIMIZER_URL}/api/public/funnel-estimate`;
+const FUNNEL_EVENT_URL     = `${ROUTE_OPTIMIZER_URL}/api/public/funnel-event`;
 
 // ──────────────────────────────────────────────
 // TRACKING HELPERS
@@ -2411,6 +2412,81 @@ function pushDataLayer(obj) {
     // The parent page listener validates the origin and forwards to its GTM dataLayer.
     window.parent.postMessage({ type: 'funnel_dataLayer_event', payload: obj }, '*');
   }
+}
+
+let fallbackFunnelRequestId = null;
+function getFunnelRequestId() {
+  try {
+    let id = sessionStorage.getItem('jps_funnel_request_id');
+    if (!id) {
+      const uuid = window.crypto && window.crypto.randomUUID
+        ? window.crypto.randomUUID()
+        : String(Date.now()) + '-' + Math.random().toString(36).slice(2);
+      id = 'fr_' + uuid;
+      sessionStorage.setItem('jps_funnel_request_id', id);
+    }
+    return id;
+  } catch(e) {
+    if (!fallbackFunnelRequestId) {
+      fallbackFunnelRequestId = 'fr_' + String(Date.now()) + '-' + Math.random().toString(36).slice(2);
+    }
+    return fallbackFunnelRequestId;
+  }
+}
+
+function safeAttribution() {
+  const attr = getAttribution();
+  const cleaned = {};
+  ['gclid','fbclid','utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(function(key) {
+    if (attr[key]) cleaned[key] = String(attr[key]).slice(0, 180);
+  });
+  return Object.keys(cleaned).length ? cleaned : undefined;
+}
+
+function funnelEventBase(extra) {
+  const base = {
+    schema_version: 1,
+    funnel_request_id: getFunnelRequestId(),
+    source: 'booking_funnel',
+    occurred_at: new Date().toISOString(),
+    state: answers.state || undefined,
+    city: answers.city && answers.city !== 'Rhode Island' ? answers.city : undefined,
+    price: booking.estimatedPrice || undefined,
+    base_price: answers.cityRemovalFee || undefined,
+    permit_fee: typeof answers.permitFee === 'number' ? answers.permitFee : undefined,
+    oil_level: answers.oil || undefined,
+    access_type: answers.access || undefined,
+    location_type: answers.location || undefined,
+    exit_type: answers.exit || undefined,
+    attribution: safeAttribution(),
+  };
+  return Object.assign(base, extra || {});
+}
+
+function trackFunnelEvent(eventType, extra) {
+  try {
+    if (!FUNNEL_EVENT_URL) return;
+    const payload = funnelEventBase(Object.assign({ event_type: eventType }, extra || {}));
+    const body = JSON.stringify(payload);
+
+    if (navigator.sendBeacon) {
+      const blob = new Blob([body], { type: 'application/json' });
+      navigator.sendBeacon(FUNNEL_EVENT_URL, blob);
+      return;
+    }
+
+    const controller = window.AbortController ? new AbortController() : null;
+    const timeout = controller ? setTimeout(function() { controller.abort(); }, 750) : null;
+    fetch(FUNNEL_EVENT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: body,
+      keepalive: true,
+      signal: controller ? controller.signal : undefined,
+    }).catch(function() {}).finally(function() {
+      if (timeout) clearTimeout(timeout);
+    });
+  } catch(e) {}
 }
 
 
@@ -2957,6 +3033,11 @@ function showResults() {
 
   computePricing();
   document.getElementById('screen-results').classList.add('active');
+  trackFunnelEvent('price_shown', {
+    price: booking.estimatedPrice,
+    city: answers.city || answers.state,
+    state: answers.state,
+  });
   // GTM: price shown — key engagement event, also fires enhanced conversion data
   const attr = getAttribution();
   pushDataLayer({
@@ -3091,6 +3172,7 @@ function selectState(el) {
     nextBtn.disabled = true;
   }
   updateEstimateBar();
+  trackFunnelEvent('state_selected', { state: answers.state });
 }
 
 // ──────────────────────────────────────────────
@@ -3106,6 +3188,7 @@ function onCityInput(input) {
   input.classList.remove('has-value');
 
   if (val.length < 2) { list.classList.remove('open'); return; }
+  trackCitySearch(val);
 
   const filtered = cityData.filter(c =>
     c.state === answers.state &&
@@ -3132,6 +3215,17 @@ function onCityInput(input) {
   list.classList.add('open');
 }
 
+let lastTrackedCitySearch = { key: '', at: 0 };
+function trackCitySearch(city) {
+  try {
+    const key = (answers.state || '') + ':' + city.toLowerCase();
+    const now = Date.now();
+    if (key === lastTrackedCitySearch.key && now - lastTrackedCitySearch.at < 3000) return;
+    lastTrackedCitySearch = { key: key, at: now };
+    trackFunnelEvent('city_search', { city: city, state: answers.state || undefined });
+  } catch(e) {}
+}
+
 function selectCity(city, fee, removalFee) {
   answers.city = city;
   answers.permitFee = (fee === null || fee === undefined || fee === 'null') ? null : fee;
@@ -3143,6 +3237,12 @@ function selectCity(city, fee, removalFee) {
   document.getElementById('autocomplete-list').classList.remove('open');
   document.getElementById('next-4').disabled = false;
   updateEstimateBar();
+  trackFunnelEvent('city_selected', {
+    city: city,
+    state: answers.state,
+    base_price: answers.cityRemovalFee || undefined,
+    permit_fee: typeof answers.permitFee === 'number' ? answers.permitFee : undefined,
+  });
 }
 
 function selectCityManual(city) {
@@ -3177,6 +3277,11 @@ function selectCityFallback(city) {
     if (!unknown.includes(entry)) { unknown.push(entry); localStorage.setItem('jps_unknown_cities', JSON.stringify(unknown)); }
   } catch(e) {}
   updateEstimateBar();
+  trackFunnelEvent('city_fallback_selected', {
+    city: city,
+    state: answers.state,
+    base_price: answers.cityRemovalFee || undefined,
+  });
 }
 
 function hideAutocompleteSoon() {
@@ -3466,6 +3571,8 @@ function startEstimator() {
   document.getElementById('progress-steps').style.display = 'flex';
   document.getElementById('quiz-shell').style.display = '';
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  getFunnelRequestId();
+  trackFunnelEvent('funnel_started');
   // GTM: customer started the funnel
   pushDataLayer({ event: 'funnel_started' });
 }
@@ -3533,6 +3640,11 @@ function goToScreen(name) {
 function goToCheckout() {
   // GTM: customer clicked "Book My Removal" — committed enough to enter their info
   pushDataLayer({ event: 'funnel_checkout_started', price: booking.estimatedPrice, state: answers.state, city: answers.city || answers.state });
+  trackFunnelEvent('checkout_started', {
+    price: booking.estimatedPrice,
+    state: answers.state,
+    city: answers.city || answers.state,
+  });
   // Pre-fill city from quiz if available
   const cityEl = document.getElementById('book-city');
   if (cityEl && answers.city && answers.city !== 'Rhode Island') {
@@ -3635,6 +3747,11 @@ function submitCheckout() {
     enhanced_first: booking.firstName || undefined,
     enhanced_last:  booking.lastName  || undefined,
   });
+  trackFunnelEvent('contact_info_submitted', {
+    price: booking.estimatedPrice,
+    city: booking.city,
+    state: booking.state,
+  });
 
   // Fire Make webhook + fetch slots in parallel
   // Webhook awaited so we can capture the contactId before booking
@@ -3675,6 +3792,7 @@ async function fireLeadWebhook() {
     utm_term:     attr.utm_term     || '',
     landing_page: attr.landing_page || '',
     referrer:     attr.referrer     || '',
+    funnelRequestId: getFunnelRequestId(),
   };
   try {
     const resp = await fetch(GHL_WEBHOOK_URL, {
@@ -3725,6 +3843,7 @@ async function captureLeadFallback() {
         ...(answers.permitFee > 0 ? { permitFee: answers.permitFee } : {}),
         ...(answers.oil === 'half_plus' ? { oilSurcharge: 150 } : {}),
         serviceType:    'OT',
+        funnelRequestId: getFunnelRequestId(),
       }),
     });
     if (resp.ok) {
@@ -3747,6 +3866,11 @@ function apiOilLevel() { return oilGaugeToApi[booking.oilGauge] || booking.oilGa
 
 async function fetchSlots() {
   const loadingText = document.getElementById('dates-loading-text');
+  trackFunnelEvent('date_lookup_requested', {
+    price: booking.estimatedPrice,
+    city: booking.city,
+    state: booking.state,
+  });
   const payload = JSON.stringify({
     address:     booking.address,
     city:        booking.city,
@@ -3754,6 +3878,7 @@ async function fetchSlots() {
     zip:         booking.zip,
     oilLevel:    apiOilLevel(),
     serviceType: 'OT',
+    funnelRequestId: getFunnelRequestId(),
   });
 
   // Try up to 3 times — Render free tier can take 30s to wake from cold start
@@ -3775,6 +3900,9 @@ async function fetchSlots() {
 
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
       const data = await resp.json();
+      if (data && data.funnelRequestId) {
+        try { sessionStorage.setItem('jps_funnel_request_id', data.funnelRequestId); } catch(e) {}
+      }
       if (!data.success || !data.slots || !data.slots.length) { showDatesError(); return; }
       renderSlots(data.slots);
       return; // success — stop retrying
@@ -3804,6 +3932,12 @@ function renderSlots(slots) {
   document.getElementById('btn-confirm-booking').disabled = true;
   // GTM: appointment slots loaded — customer is one click from booking
   pushDataLayer({ event: 'funnel_dates_shown', slot_count: slots.length, price: booking.estimatedPrice, city: booking.city, state: booking.state });
+  trackFunnelEvent('dates_shown', {
+    slot_count: slots.length,
+    price: booking.estimatedPrice,
+    city: booking.city,
+    state: booking.state,
+  });
 
   slots.slice(0, 3).forEach(function(slot) {
     const card = document.createElement('button');
@@ -3828,11 +3962,22 @@ function selectSlot(card, slot) {
   card.classList.add('selected');
   booking.selectedSlot = slot;
   document.getElementById('btn-confirm-booking').disabled = false;
+  trackFunnelEvent('slot_selected', {
+    selected_slot_rank: slot.rank || undefined,
+    price: booking.estimatedPrice,
+    city: booking.city,
+    state: booking.state,
+  });
 }
 
 function showDatesError() {
   document.getElementById('dates-loading').style.display = 'none';
   document.getElementById('dates-error').style.display   = 'block';
+  trackFunnelEvent('dates_error', {
+    price: booking.estimatedPrice,
+    city: booking.city,
+    state: booking.state,
+  });
 }
 
 // ──────────────────────────────────────────────
@@ -3864,6 +4009,12 @@ function showReviewScreen() {
 // ──────────────────────────────────────────────
 async function confirmBooking() {
   if (!booking.selectedSlot) return;
+  trackFunnelEvent('booking_attempted', {
+    selected_slot_rank: booking.selectedSlot.rank || undefined,
+    price: booking.estimatedPrice,
+    city: booking.city,
+    state: booking.state,
+  });
 
   goToScreen('booking-success');
   document.getElementById('booking-loading').style.display   = 'block';
@@ -3895,6 +4046,7 @@ async function confirmBooking() {
         exitType:       answers.exit        || '',
         tankAccess:     answers.access      || '',
         ghlContactId:   booking.ghlContactId || undefined,
+        funnelRequestId: getFunnelRequestId(),
         tags:           ['calc-booked'],
       }),
     });
@@ -3937,6 +4089,12 @@ function showBookingConfirmed(data) {
     enhanced_first:   booking.firstName || undefined,
     enhanced_last:    booking.lastName  || undefined,
   });
+  trackFunnelEvent('booking_confirmed', {
+    selected_slot_rank: booking.selectedSlot ? booking.selectedSlot.rank || undefined : undefined,
+    price: booking.estimatedPrice,
+    city: booking.city,
+    state: booking.state,
+  });
 
   const nameEl = document.getElementById('booking-success-name');
   if (nameEl) nameEl.textContent = booking.firstName || 'there';
@@ -3959,6 +4117,12 @@ function showBookingFailed(msg) {
   document.getElementById('booking-failed').style.display  = 'block';
   // GTM: booking failed — surface in GA4 so we know when the funnel breaks
   pushDataLayer({ event: 'funnel_booking_failed', reason: msg || 'unknown' });
+  trackFunnelEvent('booking_failed', {
+    selected_slot_rank: booking.selectedSlot ? booking.selectedSlot.rank || undefined : undefined,
+    price: booking.estimatedPrice,
+    city: booking.city,
+    state: booking.state,
+  });
 
   // Surface server message if present (helpful for debugging)
   if (msg) {
@@ -4075,6 +4239,11 @@ async function submitEstimate() {
 
   try {
     var estimateEmail = buildEstimateEmail(firstName, address, city, answers.state || '', zip);
+    trackFunnelEvent('estimate_requested', {
+      price: estimateEmail.total,
+      city: city,
+      state: answers.state || undefined,
+    });
 
     var payload = {
       first_name:     firstName,
