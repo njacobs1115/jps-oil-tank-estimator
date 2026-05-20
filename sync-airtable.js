@@ -96,6 +96,43 @@ function formatEntry(e) {
   return `  {city:${JSON.stringify(e.city)},state:"${e.state}",removal_fee:${e.removal_fee}${permitPart}}`;
 }
 
+function validateEntries(entries) {
+  const seen = new Map();
+  const errors = [];
+
+  for (const entry of entries) {
+    const key = `${entry.state}:${entry.city.trim().toLowerCase()}`;
+    if (!['MA', 'CT'].includes(entry.state)) {
+      errors.push(`${entry.city}: unsupported state ${entry.state}`);
+    }
+    if (!Number.isFinite(entry.removal_fee) || entry.removal_fee <= 0) {
+      errors.push(`${entry.city}, ${entry.state}: invalid removal_fee ${entry.removal_fee}`);
+    }
+    if ('permit_fee' in entry && entry.permit_fee !== null && (!Number.isFinite(entry.permit_fee) || entry.permit_fee < 0)) {
+      errors.push(`${entry.city}, ${entry.state}: invalid permit_fee ${entry.permit_fee}`);
+    }
+
+    const prior = seen.get(key);
+    if (prior) {
+      const priorPermit = 'permit_fee' in prior ? prior.permit_fee : null;
+      const permit = 'permit_fee' in entry ? entry.permit_fee : null;
+      if (prior.removal_fee !== entry.removal_fee || priorPermit !== permit) {
+        errors.push(`${entry.city}, ${entry.state}: duplicate conflicting pricing`);
+      } else {
+        errors.push(`${entry.city}, ${entry.state}: duplicate row`);
+      }
+    }
+    seen.set(key, entry);
+  }
+
+  if (errors.length) {
+    console.error('Airtable pricing validation failed:');
+    errors.slice(0, 25).forEach(err => console.error(`  - ${err}`));
+    if (errors.length > 25) console.error(`  ...and ${errors.length - 25} more`);
+    process.exit(1);
+  }
+}
+
 async function main() {
   console.log('Fetching city data from Airtable...');
 
@@ -112,6 +149,7 @@ async function main() {
   }
 
   console.log(`Total: ${allEntries.length} cities`);
+  validateEntries(allEntries);
 
   // Build the new cityData block
   const lines = allEntries.map(formatEntry);
