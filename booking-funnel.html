@@ -2395,6 +2395,7 @@ const ROUTE_OPTIMIZER_URL  = 'https://route-optimizer-jps.onrender.com';
 const GHL_WEBHOOK_URL      = `${ROUTE_OPTIMIZER_URL}/api/public/funnel-lead`;
 const ESTIMATE_WEBHOOK_URL = `${ROUTE_OPTIMIZER_URL}/api/public/funnel-estimate`;
 const FUNNEL_EVENT_URL     = `${ROUTE_OPTIMIZER_URL}/api/public/funnel-event`;
+const LEAD_CAPTURE_TIMEOUT_MS = 8000;
 
 // ──────────────────────────────────────────────
 // TRACKING HELPERS
@@ -3994,11 +3995,15 @@ async function fireLeadWebhook() {
     funnelRequestId: getFunnelRequestId(),
   };
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(function() { controller.abort(); }, LEAD_CAPTURE_TIMEOUT_MS);
     const resp = await fetch(GHL_WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
     if (resp.ok) {
       const data = await resp.json().catch(() => null);
       if (data?.contactId) {
@@ -4021,9 +4026,12 @@ async function fireLeadWebhook() {
 // funnel-error so Norman's GHL workflow fires automatically.
 async function captureLeadFallback() {
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(function() { controller.abort(); }, LEAD_CAPTURE_TIMEOUT_MS);
     const resp = await fetch(ROUTE_OPTIMIZER_URL + '/api/public/capture-lead', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
       body: JSON.stringify({
         firstName:      booking.firstName,
         lastName:       booking.lastName,
@@ -4046,6 +4054,7 @@ async function captureLeadFallback() {
         ...quoteStatePayload(),
       }),
     });
+    clearTimeout(timeout);
     if (resp.ok) {
       const data = await resp.json().catch(() => null);
       if (data?.contactId) {
