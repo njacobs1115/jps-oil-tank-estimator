@@ -1929,7 +1929,7 @@
 
     <!-- Hero total -->
     <div class="results-hero">
-      <div class="total-label">YOUR FLAT-RATE REMOVAL PRICE</div>
+      <div class="total-label" id="results-total-label">YOUR FLAT-RATE REMOVAL PRICE</div>
       <div class="total-amount" id="results-total-display">$600</div>
       <div class="total-range" id="results-range-display"></div>
       <div class="hero-badge">
@@ -1938,9 +1938,9 @@
     </div>
 
     <!-- Trust note -->
-    <div class="trust-banner">
+    <div class="trust-banner" id="quote-trust-banner">
       <span class="trust-banner-icon">🛡️</span>
-      <span>No upsells. No hidden fees. What you see is what appears on your invoice.</span>
+      <span id="quote-trust-text">No upsells. No hidden fees. What you see is what appears on your invoice.</span>
     </div>
 
     <!-- Access warning (conditional — shown when unsure) -->
@@ -2027,20 +2027,20 @@
     <div class="cta-section">
       <div class="cta-heading">Done in a day. Problem closed.</div>
 
-      <button class="btn-cta" onclick="goToCheckout()">Book My Removal &mdash; Pick a Date &rarr;</button>
-      <div class="btn-cta-sub">No deposit. No payment until your tank is physically gone.</div>
+      <button class="btn-cta" id="primary-cta" onclick="goToCheckout()">Book My Removal &mdash; Pick a Date &rarr;</button>
+      <div class="btn-cta-sub" id="primary-cta-sub">No deposit. No payment until your tank is physically gone.</div>
 
-      <div style="display:flex;align-items:center;gap:12px;margin:16px 0;">
+      <div id="estimate-divider" style="display:flex;align-items:center;gap:12px;margin:16px 0;">
         <div style="flex:1;height:1px;background:var(--border);"></div>
         <span style="font-size:13px;color:var(--muted);white-space:nowrap;">Want this price in writing?</span>
         <div style="flex:1;height:1px;background:var(--border);"></div>
       </div>
 
-      <button class="btn-secondary" onclick="goToEstimate()"
+      <button class="btn-secondary" id="estimate-cta" onclick="goToEstimate()"
         style="width:100%;height:48px;font-size:15px;font-weight:600;">
         Send My Estimate &rarr;
       </button>
-      <div style="text-align:center;font-size:12px;color:var(--muted);margin-top:6px;">
+      <div id="estimate-cta-sub" style="text-align:center;font-size:12px;color:var(--muted);margin-top:6px;">
         We&rsquo;ll send your price in writing &mdash; valid for 14 days.
       </div>
 
@@ -2112,8 +2112,8 @@
   ====================================================== -->
   <div class="screen" id="screen-checkout">
     <div class="step-heading">
-      <h1>Almost there — where should we come?</h1>
-      <p>Your estimate is <strong id="checkout-price-display">locked</strong>. Fill this in and we’ll find the best open dates near you.</p>
+      <h1 id="checkout-heading">Almost there — where should we come?</h1>
+      <p id="checkout-copy">Your estimate is <strong id="checkout-price-display">locked</strong>. Fill this in and we’ll find the best open dates near you.</p>
     </div>
 
     <!-- Honeypot for bots -->
@@ -2297,8 +2297,8 @@
   ====================================================== -->
   <div class="screen" id="screen-estimate-form">
     <div class="step-heading">
-      <h1>Where should we send your estimate?</h1>
-      <p>Your price is <strong id="estimate-price-display">locked</strong>. We&rsquo;ll email it to you &mdash; good for 14 days.</p>
+      <h1 id="estimate-heading">Where should we send your estimate?</h1>
+      <p id="estimate-copy">Your price is <strong id="estimate-price-display">locked</strong>. We&rsquo;ll email it to you &mdash; good for 14 days.</p>
     </div>
 
     <div class="form-row">
@@ -2395,6 +2395,7 @@ const ROUTE_OPTIMIZER_URL  = 'https://route-optimizer-jps.onrender.com';
 const GHL_WEBHOOK_URL      = `${ROUTE_OPTIMIZER_URL}/api/public/funnel-lead`;
 const ESTIMATE_WEBHOOK_URL = `${ROUTE_OPTIMIZER_URL}/api/public/funnel-estimate`;
 const FUNNEL_EVENT_URL     = `${ROUTE_OPTIMIZER_URL}/api/public/funnel-event`;
+const LEAD_CAPTURE_TIMEOUT_MS = 8000;
 
 // ──────────────────────────────────────────────
 // TRACKING HELPERS
@@ -2454,6 +2455,11 @@ function funnelEventBase(extra) {
     price: booking.estimatedPrice || undefined,
     base_price: answers.cityRemovalFee || undefined,
     permit_fee: typeof answers.permitFee === 'number' ? answers.permitFee : undefined,
+    quote_confidence: answers.quoteConfidence || undefined,
+    booking_eligible: typeof bookingEligible === 'function' ? bookingEligible() : undefined,
+    city_match_source: answers.cityMatchSource || undefined,
+    permit_status: answers.permitStatus || undefined,
+    manual_quote_reason: answers.manualQuoteReason || undefined,
     oil_level: answers.oil || undefined,
     access_type: answers.access || undefined,
     location_type: answers.location || undefined,
@@ -2503,8 +2509,49 @@ const answers = {
   city: null,
   permitFee: null,
   permitSource: 'none',
-  cityRemovalFee: null
+  cityRemovalFee: null,
+  quoteConfidence: 'verified',
+  cityMatchSource: 'state_default',
+  permitStatus: 'none_required',
+  manualQuoteReason: null
 };
+
+function isManualQuoteRequired() {
+  return answers.quoteConfidence === 'unknown_city_manual_quote';
+}
+
+function isPermitTbdQuote() {
+  return answers.quoteConfidence === 'ma_permit_tbd';
+}
+
+function bookingEligible() {
+  return !isManualQuoteRequired();
+}
+
+function quoteStatePayload() {
+  return {
+    quoteConfidence: answers.quoteConfidence || 'verified',
+    cityMatchSource: answers.cityMatchSource || 'state_default',
+    permitStatus: answers.permitStatus || 'none_required',
+    manualQuoteReason: answers.manualQuoteReason || undefined,
+  };
+}
+
+function quoteTelemetryFields() {
+  return {
+    quote_confidence: answers.quoteConfidence || 'verified',
+    booking_eligible: bookingEligible(),
+    city_match_source: answers.cityMatchSource || 'state_default',
+    permit_status: answers.permitStatus || 'none_required',
+    manual_quote_reason: answers.manualQuoteReason || undefined,
+  };
+}
+
+function quotePriceLabel() {
+  if (isManualQuoteRequired()) return 'Confirmed price needed';
+  if (isPermitTbdQuote()) return '$' + ((answers.cityRemovalFee || 600) + (answers.oil === 'half_plus' ? 150 : 0)).toLocaleString() + ' + permit';
+  return '$' + (booking.estimatedPrice || 0).toLocaleString();
+}
 
 // ──────────────────────────────────────────────
 // CITY/PERMIT DATA — loaded from Airtable at runtime
@@ -2542,10 +2589,11 @@ let cityData = [
   {city:"Rockland",state:"MA",removal_fee:600,permit_fee:50},
   {city:"Concord",state:"MA",removal_fee:600,permit_fee:50},
   {city:"Westwood",state:"MA",removal_fee:600,permit_fee:40},
-  {city:"Dracut",state:"MA",removal_fee:900,permit_fee:NaN},
+  {city:"Dracut",state:"MA",removal_fee:900,permit_fee:null},
   {city:"Erving",state:"MA",removal_fee:600,permit_fee:null},
   {city:"Brookfield",state:"MA",removal_fee:600,permit_fee:50},
   {city:"Wellesley",state:"MA",removal_fee:600,permit_fee:37},
+  {city:"Malden",state:"MA",removal_fee:800,permit_fee:null},
   {city:"Medford",state:"MA",removal_fee:750,permit_fee:50},
   {city:"Greenfield",state:"MA",removal_fee:600,permit_fee:null},
   {city:"Conway",state:"MA",removal_fee:600,permit_fee:null},
@@ -2574,7 +2622,6 @@ let cityData = [
   {city:"Stow",state:"MA",removal_fee:850,permit_fee:null},
   {city:"Pembroke",state:"MA",removal_fee:600,permit_fee:50},
   {city:"Ayer",state:"MA",removal_fee:775,permit_fee:50},
-  {city:"Brookline",state:"MA",removal_fee:600,permit_fee:null},
   {city:"Norfolk",state:"MA",removal_fee:600,permit_fee:50},
   {city:"Charlemont",state:"MA",removal_fee:600,permit_fee:null},
   {city:"Lancaster",state:"MA",removal_fee:600,permit_fee:null},
@@ -2721,7 +2768,6 @@ let cityData = [
   {city:"Lowell",state:"MA",removal_fee:775,permit_fee:50},
   {city:"Lanesborough",state:"MA",removal_fee:600,permit_fee:null},
   {city:"Springfield",state:"MA",removal_fee:900,permit_fee:50},
-  {city:"Falmouth",state:"MA",removal_fee:775,permit_fee:null},
   {city:"Canton",state:"MA",removal_fee:600,permit_fee:50},
   {city:"Petersham",state:"MA",removal_fee:775,permit_fee:null},
   {city:"Lakeville",state:"MA",removal_fee:600,permit_fee:50},
@@ -2898,7 +2944,6 @@ let cityData = [
   {city:"Guilford",state:"CT",removal_fee:850},
   {city:"Hampton",state:"CT",removal_fee:600},
   {city:"Stonington",state:"CT",removal_fee:600},
-  {city:"Lebanon",state:"CT",removal_fee:600},
   {city:"Franklin",state:"CT",removal_fee:600},
   {city:"Willimantic",state:"CT",removal_fee:600},
   {city:"Lisbon",state:"CT",removal_fee:600},
@@ -3018,7 +3063,7 @@ function continueFromStep1() {
 
 function showResults() {
   if (!answers.state) return;
-  if (answers.state === 'MA' && !answers.city) return;
+  if ((answers.state === 'MA' || answers.state === 'CT') && !answers.city) return;
 
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('quiz-shell').classList.add('results-mode');
@@ -3134,6 +3179,11 @@ function selectState(el) {
   answers.state = el.dataset.value;
   answers.city = null;
   answers.permitFee = null;
+  answers.cityRemovalFee = null;
+  answers.quoteConfidence = null;
+  answers.cityMatchSource = null;
+  answers.permitStatus = null;
+  answers.manualQuoteReason = null;
 
   const riNote = document.getElementById('ri-note');
   const ctNote = document.getElementById('ct-note');
@@ -3150,6 +3200,10 @@ function selectState(el) {
     answers.permitFee = 0;
     answers.permitSource = 'none';
     answers.city = 'Rhode Island';
+    answers.cityRemovalFee = 600;
+    answers.quoteConfidence = 'verified';
+    answers.cityMatchSource = 'state_default';
+    answers.permitStatus = 'none_required';
     nextBtn.disabled = false;
   } else if (answers.state === 'CT') {
     ctNote.style.display = 'flex';
@@ -3157,6 +3211,9 @@ function selectState(el) {
     answers.permitSource = 'none';
     answers.city = null;
     answers.cityRemovalFee = null;
+    answers.quoteConfidence = null;
+    answers.cityMatchSource = null;
+    answers.permitStatus = null;
     // CT needs city for accurate pricing
     cityWrap.style.display = 'block';
     const cityInputCT = document.getElementById('city-input');
@@ -3184,6 +3241,10 @@ function onCityInput(input) {
   answers.city = null;
   answers.permitFee = null;
   answers.cityRemovalFee = null;
+  answers.quoteConfidence = null;
+  answers.cityMatchSource = null;
+  answers.permitStatus = null;
+  answers.manualQuoteReason = null;
   document.getElementById('next-4').disabled = true;
   input.classList.remove('has-value');
 
@@ -3231,6 +3292,12 @@ function selectCity(city, fee, removalFee) {
   answers.permitFee = (fee === null || fee === undefined || fee === 'null') ? null : fee;
   answers.cityRemovalFee = removalFee || 600;
   answers.permitSource = 'airtable';
+  answers.quoteConfidence = (answers.state === 'MA' && answers.permitFee === null) ? 'ma_permit_tbd' : 'verified';
+  answers.cityMatchSource = 'airtable';
+  answers.permitStatus = answers.state === 'MA'
+    ? (answers.permitFee === null ? 'tbd' : 'known')
+    : 'none_required';
+  answers.manualQuoteReason = null;
   const input = document.getElementById('city-input');
   input.value = city + ', ' + answers.state;
   input.classList.add('has-value');
@@ -3242,6 +3309,7 @@ function selectCity(city, fee, removalFee) {
     state: answers.state,
     base_price: answers.cityRemovalFee || undefined,
     permit_fee: typeof answers.permitFee === 'number' ? answers.permitFee : undefined,
+    ...quoteTelemetryFields(),
   });
 }
 
@@ -3250,6 +3318,10 @@ function selectCityManual(city) {
   answers.permitFee = null;
   answers.cityRemovalFee = null;
   answers.permitSource = 'tbd';
+  answers.quoteConfidence = 'unknown_city_manual_quote';
+  answers.cityMatchSource = 'manual';
+  answers.permitStatus = 'manual_quote_required';
+  answers.manualQuoteReason = 'unknown_city';
   const input = document.getElementById('city-input');
   input.value = city + ', ' + answers.state;
   input.classList.add('has-value');
@@ -3258,13 +3330,16 @@ function selectCityManual(city) {
   updateEstimateBar();
 }
 
-// City typed but not found in Airtable — use state-level fallback, still allow submission
+// City typed but not found in Airtable — collect contact info for manual pricing.
 function selectCityFallback(city) {
   answers.city = city;
   answers.permitFee = null;
-  // State-level fallback pricing: CT base $700, MA base $600
-  answers.cityRemovalFee = answers.state === 'CT' ? 700 : 600;
+  answers.cityRemovalFee = null;
   answers.permitSource = 'tbd';
+  answers.quoteConfidence = 'unknown_city_manual_quote';
+  answers.cityMatchSource = 'manual';
+  answers.permitStatus = 'manual_quote_required';
+  answers.manualQuoteReason = 'unknown_city';
   const input = document.getElementById('city-input');
   input.value = city + ', ' + answers.state;
   input.classList.add('has-value');
@@ -3280,7 +3355,7 @@ function selectCityFallback(city) {
   trackFunnelEvent('city_fallback_selected', {
     city: city,
     state: answers.state,
-    base_price: answers.cityRemovalFee || undefined,
+    ...quoteTelemetryFields(),
   });
 }
 
@@ -3357,9 +3432,15 @@ function updateEstimateBar() {
   const amountEl = document.getElementById('estimate-bar-amount');
   const noteEl = document.getElementById('estimate-bar-note');
 
-  if (answers.state === 'MA' && !answers.city) {
+  if (isManualQuoteRequired()) {
+    amountEl.textContent = 'needs confirmation';
+    noteEl.textContent = (answers.city || 'This city') + ' requires a confirmed price';
+  } else if (answers.state === 'MA' && !answers.city) {
     amountEl.textContent = 'from $600+';
     noteEl.textContent = 'Select your city for exact price';
+  } else if (isPermitTbdQuote()) {
+    amountEl.textContent = 'from $' + low.toLocaleString() + ' + permit';
+    noteEl.textContent = 'Permit usually $50-$110, confirmed after booking';
   } else {
     amountEl.textContent = 'from $' + low.toLocaleString();
     noteEl.textContent = answers.state ? answers.state + (answers.city && answers.city !== 'Rhode Island' ? ' · ' + answers.city : '') : 'Based on your answers';
@@ -3374,37 +3455,77 @@ function computePricing() {
   const hasExcessOil = answers.oil === 'half_plus';
   const oilFee = hasExcessOil ? 150 : 0;
   const permitFee = (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee ?? null);
+  const manualQuote = isManualQuoteRequired();
+  const permitTbd = isPermitTbdQuote();
 
   // Totals
   const lowTotal = BASE + oilFee + (permitFee ?? 0);
   const highTotal = BASE + oilFee + (permitFee ?? 0);
+  booking.estimatedPrice = manualQuote ? 0 : lowTotal;
 
   // --- Update UI ---
 
   // Total hero
   const totalEl = document.getElementById('results-total-display');
   const rangeEl = document.getElementById('results-range-display');
+  const labelEl = document.getElementById('results-total-label');
+  const trustText = document.getElementById('quote-trust-text');
+  const primaryCta = document.getElementById('primary-cta');
+  const primarySub = document.getElementById('primary-cta-sub');
+  const estimateDivider = document.getElementById('estimate-divider');
+  const estimateCta = document.getElementById('estimate-cta');
+  const estimateSub = document.getElementById('estimate-cta-sub');
+  const ctaHeading = document.querySelector('.cta-heading');
+  const whyBody = document.getElementById('why-body');
 
   const isFallbackCity = answers.permitSource === 'tbd';
-  if (isFallbackCity && answers.state === 'MA') {
-    totalEl.textContent = '$' + (BASE + oilFee);
-    rangeEl.textContent = '+ permit fee — confirmed when we connect';
-  } else if (isFallbackCity) {
-    totalEl.textContent = 'from $' + lowTotal.toLocaleString();
-    rangeEl.textContent = 'Final price confirmed when we connect';
+  if (manualQuote) {
+    if (labelEl) labelEl.textContent = 'CONFIRMED PRICE NEEDED';
+    totalEl.textContent = 'Price review';
+    rangeEl.textContent = 'We serve many ' + (STATE_NAMES[answers.state] || answers.state) + ' towns, but ' + answers.city + ' is not in our instant-price list yet.';
+    if (trustText) trustText.textContent = 'We will not guess on your price. Send the job details and we will confirm the correct number before anything is scheduled.';
+    if (primaryCta) primaryCta.innerHTML = 'Request Confirmed Price &rarr;';
+    if (primarySub) primarySub.textContent = 'No appointment is booked and no price is locked until we confirm this town.';
+    if (estimateDivider) estimateDivider.style.display = 'none';
+    if (estimateCta) estimateCta.style.display = 'none';
+    if (estimateSub) estimateSub.style.display = 'none';
+    if (ctaHeading) ctaHeading.textContent = 'Get the right number before you book.';
+    if (whyBody) whyBody.textContent = 'This town is outside the instant-price list, so we need to review it before giving a number. That protects you from a low quote that changes later.';
+  } else if (permitTbd) {
+    if (labelEl) labelEl.textContent = 'YOUR REMOVAL PRICE';
+    totalEl.textContent = '$' + (BASE + oilFee).toLocaleString();
+    rangeEl.textContent = '+ town permit, usually $50-$110';
+    if (trustText) trustText.textContent = 'Your removal price is set. Massachusetts requires a town permit, and the exact permit fee will be confirmed shortly after booking.';
+    if (primaryCta) primaryCta.innerHTML = 'Book My Removal &mdash; Pick a Date &rarr;';
+    if (primarySub) primarySub.textContent = 'No deposit. Permit is separate and usually $50-$110 depending on town.';
+    if (estimateDivider) estimateDivider.style.display = 'flex';
+    if (estimateCta) estimateCta.style.display = '';
+    if (estimateSub) estimateSub.style.display = '';
+    if (ctaHeading) ctaHeading.textContent = 'Done in a day. Problem closed.';
+    if (whyBody) whyBody.textContent = 'Your removal price is based on the job details you entered. Massachusetts towns also require permits, and that town fee is usually $50-$110. We confirm the exact permit fee shortly after booking.';
   } else if (permitFee === null) {
+    if (labelEl) labelEl.textContent = 'YOUR REMOVAL PRICE';
     totalEl.textContent = '$' + (BASE + oilFee);
-    rangeEl.textContent = '+ permit fee (confirmed when we connect)';
+    rangeEl.textContent = '+ town permit, usually $50-$110';
   } else {
+    if (labelEl) labelEl.textContent = 'YOUR FLAT-RATE REMOVAL PRICE';
     totalEl.textContent = '$' + lowTotal.toLocaleString();
     rangeEl.textContent = '';
+    if (trustText) trustText.textContent = 'No upsells. No hidden fees. What you see is what appears on your invoice.';
+    if (primaryCta) primaryCta.innerHTML = 'Book My Removal &mdash; Pick a Date &rarr;';
+    if (primarySub) primarySub.textContent = 'No deposit. No payment until your tank is physically gone.';
+    if (estimateDivider) estimateDivider.style.display = 'flex';
+    if (estimateCta) estimateCta.style.display = '';
+    if (estimateSub) estimateSub.style.display = '';
+    if (ctaHeading) ctaHeading.textContent = 'Done in a day. Problem closed.';
+    if (whyBody) whyBody.textContent = "Most contractors bill hourly or charge per gallon of oil. We don't. One flat rate covers the whole job — permits, pumping, cutting, haul-off, and cleanup. We've been doing this since 2013 and we've removed thousands of tanks across RI, MA, and CT. We know exactly what a job costs, and we price it upfront. What you see above is what you pay. No exceptions, no surprises, no callbacks to renegotiate.";
   }
 
   // Base fee
-  document.getElementById('base-fee-display').textContent = isFallbackCity ? 'from $' + BASE : '$' + BASE;
+  document.getElementById('base-fee-display').textContent = manualQuote ? 'TBD' : '$' + BASE;
   document.getElementById('base-sub').textContent =
-    isFallbackCity
-      ? 'Starting price for ' + answers.city + ' — confirmed when we connect'
+    manualQuote
+      ? answers.city + ' is not in our instant-price list yet'
       : answers.location === 'basement'
         ? 'Basement removal — cutting, safe extraction & disposal'
         : 'Cutting, safe removal & disposal';
@@ -3422,7 +3543,12 @@ function computePricing() {
   const permitSub = document.getElementById('permit-sub');
   const permitDisplay = document.getElementById('permit-fee-display');
 
-  if (answers.state === 'RI') {
+  if (manualQuote) {
+    permitLine.style.display = 'flex';
+    permitDisplay.textContent = 'TBD';
+    permitSub.textContent = 'Permit/pricing requirements will be confirmed with your quote';
+    permitDisplay.classList.remove('included');
+  } else if (answers.state === 'RI') {
     // RI: no permit — don't mention it
     permitLine.style.display = 'none';
   } else if (answers.state === 'CT') {
@@ -3430,8 +3556,8 @@ function computePricing() {
     permitLine.style.display = 'none';
   } else if (permitFee === null) {
     permitLine.style.display = 'flex';
-    permitDisplay.textContent = 'TBD';
-    permitSub.textContent = 'Permit fee for ' + (answers.city || 'your city') + ' — confirmed when we connect';
+    permitDisplay.textContent = '$50-$110';
+    permitSub.textContent = 'Massachusetts permit required — exact town fee confirmed shortly after booking';
     permitDisplay.classList.remove('included');
   } else {
     permitLine.style.display = 'flex';
@@ -3442,7 +3568,9 @@ function computePricing() {
 
   // Total line
   const totalLineEl = document.getElementById('total-display');
-  if (permitFee !== null) {
+  if (manualQuote) {
+    totalLineEl.textContent = 'Confirmed after review';
+  } else if (permitFee !== null) {
     totalLineEl.textContent = '$' + lowTotal;
   } else {
     totalLineEl.textContent = '$' + (BASE + oilFee) + ' + permit';
@@ -3644,6 +3772,7 @@ function goToCheckout() {
     price: booking.estimatedPrice,
     state: answers.state,
     city: answers.city || answers.state,
+    ...quoteTelemetryFields(),
   });
   // Pre-fill city from quiz if available
   const cityEl = document.getElementById('book-city');
@@ -3654,8 +3783,24 @@ function goToCheckout() {
   hideQuoteStateWarning();
 
   // Mirror the locked price into checkout heading
+  const headingEl = document.getElementById('checkout-heading');
+  const copyEl = document.getElementById('checkout-copy');
+  const findBtn = document.getElementById('btn-find-dates');
+  if (isManualQuoteRequired()) {
+    if (headingEl) headingEl.textContent = 'Where should we confirm your price?';
+    if (copyEl) copyEl.innerHTML = 'Your city needs a confirmed price before online booking. Fill this in and we&rsquo;ll review the job details.';
+    if (findBtn) findBtn.textContent = 'Request Confirmed Price \u2192';
+  } else if (isPermitTbdQuote()) {
+    if (headingEl) headingEl.textContent = 'Almost there — where should we come?';
+    if (copyEl) copyEl.innerHTML = 'Your removal price is <strong id="checkout-price-display">' + quotePriceLabel() + '</strong>. Town permit is usually $50-$110 and will be confirmed shortly after booking.';
+    if (findBtn) findBtn.textContent = 'Find Available Dates \u2192';
+  } else {
+    if (headingEl) headingEl.textContent = 'Almost there — where should we come?';
+    if (copyEl) copyEl.innerHTML = 'Your estimate is <strong id="checkout-price-display">locked</strong>. Fill this in and we&rsquo;ll find the best open dates near you.';
+    if (findBtn) findBtn.textContent = 'Find Available Dates \u2192';
+  }
   const priceEl = document.getElementById('checkout-price-display');
-  if (priceEl) {
+  if (!isManualQuoteRequired() && priceEl) {
     const heroEl = document.getElementById('results-total-display');
     if (heroEl) priceEl.textContent = heroEl.textContent;
   }
@@ -3722,7 +3867,12 @@ function submitCheckout() {
   const BASE      = answers.cityRemovalFee || 600;
   const oilFee    = answers.oil === 'half_plus' ? 150 : 0;
   const permitFee = (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee ?? 0);
-  booking.estimatedPrice = BASE + oilFee + (permitFee || 0);
+  booking.estimatedPrice = isManualQuoteRequired() ? 0 : BASE + oilFee + (permitFee || 0);
+
+  if (isManualQuoteRequired()) {
+    submitManualQuoteRequest();
+    return;
+  }
 
   // Show dates screen in loading state
   goToScreen('dates');
@@ -3751,12 +3901,59 @@ function submitCheckout() {
     price: booking.estimatedPrice,
     city: booking.city,
     state: booking.state,
+    ...quoteTelemetryFields(),
   });
 
   // Fire Make webhook + fetch slots in parallel
   // Webhook awaited so we can capture the contactId before booking
-  fireLeadWebhook();  // async — runs in background, stores contactId when done
-  fetchSlots();       // runs immediately in parallel
+  fireLeadWebhook().finally(fetchSlots);
+}
+
+async function submitManualQuoteRequest() {
+  goToScreen('booking-success');
+  document.getElementById('booking-loading').style.display   = 'block';
+  document.getElementById('booking-confirmed').style.display = 'none';
+  document.getElementById('booking-failed').style.display    = 'none';
+
+  trackFunnelEvent('manual_quote_requested', {
+    city: booking.city,
+    state: booking.state,
+    ...quoteTelemetryFields(),
+  });
+
+  try {
+    const resp = await fetch(ROUTE_OPTIMIZER_URL + '/api/public/manual-quote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firstName:      booking.firstName,
+        lastName:       booking.lastName,
+        phone:          booking.phone,
+        email:          booking.email || undefined,
+        address:        booking.address,
+        city:           booking.city,
+        state:          booking.state,
+        zip:            booking.zip,
+        oilLevel:       apiOilLevel(),
+        tankLocation:   answers.location ? answers.location.charAt(0).toUpperCase() + answers.location.slice(1) : answers.location,
+        exitType:       answers.exit     ? answers.exit.charAt(0).toUpperCase()     + answers.exit.slice(1)     : answers.exit,
+        tankAccess:     answers.access === 'standard' ? 'Yes' : answers.access === 'restricted' ? 'No' : 'Unsure',
+        serviceType:    'OT',
+        funnelRequestId: getFunnelRequestId(),
+        ...quoteStatePayload(),
+      }),
+    });
+    const data = await resp.json().catch(() => null);
+    if (!resp.ok || !data?.success) {
+      showBookingFailed(data?.error || null);
+      return;
+    }
+    booking.ghlContactId = data.contactId || booking.ghlContactId;
+    showManualQuoteSubmitted();
+  } catch (err) {
+    console.error('[Funnel] manual quote request failed:', err);
+    showBookingFailed();
+  }
 }
 
 async function fireLeadWebhook() {
@@ -3781,6 +3978,9 @@ async function fireLeadWebhook() {
     base_removal_fee:     answers.cityRemovalFee || 600,
     estimated_total:      booking.estimatedPrice,
     permit_fee:           (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee ?? 'TBD'),
+    quote_confidence:     answers.quoteConfidence || 'verified',
+    city_match_source:    answers.cityMatchSource || 'state_default',
+    permit_status:        answers.permitStatus || 'none_required',
     source:               'booking_funnel',
     created_at:           new Date().toISOString(),
     gclid:        attr.gclid        || '',
@@ -3795,11 +3995,15 @@ async function fireLeadWebhook() {
     funnelRequestId: getFunnelRequestId(),
   };
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(function() { controller.abort(); }, LEAD_CAPTURE_TIMEOUT_MS);
     const resp = await fetch(GHL_WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
     if (resp.ok) {
       const data = await resp.json().catch(() => null);
       if (data?.contactId) {
@@ -3822,9 +4026,12 @@ async function fireLeadWebhook() {
 // funnel-error so Norman's GHL workflow fires automatically.
 async function captureLeadFallback() {
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(function() { controller.abort(); }, LEAD_CAPTURE_TIMEOUT_MS);
     const resp = await fetch(ROUTE_OPTIMIZER_URL + '/api/public/capture-lead', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
       body: JSON.stringify({
         firstName:      booking.firstName,
         lastName:       booking.lastName,
@@ -3844,8 +4051,10 @@ async function captureLeadFallback() {
         ...(answers.oil === 'half_plus' ? { oilSurcharge: 150 } : {}),
         serviceType:    'OT',
         funnelRequestId: getFunnelRequestId(),
+        ...quoteStatePayload(),
       }),
     });
+    clearTimeout(timeout);
     if (resp.ok) {
       const data = await resp.json().catch(() => null);
       if (data?.contactId) {
@@ -3870,6 +4079,7 @@ async function fetchSlots() {
     price: booking.estimatedPrice,
     city: booking.city,
     state: booking.state,
+    ...quoteTelemetryFields(),
   });
   const payload = JSON.stringify({
     address:     booking.address,
@@ -3879,6 +4089,7 @@ async function fetchSlots() {
     oilLevel:    apiOilLevel(),
     serviceType: 'OT',
     funnelRequestId: getFunnelRequestId(),
+    ...quoteStatePayload(),
   });
 
   // Try up to 3 times — Render free tier can take 30s to wake from cold start
@@ -3937,6 +4148,7 @@ function renderSlots(slots) {
     price: booking.estimatedPrice,
     city: booking.city,
     state: booking.state,
+    ...quoteTelemetryFields(),
   });
 
   slots.slice(0, 3).forEach(function(slot) {
@@ -3967,6 +4179,7 @@ function selectSlot(card, slot) {
     price: booking.estimatedPrice,
     city: booking.city,
     state: booking.state,
+    ...quoteTelemetryFields(),
   });
 }
 
@@ -3977,6 +4190,7 @@ function showDatesError() {
     price: booking.estimatedPrice,
     city: booking.city,
     state: booking.state,
+    ...quoteTelemetryFields(),
   });
 }
 
@@ -3991,7 +4205,9 @@ function showReviewScreen() {
   document.getElementById('rv-address').textContent = [booking.address, booking.city, booking.state, booking.zip].filter(Boolean).join(', ');
   document.getElementById('rv-date').textContent    = booking.selectedSlot.displayDate || booking.selectedSlot.date || '';
   document.getElementById('rv-time').textContent    = booking.selectedSlot.time || '';
-  document.getElementById('rv-price').textContent   = booking.estimatedPrice ? '$' + booking.estimatedPrice : '';
+  document.getElementById('rv-price').textContent   = isPermitTbdQuote()
+    ? '$' + booking.estimatedPrice + ' + permit ($50-$110 typical)'
+    : (booking.estimatedPrice ? '$' + booking.estimatedPrice : '');
 
   const emailRow = document.getElementById('rv-email-row');
   if (booking.email) {
@@ -4014,6 +4230,7 @@ async function confirmBooking() {
     price: booking.estimatedPrice,
     city: booking.city,
     state: booking.state,
+    ...quoteTelemetryFields(),
   });
 
   goToScreen('booking-success');
@@ -4048,6 +4265,7 @@ async function confirmBooking() {
         ghlContactId:   booking.ghlContactId || undefined,
         funnelRequestId: getFunnelRequestId(),
         tags:           ['calc-booked'],
+        ...quoteStatePayload(),
       }),
     });
     let data;
@@ -4094,10 +4312,22 @@ function showBookingConfirmed(data) {
     price: booking.estimatedPrice,
     city: booking.city,
     state: booking.state,
+    ...quoteTelemetryFields(),
   });
 
   const nameEl = document.getElementById('booking-success-name');
   if (nameEl) nameEl.textContent = booking.firstName || 'there';
+  const heading = document.querySelector('#booking-confirmed .success-heading');
+  const body = document.querySelector('#booking-confirmed .success-body');
+  const detail = document.querySelector('#booking-confirmed .success-detail');
+  if (heading) heading.textContent = 'Your appointment request has been received.';
+  if (body) body.textContent = 'You\u2019ll receive a confirmation text shortly with your appointment details. Thank you and enjoy the rest of your day!';
+  if (detail) {
+    detail.innerHTML =
+      'We arrive, pump the tank, cut it up, and haul everything away \u2014 all in one visit. ' +
+      'You don\u2019t need to be there, just make sure we have access.<br /><br />' +
+      'Questions? Call or text Norman directly: <strong><a href="tel:+14013893200" style="color:var(--brand)">(401) 389-3200</a></strong>';
+  }
 
   const summaryEl = document.getElementById('booking-summary-box');
   if (summaryEl && booking.selectedSlot) {
@@ -4108,7 +4338,37 @@ function showBookingConfirmed(data) {
       '<strong>Date:</strong> '    + displayDate + '<br>' +
       '<strong>Time:</strong> '    + booking.selectedSlot.time + '<br>' +
       '<strong>Address:</strong> ' + booking.address + ', ' + booking.city + ', ' + booking.state + ' ' + booking.zip + '<br>' +
-      '<strong>Est. price:</strong> $' + booking.estimatedPrice;
+      '<strong>Est. price:</strong> ' + (isPermitTbdQuote() ? '$' + booking.estimatedPrice + ' + permit ($50-$110 typical)' : '$' + booking.estimatedPrice);
+  }
+}
+
+function showManualQuoteSubmitted() {
+  document.getElementById('booking-loading').style.display   = 'none';
+  document.getElementById('booking-confirmed').style.display = 'block';
+  document.getElementById('booking-failed').style.display    = 'none';
+  trackFunnelEvent('manual_quote_submitted', {
+    city: booking.city,
+    state: booking.state,
+    ...quoteTelemetryFields(),
+  });
+
+  const heading = document.querySelector('#booking-confirmed .success-heading');
+  const body = document.querySelector('#booking-confirmed .success-body');
+  const detail = document.querySelector('#booking-confirmed .success-detail');
+  const summaryEl = document.getElementById('booking-summary-box');
+
+  if (heading) heading.textContent = 'Your price request has been sent.';
+  if (body) body.textContent = 'We have your job details. Kelly or Norman will confirm the correct price for ' + booking.city + ' before anything is scheduled.';
+  if (summaryEl) {
+    summaryEl.innerHTML =
+      '<strong>City:</strong> ' + booking.city + ', ' + booking.state + '<br>' +
+      '<strong>Address:</strong> ' + booking.address + ', ' + booking.city + ', ' + booking.state + ' ' + booking.zip + '<br>' +
+      '<strong>Status:</strong> confirmed price needed';
+  }
+  if (detail) {
+    detail.innerHTML =
+      'No appointment has been booked yet, and no price has been locked. We will review the town, permit requirements, and travel before confirming the number.<br /><br />' +
+      'Questions? Call or text Norman directly: <strong><a href="tel:+14013893200" style="color:var(--brand)">(401) 389-3200</a></strong>';
   }
 }
 
@@ -4122,20 +4382,10 @@ function showBookingFailed(msg) {
     price: booking.estimatedPrice,
     city: booking.city,
     state: booking.state,
+    ...quoteTelemetryFields(),
   });
 
-  // Surface server message if present (helpful for debugging)
-  if (msg) {
-    const failEl = document.getElementById('booking-failed');
-    const existing = failEl.querySelector('.booking-fail-detail');
-    if (!existing) {
-      const detail = document.createElement('p');
-      detail.className = 'booking-fail-detail';
-      detail.style.cssText = 'color:#6b7280;font-size:0.8rem;margin-top:8px;';
-      detail.textContent = 'Details: ' + msg;
-      failEl.appendChild(detail);
-    }
-  }
+  // Keep customer copy non-technical; server details stay in logs/telemetry.
 }
 
 
@@ -4144,8 +4394,8 @@ function showBookingFailed(msg) {
 function buildEstimateEmail(firstName, address, city, state, zip) {
   var basePrice   = answers.cityRemovalFee || 600;
   var oilFee      = answers.oil === 'half_plus' ? 150 : 0;
-  var permitFee   = (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee || 0);
-  var total       = basePrice + oilFee + permitFee;
+  var permitFee   = (answers.state === 'RI' || answers.state === 'CT') ? 0 : answers.permitFee;
+  var total       = isManualQuoteRequired() ? 0 : basePrice + oilFee + (permitFee || 0);
   var location    = answers.location || 'Basement';
   var bookingUrl  = window.location.origin + window.location.pathname;
 
@@ -4153,9 +4403,12 @@ function buildEstimateEmail(firstName, address, city, state, zip) {
     ? '<tr style="border-top:1px solid #e0e0e0;"><td style="padding:14px 20px;font-size:15px;color:#333;">Excess Oil Disposal</td><td style="padding:14px 20px;font-size:15px;color:#333;text-align:right;">$' + oilFee + '</td></tr>'
     : '';
 
-  var permitRow = permitFee > 0
+  var permitRow = isPermitTbdQuote()
+    ? '<tr style="border-top:1px solid #e0e0e0;"><td style="padding:14px 20px;font-size:15px;color:#333;">Massachusetts Permit (' + city + ', ' + state + ')</td><td style="padding:14px 20px;font-size:15px;color:#333;text-align:right;">$50-$110 typical</td></tr>'
+    : permitFee > 0
     ? '<tr style="border-top:1px solid #e0e0e0;"><td style="padding:14px 20px;font-size:15px;color:#333;">Permit Fee (' + city + ', ' + state + ')</td><td style="padding:14px 20px;font-size:15px;color:#333;text-align:right;">$' + permitFee + '</td></tr>'
     : '';
+  var totalLabel = isPermitTbdQuote() ? '$' + total + ' + permit' : '$' + total;
 
   var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,sans-serif;">'
     + '<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;padding:40px 0;"><tr><td align="center">'
@@ -4174,7 +4427,7 @@ function buildEstimateEmail(firstName, address, city, state, zip) {
     + '<tr style="border-top:1px solid #e0e0e0;"><td style="padding:14px 20px;font-size:15px;color:#333;">Oil Tank Removal (' + location + ')</td><td style="padding:14px 20px;font-size:15px;color:#333;text-align:right;">$' + basePrice + '</td></tr>'
     + oilRow
     + permitRow
-    + '<tr style="background:#1a1a2e;"><td style="padding:16px 20px;font-size:16px;font-weight:bold;color:#ffffff;">Estimated Total</td><td style="padding:16px 20px;font-size:20px;font-weight:bold;color:#ffffff;text-align:right;">$' + total + '</td></tr>'
+    + '<tr style="background:#1a1a2e;"><td style="padding:16px 20px;font-size:16px;font-weight:bold;color:#ffffff;">Estimated Total</td><td style="padding:16px 20px;font-size:20px;font-weight:bold;color:#ffffff;text-align:right;">' + totalLabel + '</td></tr>'
     + '</table>'
     + (answers.oil === 'half_plus'
         ? '<p style="margin:10px 0 0;font-size:12px;color:#999;">Price is based on information provided. Pricing &amp; details are confirmed at booking.</p>'
@@ -4189,16 +4442,26 @@ function buildEstimateEmail(firstName, address, city, state, zip) {
     + '</td></tr>'
     + '</table></td></tr></table></body></html>';
 
-  var subject = 'Your Oil Tank Removal Estimate \u2014 $' + total;
+  var subject = 'Your Oil Tank Removal Estimate \u2014 ' + totalLabel;
   return { html: html, subject: subject, total: total };
 }
 
 function goToEstimate() {
+  if (isManualQuoteRequired()) {
+    goToCheckout();
+    return;
+  }
   var cityEl = document.getElementById('est-city');
   if (cityEl && answers.city && answers.city !== 'Rhode Island') {
     cityEl.value = answers.city;
   }
   var priceEl = document.getElementById('estimate-price-display');
+  var headingEl = document.getElementById('estimate-heading');
+  var copyEl = document.getElementById('estimate-copy');
+  if (headingEl) headingEl.textContent = 'Where should we send your estimate?';
+  if (copyEl && isPermitTbdQuote()) copyEl.innerHTML = 'Your removal price is <strong id="estimate-price-display">' + quotePriceLabel() + '</strong>. Town permit is usually $50-$110 and will be confirmed shortly after booking.';
+  if (copyEl && !isPermitTbdQuote()) copyEl.innerHTML = 'Your price is <strong id="estimate-price-display">locked</strong>. We&rsquo;ll email it to you &mdash; good for 14 days.';
+  priceEl = document.getElementById('estimate-price-display');
   if (priceEl) {
     var heroEl = document.getElementById('results-total-display');
     if (heroEl) priceEl.textContent = heroEl.textContent;
@@ -4243,6 +4506,7 @@ async function submitEstimate() {
       price: estimateEmail.total,
       city: city,
       state: answers.state || undefined,
+      ...quoteTelemetryFields(),
     });
 
     var payload = {
@@ -4266,6 +4530,9 @@ async function submitEstimate() {
       base_removal_fee:     answers.cityRemovalFee || 600,
       estimated_total:      estimateEmail.total,
       permit_fee:           (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee ?? 'TBD'),
+      quote_confidence:     answers.quoteConfidence || 'verified',
+      city_match_source:    answers.cityMatchSource || 'state_default',
+      permit_status:        answers.permitStatus || 'none_required',
       email_subject:        estimateEmail.subject,
       email_html:           estimateEmail.html,
       source:               'estimate_funnel',
@@ -4298,7 +4565,7 @@ async function submitEstimate() {
 
   document.getElementById('estimate-sent-name').textContent    = firstName;
   document.getElementById('estimate-sent-email').textContent   = email;
-  document.getElementById('estimate-sent-price').textContent   = '$' + estimateEmail.total;
+  document.getElementById('estimate-sent-price').textContent   = isPermitTbdQuote() ? '$' + estimateEmail.total + ' + permit' : '$' + estimateEmail.total;
   document.getElementById('estimate-sent-address').textContent = address + ', ' + city + ', ' + (answers.state || '') + ' ' + zip;
   goToScreen('estimate-sent');
 }

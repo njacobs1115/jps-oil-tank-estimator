@@ -1,42 +1,59 @@
-# Last Session - 2026-05-10
+# Last Session - 2026-05-19
 
-## What We Worked On
-- Picked up Claude's hung PR `#29` on branch `fix/funnel-fee-state-gate`.
-- Re-scoped the change away from a second checkout state/city picker.
-- Shipped the lower-friction fix Norman wanted: checkout address city/ZIP is checked against the state used for the quote.
-- If the checkout address appears to be in a different state, the funnel stops before date lookup and shows:
-  - "You were quoted for [state]. This address looks like [state]. Please confirm your address. A different state may affect price."
-- Customer can correct city/ZIP in place or go back to the quote state step.
+## What Changed
+- Built the approved quote-guardrail implementation locally.
+- No code was staged, committed, merged, or deployed.
+- Estimator frontend and Route Optimizer backend were both changed.
 
-## Merge / Deploy State
-- PR `#29`: merged into `master`.
-- Merge commit: `7a7ce96650cb78f30386fab7f3a32bc2548cdd5c`.
-- Feature commit: `73e6525` (`fix: warn on checkout quote-state mismatch`).
-- GitHub Pages deploy run: `25646995350`, completed successfully.
-- Live GitHub Pages file verified: `https://njacobs1115.github.io/jps-oil-tank-estimator/booking-funnel.html`.
+## Estimator Changes
+- Added canonical quote states: `verified`, `ma_permit_tbd`, `unknown_city_manual_quote`.
+- Removed unknown MA/CT fallback pricing from the customer path.
+- Unknown city now shows confirmed-price request copy, not a price.
+- Unknown city submit uses the booking contact fields but calls `/api/public/manual-quote`.
+- Unknown city path does not call date lookup or booking.
+- MA permit-TBD remains bookable and says permit is required, usually `$50-$110`, exact fee confirmed shortly after booking.
+- Normal verified-city booking path remains intact.
+- Lead/contact capture now completes before slot lookup starts.
+- Added focused local test: `test-quote-guardrails.js`.
 
-## Validation
-- Local browser smoke:
-  - RI quote + RI address reaches date lookup.
-  - MA quote + MA address reaches date lookup.
-  - CT quote + CT address reaches date lookup.
-  - RI quote + MA ZIP blocks before any fetch/webhook/date call.
-  - MA quote + CT ZIP blocks before any fetch/webhook/date call.
-  - Editing city/ZIP clears the warning.
-  - "Update quote state" returns to step 4.
-  - Estimate email path still reaches `screen-estimate-sent`.
-- Live browser smoke:
-  - RI quote + MA ZIP shows the warning and makes zero fetch calls.
-- `git diff --check` passed except the existing Windows LF/CRLF warning.
+## City Data
+- Added `Malden, MA` at removal fee `$800`, permit TBD.
+- Fixed `Dracut, MA` permit from `NaN` to `null`.
+- Removed duplicate/conflicting `Falmouth, MA`, `Brookline, MA`, and duplicate `Lebanon, CT`.
+- Added validation to `sync-airtable.js` so future syncs fail on NaN fees, duplicate/conflicting city rows, missing removal fees, or unsupported states.
+- `AIRTABLE_API_TOKEN` was not present locally, so live Airtable sync was not run.
 
-## Branch Protection Note
-- `codex-review` passed.
-- `adversarial-review` escalated because booking/checkout behavior is protected by policy.
-- Norman approved merge/deploy with token `1228`.
-- Branch protection was temporarily relaxed only for the merge window, then restored with required review, `codex-review`, `adversarial-review`, admin enforcement, and conversation resolution.
+## Backend Changes In Route Optimizer
+- `server/public-api.ts`
+  - added quote-state schema fields
+  - rejects `unknown_city_manual_quote` on `/find-slots` and `/book`
+  - added `/api/public/manual-quote`
+  - applies allowlisted `funnel-manual-quote-needed`
+  - sends Telegram alert with dedupe
+  - adds kill switch `DISABLE_MANUAL_QUOTE_CAPTURE`
+  - writes booking intent contact fields + contact note before appointment creation
+  - blocks booking if intent persistence fails
+- `server/ghl.ts`
+  - added `addContactNote`
+- `server/funnel-events.ts`
+  - added quote-state telemetry fields and manual quote events
+- Added `server/public-api-quote-state.test.ts`.
 
-## Current State at Close
-- Live funnel is deployed with quote-state mismatch warning.
-- Routing logic, Maps/API logic, slot ranking, booking confirmation, webhook URLs, GHL payload fields, Telegram/rescue logic, pricing formula, and tracking events were not intentionally changed.
-- Local `master` is fast-forwarded to `origin/master`.
-- Untracked local scratch/project files remain present and were not touched except shared docs updated after deployment.
+## Verification
+- `node test-quote-guardrails.js` passed.
+- `node node_modules\typescript\bin\tsc` passed in Route Optimizer.
+- `node node_modules\tsx\dist\cli.cjs server\funnel-events.test.ts` passed.
+- `node node_modules\tsx\dist\cli.cjs server\public-api-quote-state.test.ts` passed.
+- Browser smoke passed using local `booking-funnel.html`:
+  - unknown `Faketown, MA` showed manual quote copy
+  - submitted to `/manual-quote`
+  - did not call `/find-slots`
+  - did not call `/book`
+  - `Malden, MA` showed `$800` and `$50-$110` permit caveat
+  - `Malden, MA` remained bookable
+
+## Still Required
+- Review diffs carefully.
+- Run required review/gate process before merge/deploy.
+- Verify Airtable sync/live truth for Malden and cleaned city data.
+- Coordinate estimator + Route Optimizer deploy order.
