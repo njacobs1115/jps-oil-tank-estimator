@@ -82,10 +82,10 @@ The customer can correct city/ZIP in place or return to step 4 to update the quo
 | Permit fee (MA) | City-specific from `cityData` — shown as line item |
 | Permit fee (CT) | None — green banner shown |
 | Permit fee (RI) | None — green banner shown |
-| Unknown city | Soft fallback — state default price, keeps lead in funnel, logs to `jps_unknown_cities` in localStorage |
+| Unknown MA/CT city | No fallback price. Customer sees confirmed-price request path; funnel calls `/api/public/manual-quote` and does not fetch dates or book. |
 
 ### City Data
-373 MA cities + 70 CT cities hardcoded into `cityData` array in `booking-funnel.html` — no runtime API calls, instant load. Rebuild with `sync-airtable.js` if pricing changes.
+City pricing is hardcoded into `cityData` in `booking-funnel.html` for instant load. Rebuild with `sync-airtable.js` if pricing changes. Validation fails on NaN fees, duplicate/conflicting city rows, missing removal fees, or unsupported states.
 
 ### GHL / Route Optimizer Integration
 
