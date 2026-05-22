@@ -41,5 +41,16 @@ assert('unknown city fallback does not assign MA/CT default prices', !html.inclu
 assert('manual quote endpoint is wired', html.includes("/api/public/manual-quote"));
 assert('unknown-city quote state is wired', html.includes("unknown_city_manual_quote"));
 assert('date lookup receives quote state', html.includes("...quoteStatePayload()"));
+assert('lead capture timeout remains wired', html.includes("LEAD_CAPTURE_TIMEOUT_MS") && html.includes("signal: controller.signal"));
+assert('GHL tank location normalization is wired', html.includes("tankLocation:   ghlTankLocation()"));
+assert('GHL exit type normalization is wired', html.includes("exitType:       ghlExitType()"));
+assert('GHL pricing oil normalization is wired', html.includes("oil_level_pricing:    ghlPricingOilLevel()"));
+assert('GHL remaining oil value is sent', html.includes("remaining_oil:"));
+assert('GHL remaining oil gauge value is sent', html.includes("ghlOilLevel:    booking.oilGauge || undefined"));
+assert('GHL accessibility only sends live Tight Access option', html.includes("return 'Tight Access'") && !html.includes("return 'Yes';"));
+assert('accessible tanks do not send an empty tank access value', !html.includes("tankAccess:     ghlTankAccess()     || ''"));
+assert('unsure access sends uppercase job details', html.includes("return 'POTENTIAL ACCESS ISSUES'"));
+assert('direct public API payloads carry job details', html.includes("jobDetails:     ghlJobDetails()"));
+assert('Make proxy payloads carry job details', html.includes("job_details:          ghlJobDetails()"));
 
 if (process.exitCode) process.exit(process.exitCode);
