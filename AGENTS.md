@@ -6,11 +6,12 @@ Public-facing JPS oil tank estimator and booking funnel. This is live customer-f
 ## Read First
 1. `next_session.md`
 2. `last_session.md`
-3. `README.md`
-4. `CLAUDE.md`
+3. `PROJECT_DECISIONS.md`
+4. `README.md`
+5. `CLAUDE.md`
 
 ## Agent Lanes
-- Shared repo truth lives in `README.md`, `AGENTS.md`, and approved funnel/runbook docs.
+- Shared repo truth lives in `README.md`, `AGENTS.md`, `PROJECT_DECISIONS.md`, and approved funnel/runbook docs.
 - Codex private scratch lives under `.codex/`.
 - Claude private scratch lives under `.claude/`.
 - Do not edit the other agent's private lane.
