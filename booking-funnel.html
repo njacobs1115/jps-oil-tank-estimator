@@ -2547,6 +2547,36 @@ function quoteTelemetryFields() {
   };
 }
 
+function capitalizedFunnelValue(value) {
+  if (!value) return value;
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function ghlTankLocation() {
+  return capitalizedFunnelValue(answers.location);
+}
+
+function ghlExitType() {
+  return capitalizedFunnelValue(answers.exit);
+}
+
+function ghlPricingOilLevel() {
+  if (answers.oil === 'quarter') return '1/4';
+  if (answers.oil === 'half_plus') return '1/2';
+  if (answers.oil === 'no_gauge') return 'I dont know';
+  return capitalizedFunnelValue(answers.oil);
+}
+
+function ghlTankAccess() {
+  if (answers.access === 'restricted') return 'Tight Access';
+  return undefined;
+}
+
+function ghlJobDetails() {
+  if (answers.access === 'unsure') return 'POTENTIAL ACCESS ISSUES';
+  return undefined;
+}
+
 function quotePriceLabel() {
   if (isManualQuoteRequired()) return 'Confirmed price needed';
   if (isPermitTbdQuote()) return '$' + ((answers.cityRemovalFee || 600) + (answers.oil === 'half_plus' ? 150 : 0)).toLocaleString() + ' + permit';
@@ -3624,10 +3654,10 @@ function submitCTA() {
   const payload = {
     name, phone, email, note,
     tank_size: answers.size,
-    location_type: answers.location ? answers.location.charAt(0).toUpperCase() + answers.location.slice(1) : answers.location,
-    exit_type: answers.exit ? answers.exit.charAt(0).toUpperCase() + answers.exit.slice(1) : answers.exit,
+    location_type: ghlTankLocation(),
+    exit_type: ghlExitType(),
     access_type: answers.access,
-    oil_level: answers.oil,
+    oil_level: ghlPricingOilLevel(),
     ...(answers.oil === 'half_plus' ? { excess_oil_fee: '$150' } : {}),
     state: answers.state,
     city: answers.city,
@@ -3935,9 +3965,11 @@ async function submitManualQuoteRequest() {
         state:          booking.state,
         zip:            booking.zip,
         oilLevel:       apiOilLevel(),
-        tankLocation:   answers.location ? answers.location.charAt(0).toUpperCase() + answers.location.slice(1) : answers.location,
-        exitType:       answers.exit     ? answers.exit.charAt(0).toUpperCase()     + answers.exit.slice(1)     : answers.exit,
-        tankAccess:     answers.access === 'standard' ? 'Yes' : answers.access === 'restricted' ? 'No' : 'Unsure',
+        ghlOilLevel:    booking.oilGauge || undefined,
+        tankLocation:   ghlTankLocation(),
+        exitType:       ghlExitType(),
+        tankAccess:     ghlTankAccess(),
+        jobDetails:     ghlJobDetails(),
         serviceType:    'OT',
         funnelRequestId: getFunnelRequestId(),
         ...quoteStatePayload(),
@@ -3966,13 +3998,15 @@ async function fireLeadWebhook() {
     address1: booking.address, city: booking.city,
     state: booking.state, postal_code: booking.zip,
     tank_size:            answers.size,
-    location_type:        answers.location ? answers.location.charAt(0).toUpperCase() + answers.location.slice(1) : answers.location,
-    exit_type:            answers.exit ? answers.exit.charAt(0).toUpperCase() + answers.exit.slice(1) : answers.exit,
+    location_type:        ghlTankLocation(),
+    exit_type:            ghlExitType(),
     access_type:          answers.access,
-    oil_level_pricing:    answers.oil,
+    oil_level_pricing:    ghlPricingOilLevel(),
     oil_level_gauge:      booking.oilGauge,
+    remaining_oil:        booking.oilGauge,
     ...(answers.oil === 'half_plus' ? { excess_oil_fee: '$150' } : {}),
-    tank_accessible:      answers.access === 'standard' ? 'Yes' : answers.access === 'restricted' ? 'No' : 'Unsure',
+    tank_accessible:      ghlTankAccess(),
+    job_details:          ghlJobDetails(),
     restricted_access:    answers.access === 'restricted' ? 'true' : 'false',
     stair_removal:        answers.exit === 'stairs' ? 'true' : 'false',
     base_removal_fee:     answers.cityRemovalFee || 600,
@@ -4042,9 +4076,11 @@ async function captureLeadFallback() {
         state:          booking.state,
         zip:            booking.zip,
         oilLevel:       apiOilLevel(),
-        tankLocation:   answers.location ? answers.location.charAt(0).toUpperCase() + answers.location.slice(1) : answers.location,
-        exitType:       answers.exit     ? answers.exit.charAt(0).toUpperCase()     + answers.exit.slice(1)     : answers.exit,
-        tankAccess:     answers.access === 'standard' ? 'Yes' : answers.access === 'restricted' ? 'No' : 'Unsure',
+        ghlOilLevel:    booking.oilGauge || undefined,
+        tankLocation:   ghlTankLocation(),
+        exitType:       ghlExitType(),
+        tankAccess:     ghlTankAccess(),
+        jobDetails:     ghlJobDetails(),
         estimatedPrice: booking.estimatedPrice,
         basePrice:      answers.cityRemovalFee || 600,
         ...(answers.permitFee > 0 ? { permitFee: answers.permitFee } : {}),
@@ -4254,14 +4290,16 @@ async function confirmBooking() {
         date:           booking.selectedSlot.date,
         time:           booking.selectedSlot.time,
         oilLevel:       apiOilLevel(),
+        ghlOilLevel:    booking.oilGauge || undefined,
         serviceType:    'OT',
         estimatedPrice: booking.estimatedPrice,
         basePrice:      answers.cityRemovalFee || 600,
         ...(answers.permitFee > 0 ? { permitFee: answers.permitFee } : {}),
         ...(answers.oil === 'half_plus' ? { oilSurcharge: 150 } : {}),
-        tankLocation:   answers.location    || '',
-        exitType:       answers.exit        || '',
-        tankAccess:     answers.access      || '',
+        tankLocation:   ghlTankLocation()   || '',
+        exitType:       ghlExitType()       || '',
+        tankAccess:     ghlTankAccess(),
+        jobDetails:     ghlJobDetails(),
         ghlContactId:   booking.ghlContactId || undefined,
         funnelRequestId: getFunnelRequestId(),
         tags:           ['calc-booked'],
@@ -4520,11 +4558,13 @@ async function submitEstimate() {
       state:          answers.state || '',
       postal_code:    zip,
       tank_size:            answers.size,
-      location_type:        answers.location ? answers.location.charAt(0).toUpperCase() + answers.location.slice(1) : answers.location,
-      exit_type:            answers.exit ? answers.exit.charAt(0).toUpperCase() + answers.exit.slice(1) : answers.exit,
+      location_type:        ghlTankLocation(),
+      exit_type:            ghlExitType(),
       access_type:          answers.access,
-      oil_level_pricing:    answers.oil,
-      tank_accessible:      answers.access === 'standard' ? 'Yes' : answers.access === 'restricted' ? 'No' : 'Unsure',
+      oil_level_pricing:    ghlPricingOilLevel(),
+      remaining_oil:        ghlPricingOilLevel(),
+      tank_accessible:      ghlTankAccess(),
+      job_details:          ghlJobDetails(),
       restricted_access:    answers.access === 'restricted' ? 'true' : 'false',
       stair_removal:        answers.exit === 'stairs' ? 'true' : 'false',
       base_removal_fee:     answers.cityRemovalFee || 600,

@@ -163,6 +163,7 @@ These values are already part of the booking flow. Do not change Route Optimizer
 | File | Purpose |
 |---|---|
 | `AGENTS.md` | Shared agent rules, protected funnel invariants, and review requirements |
+| `PROJECT_DECISIONS.md` | Durable decision log explaining why major funnel guardrails and integrations work the way they do |
 | `CLAUDE.md` | Claude/session operating context and current live guardrails |
 | `CURRENT_STATE.md` | Current live status, IDs, pending work, and latest deployed change |
 | `BRAND.md` | Visual identity and customer-facing design rules |
