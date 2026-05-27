@@ -2,6 +2,7 @@ const fs = require('fs');
 const vm = require('vm');
 
 const html = fs.readFileSync('booking-funnel.html', 'utf8');
+const wpTemplate = fs.readFileSync('page-oil-tank-removal-cost.php', 'utf8');
 
 function assert(name, condition) {
   if (!condition) {
@@ -51,6 +52,17 @@ assert('GHL accessibility only sends live Tight Access option', html.includes("r
 assert('accessible tanks do not send an empty tank access value', !html.includes("tankAccess:     ghlTankAccess()     || ''"));
 assert('unsure access sends uppercase job details', html.includes("return 'POTENTIAL ACCESS ISSUES'"));
 assert('direct public API payloads carry job details', html.includes("jobDetails:     ghlJobDetails()"));
-assert('Make proxy payloads carry job details', html.includes("job_details:          ghlJobDetails()"));
+assert('lead/estimate proxy payloads carry job details', html.includes("job_details:          ghlJobDetails()"));
+assert('attribution capture includes Google Ads enhanced params', html.includes("'gbraid'") && html.includes("'wbraid'") && html.includes("'gad_source'") && html.includes("'gad_campaignid'"));
+assert('attribution capture preserves first touch values', html.includes("if (!attr[key]) attr[key] = value"));
+assert('attribution capture does not persist raw URLs', html.includes("ATTRIBUTION_URL_PARAM_KEYS.indexOf(key)") && html.includes("cleanAttributionUrl"));
+assert('funnel telemetry keeps existing non-PII attribution subset', html.includes("function safeTelemetryAttribution()") && html.includes("attribution: safeTelemetryAttribution()"));
+assert('lead webhook payload carries attribution object', html.includes("const payload = addAttributionFields({") && html.includes("funnelRequestId: getFunnelRequestId()"));
+assert('fallback lead payload carries attribution object', html.includes("ROUTE_OPTIMIZER_URL + '/api/public/capture-lead'") && html.includes("body: JSON.stringify(addAttributionFields({"));
+assert('manual quote payload carries attribution object', html.includes("ROUTE_OPTIMIZER_URL + '/api/public/manual-quote'") && html.includes("body: JSON.stringify(addAttributionFields({"));
+assert('booking payload carries signed contact token', html.includes("contactToken:   booking.ghlContactToken || undefined"));
+assert('booking payload carries attribution object', html.includes("ROUTE_OPTIMIZER_URL + '/api/public/book'") && html.includes("body: JSON.stringify(addAttributionFields({"));
+assert('WordPress iframe src carries allowlisted attribution params', wpTemplate.includes('$jps_attribution_keys') && wpTemplate.includes('add_query_arg( $jps_attribution_args, $jps_funnel_base )'));
+assert('WordPress iframe src includes parent landing page', wpTemplate.includes("$jps_attribution_args['landing_page']"));
 
 if (process.exitCode) process.exit(process.exitCode);

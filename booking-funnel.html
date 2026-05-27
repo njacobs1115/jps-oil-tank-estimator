@@ -2389,13 +2389,30 @@
 
 <script>
 // ──────────────────────────────────────────────
-// Make webhook URLs are proxied through Route Optimizer — never hardcode Make URLs in public repos
+// Lead/estimate webhooks are proxied through Route Optimizer — never hardcode webhook URLs in public repos
 // ──────────────────────────────────────────────────────────────────────────────────────────────
 const ROUTE_OPTIMIZER_URL  = 'https://route-optimizer-jps.onrender.com';
 const GHL_WEBHOOK_URL      = `${ROUTE_OPTIMIZER_URL}/api/public/funnel-lead`;
 const ESTIMATE_WEBHOOK_URL = `${ROUTE_OPTIMIZER_URL}/api/public/funnel-estimate`;
 const FUNNEL_EVENT_URL     = `${ROUTE_OPTIMIZER_URL}/api/public/funnel-event`;
 const LEAD_CAPTURE_TIMEOUT_MS = 8000;
+const ATTRIBUTION_TEXT_KEYS = [
+  'gclid',
+  'gbraid',
+  'wbraid',
+  'gad_source',
+  'gad_campaignid',
+  'fbclid',
+  'msclkid',
+  'ttclid',
+  'utm_source',
+  'utm_medium',
+  'utm_campaign',
+  'utm_content',
+  'utm_term',
+];
+const ATTRIBUTION_URL_KEYS = ['landing_page', 'referrer'];
+const ATTRIBUTION_URL_PARAM_KEYS = ATTRIBUTION_TEXT_KEYS.concat(['landing_page', 'referrer']);
 
 // ──────────────────────────────────────────────
 // TRACKING HELPERS
@@ -2438,10 +2455,33 @@ function getFunnelRequestId() {
 function safeAttribution() {
   const attr = getAttribution();
   const cleaned = {};
-  ['gclid','fbclid','utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(function(key) {
-    if (attr[key]) cleaned[key] = String(attr[key]).slice(0, 180);
+  ATTRIBUTION_TEXT_KEYS.forEach(function(key) {
+    if (attr[key]) cleaned[key] = cleanAttributionText(attr[key], 180);
+  });
+  ATTRIBUTION_URL_KEYS.forEach(function(key) {
+    if (attr[key]) cleaned[key] = cleanAttributionUrl(attr[key], 700);
+  });
+  if (attr.captured_at) cleaned.captured_at = cleanAttributionText(attr.captured_at, 40);
+  return Object.keys(cleaned).length ? cleaned : undefined;
+}
+
+function safeTelemetryAttribution() {
+  const attr = getAttribution();
+  const cleaned = {};
+  ['gclid', 'fbclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach(function(key) {
+    if (attr[key]) cleaned[key] = cleanAttributionText(attr[key], 180);
   });
   return Object.keys(cleaned).length ? cleaned : undefined;
+}
+
+function addAttributionFields(payload) {
+  const attr = safeAttribution();
+  if (!attr) return payload;
+  payload.attribution = attr;
+  Object.keys(attr).forEach(function(key) {
+    payload[key] = attr[key];
+  });
+  return payload;
 }
 
 function funnelEventBase(extra) {
@@ -2464,7 +2504,7 @@ function funnelEventBase(extra) {
     access_type: answers.access || undefined,
     location_type: answers.location || undefined,
     exit_type: answers.exit || undefined,
-    attribution: safeAttribution(),
+    attribution: safeTelemetryAttribution(),
   };
   return Object.assign(base, extra || {});
 }
@@ -3750,26 +3790,81 @@ updateProgressSteps(1);
 // ──────────────────────────────────────────────
 // ATTRIBUTION CAPTURE
 // ──────────────────────────────────────────────
+function cleanAttributionText(value, maxLength) {
+  if (!value) return '';
+  return String(value)
+    .replace(/[\u0000-\u001f\u007f]/g, '')
+    .replace(/[<>]/g, '')
+    .trim()
+    .slice(0, maxLength || 180);
+}
+
+function cleanAttributionUrl(value, maxLength) {
+  var raw = cleanAttributionText(value, maxLength || 700);
+  if (!raw) return '';
+
+  try {
+    var parsed = new URL(raw, window.location.href);
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return '';
+
+    var cleanUrl = new URL(parsed.origin + parsed.pathname);
+    parsed.searchParams.forEach(function(paramValue, key) {
+      if (ATTRIBUTION_URL_PARAM_KEYS.indexOf(key) !== -1) {
+        var cleanValue = cleanAttributionText(paramValue, 180);
+        if (cleanValue) cleanUrl.searchParams.set(key, cleanValue);
+      }
+    });
+    return cleanUrl.toString().slice(0, maxLength || 700);
+  } catch(e) {
+    return '';
+  }
+}
+
+function readStoredAttribution() {
+  try { return JSON.parse(sessionStorage.getItem('jps_attr') || '{}') || {}; } catch(e) { return {}; }
+}
+
+function shouldReplaceLandingPage(currentValue, nextValue) {
+  return nextValue && (!currentValue || String(currentValue).indexOf('njacobs1115.github.io') !== -1);
+}
+
 (function captureAttribution() {
   try {
     const params = new URLSearchParams(window.location.search);
-    const attr = {
-      gclid:        params.get('gclid')        || '',
-      fbclid:       params.get('fbclid')       || '',
-      utm_source:   params.get('utm_source')   || '',
-      utm_medium:   params.get('utm_medium')   || '',
-      utm_campaign: params.get('utm_campaign') || '',
-      utm_content:  params.get('utm_content')  || '',
-      utm_term:     params.get('utm_term')     || '',
-      landing_page: window.location.href,
-      referrer:     document.referrer || '',
-    };
+    const attr = readStoredAttribution();
+    var hasFreshAttribution = false;
+
+    ATTRIBUTION_TEXT_KEYS.forEach(function(key) {
+      var value = cleanAttributionText(params.get(key), 180);
+      if (value) {
+        hasFreshAttribution = true;
+        if (!attr[key]) attr[key] = value;
+      }
+    });
+
+    var explicitLandingPage = cleanAttributionUrl(params.get('landing_page'), 700);
+    var fallbackLandingPage = cleanAttributionUrl(window.location.href, 700);
+    if (shouldReplaceLandingPage(attr.landing_page, explicitLandingPage)) {
+      attr.landing_page = explicitLandingPage;
+    } else if (!attr.landing_page && fallbackLandingPage) {
+      attr.landing_page = fallbackLandingPage;
+    }
+
+    var explicitReferrer = cleanAttributionUrl(params.get('referrer'), 700);
+    var fallbackReferrer = cleanAttributionUrl(document.referrer || '', 700);
+    if (!attr.referrer && (explicitReferrer || fallbackReferrer)) {
+      attr.referrer = explicitReferrer || fallbackReferrer;
+    }
+
+    if (!attr.captured_at && (hasFreshAttribution || attr.landing_page)) {
+      attr.captured_at = new Date().toISOString();
+    }
     sessionStorage.setItem('jps_attr', JSON.stringify(attr));
   } catch(e) {}
 })();
 
 function getAttribution() {
-  try { return JSON.parse(sessionStorage.getItem('jps_attr') || '{}'); } catch(e) { return {}; }
+  return readStoredAttribution();
 }
 
 // ──────────────────────────────────────────────
@@ -3781,7 +3876,8 @@ const booking = {
   oilGauge: '',
   estimatedPrice: 0,
   selectedSlot: null,
-  ghlContactId: null,  // populated from Make webhook response
+  ghlContactId: null,
+  ghlContactToken: null,
 };
 
 // ──────────────────────────────────────────────
@@ -3934,8 +4030,8 @@ function submitCheckout() {
     ...quoteTelemetryFields(),
   });
 
-  // Fire Make webhook + fetch slots in parallel
-  // Webhook awaited so we can capture the contactId before booking
+  // Fire lead webhook + fetch slots in parallel.
+  // Webhook awaited so we can capture the contactId before booking.
   fireLeadWebhook().finally(fetchSlots);
 }
 
@@ -3955,7 +4051,7 @@ async function submitManualQuoteRequest() {
     const resp = await fetch(ROUTE_OPTIMIZER_URL + '/api/public/manual-quote', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+      body: JSON.stringify(addAttributionFields({
         firstName:      booking.firstName,
         lastName:       booking.lastName,
         phone:          booking.phone,
@@ -3973,7 +4069,7 @@ async function submitManualQuoteRequest() {
         serviceType:    'OT',
         funnelRequestId: getFunnelRequestId(),
         ...quoteStatePayload(),
-      }),
+      })),
     });
     const data = await resp.json().catch(() => null);
     if (!resp.ok || !data?.success) {
@@ -3981,6 +4077,7 @@ async function submitManualQuoteRequest() {
       return;
     }
     booking.ghlContactId = data.contactId || booking.ghlContactId;
+    booking.ghlContactToken = data.contactToken || booking.ghlContactToken;
     showManualQuoteSubmitted();
   } catch (err) {
     console.error('[Funnel] manual quote request failed:', err);
@@ -3990,8 +4087,7 @@ async function submitManualQuoteRequest() {
 
 async function fireLeadWebhook() {
   if (!GHL_WEBHOOK_URL || GHL_WEBHOOK_URL.includes('PASTE_')) return;
-  const attr = getAttribution();
-  const payload = {
+  const payload = addAttributionFields({
     first_name: booking.firstName, last_name: booking.lastName,
     name: booking.firstName + ' ' + booking.lastName,
     phone: booking.phone, email: booking.email,
@@ -4017,17 +4113,8 @@ async function fireLeadWebhook() {
     permit_status:        answers.permitStatus || 'none_required',
     source:               'booking_funnel',
     created_at:           new Date().toISOString(),
-    gclid:        attr.gclid        || '',
-    fbclid:       attr.fbclid       || '',
-    utm_source:   attr.utm_source   || '',
-    utm_medium:   attr.utm_medium   || '',
-    utm_campaign: attr.utm_campaign || '',
-    utm_content:  attr.utm_content  || '',
-    utm_term:     attr.utm_term     || '',
-    landing_page: attr.landing_page || '',
-    referrer:     attr.referrer     || '',
     funnelRequestId: getFunnelRequestId(),
-  };
+  });
   try {
     const controller = new AbortController();
     const timeout = setTimeout(function() { controller.abort(); }, LEAD_CAPTURE_TIMEOUT_MS);
@@ -4042,12 +4129,13 @@ async function fireLeadWebhook() {
       const data = await resp.json().catch(() => null);
       if (data?.contactId) {
         booking.ghlContactId = data.contactId;
-        console.log('[Funnel] Got contactId from Make:', booking.ghlContactId);
-        return; // Make succeeded — fallback not needed
+        booking.ghlContactToken = data.contactToken || booking.ghlContactToken;
+        console.log('[Funnel] Got contactId from lead webhook:', booking.ghlContactId);
+        return; // Lead webhook succeeded — fallback not needed
       }
     }
-    // Make returned non-ok or no contactId — activate fallback
-    console.warn('[Funnel] Make webhook did not return a contactId — activating capture-lead fallback');
+    // Lead webhook returned non-ok or no contactId — activate fallback
+    console.warn('[Funnel] Lead webhook did not return a contactId — activating capture-lead fallback');
     await captureLeadFallback();
   } catch (err) {
     console.error('[Funnel] Lead webhook error:', err);
@@ -4055,7 +4143,7 @@ async function fireLeadWebhook() {
   }
 }
 
-// Called when Make fails. Creates GHL contact directly via Route Optimizer
+// Called when the lead webhook fails. Creates GHL contact directly via Route Optimizer
 // so the lead is captured even if the customer abandons. Tags contact with
 // funnel-error so Norman's GHL workflow fires automatically.
 async function captureLeadFallback() {
@@ -4066,7 +4154,7 @@ async function captureLeadFallback() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       signal: controller.signal,
-      body: JSON.stringify({
+      body: JSON.stringify(addAttributionFields({
         firstName:      booking.firstName,
         lastName:       booking.lastName,
         phone:          booking.phone,
@@ -4088,13 +4176,14 @@ async function captureLeadFallback() {
         serviceType:    'OT',
         funnelRequestId: getFunnelRequestId(),
         ...quoteStatePayload(),
-      }),
+      })),
     });
     clearTimeout(timeout);
     if (resp.ok) {
       const data = await resp.json().catch(() => null);
       if (data?.contactId) {
         booking.ghlContactId = data.contactId;
+        booking.ghlContactToken = data.contactToken || booking.ghlContactToken;
         console.log('[Funnel] capture-lead fallback succeeded, contactId:', booking.ghlContactId);
       }
     } else {
@@ -4278,7 +4367,7 @@ async function confirmBooking() {
     const resp = await fetch(ROUTE_OPTIMIZER_URL + '/api/public/book', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+      body: JSON.stringify(addAttributionFields({
         firstName:      booking.firstName,
         lastName:       booking.lastName,
         phone:          booking.phone,
@@ -4301,10 +4390,11 @@ async function confirmBooking() {
         tankAccess:     ghlTankAccess(),
         jobDetails:     ghlJobDetails(),
         ghlContactId:   booking.ghlContactId || undefined,
+        contactToken:   booking.ghlContactToken || undefined,
         funnelRequestId: getFunnelRequestId(),
         tags:           ['calc-booked'],
         ...quoteStatePayload(),
-      }),
+      })),
     });
     let data;
     try { data = await resp.json(); } catch(parseErr) {
@@ -4428,7 +4518,7 @@ function showBookingFailed(msg) {
 
 
 // ── ESTIMATE PATH ─────────────────────────────────────────────────────────
-// Build the HTML email body for the estimate — all formatting logic lives here, not in Make
+// Build the HTML email body for the estimate; all customer-facing formatting logic lives here.
 function buildEstimateEmail(firstName, address, city, state, zip) {
   var basePrice   = answers.cityRemovalFee || 600;
   var oilFee      = answers.oil === 'half_plus' ? 150 : 0;
@@ -4536,8 +4626,6 @@ async function submitEstimate() {
   btn.disabled = true;
   btn.textContent = 'Sending...';
 
-  var attr = getAttribution();
-
   try {
     var estimateEmail = buildEstimateEmail(firstName, address, city, answers.state || '', zip);
     trackFunnelEvent('estimate_requested', {
@@ -4547,7 +4635,7 @@ async function submitEstimate() {
       ...quoteTelemetryFields(),
     });
 
-    var payload = {
+    var payload = addAttributionFields({
       first_name:     firstName,
       last_name:      lastName,
       name:           firstName + ' ' + lastName,
@@ -4578,16 +4666,7 @@ async function submitEstimate() {
       source:               'estimate_funnel',
       tags:                 ['calc-estimate'],
       created_at:           new Date().toISOString(),
-      gclid:          attr.gclid        || '',
-      fbclid:         attr.fbclid       || '',
-      utm_source:     attr.utm_source   || '',
-      utm_medium:     attr.utm_medium   || '',
-      utm_campaign:   attr.utm_campaign || '',
-      utm_content:    attr.utm_content  || '',
-      utm_term:       attr.utm_term     || '',
-      landing_page:   attr.landing_page || '',
-      referrer:       attr.referrer     || '',
-    };
+    });
     if (answers.oil === 'half_plus') payload.excess_oil_fee = '$150';
 
     var controller = new AbortController();

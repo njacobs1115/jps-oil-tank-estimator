@@ -21,6 +21,47 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+$jps_funnel_base = 'https://njacobs1115.github.io/jps-oil-tank-estimator/booking-funnel.html';
+$jps_attribution_keys = array(
+	'gclid',
+	'gbraid',
+	'wbraid',
+	'gad_source',
+	'gad_campaignid',
+	'fbclid',
+	'msclkid',
+	'ttclid',
+	'utm_source',
+	'utm_medium',
+	'utm_campaign',
+	'utm_content',
+	'utm_term',
+);
+$jps_attribution_args = array();
+
+foreach ( $jps_attribution_keys as $jps_key ) {
+	if ( isset( $_GET[ $jps_key ] ) && is_scalar( $_GET[ $jps_key ] ) ) {
+		$jps_value = substr( sanitize_text_field( wp_unslash( $_GET[ $jps_key ] ) ), 0, 180 );
+		if ( '' !== $jps_value ) {
+			$jps_attribution_args[ $jps_key ] = $jps_value;
+		}
+	}
+}
+
+$jps_request_path = isset( $_SERVER['REQUEST_URI'] )
+	? strtok( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), '?' )
+	: '/oil-tank-removal-cost/';
+$jps_attribution_args['landing_page'] = home_url( add_query_arg( $jps_attribution_args, $jps_request_path ) );
+
+if ( isset( $_SERVER['HTTP_REFERER'] ) ) {
+	$jps_referrer = substr( esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ), 0, 700 );
+	if ( '' !== $jps_referrer ) {
+		$jps_attribution_args['referrer'] = $jps_referrer;
+	}
+}
+
+$jps_funnel_src = add_query_arg( $jps_attribution_args, $jps_funnel_base );
+
 get_header();
 ?>
 
@@ -114,7 +155,7 @@ body {
 
 <iframe
 	id="jps-funnel-frame"
-	src="https://njacobs1115.github.io/jps-oil-tank-estimator/booking-funnel.html"
+	src="<?php echo esc_url( $jps_funnel_src ); ?>"
 	title="Oil Tank Removal Cost Estimator"
 	scrolling="no"
 ></iframe>
