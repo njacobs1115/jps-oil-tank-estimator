@@ -64,5 +64,6 @@ assert('booking payload carries signed contact token', html.includes("contactTok
 assert('booking payload carries attribution object', html.includes("ROUTE_OPTIMIZER_URL + '/api/public/book'") && html.includes("body: JSON.stringify(addAttributionFields({"));
 assert('WordPress iframe src carries allowlisted attribution params', wpTemplate.includes('$jps_attribution_keys') && wpTemplate.includes('add_query_arg( $jps_attribution_args, $jps_funnel_base )'));
 assert('WordPress iframe src includes parent landing page', wpTemplate.includes("$jps_attribution_args['landing_page']"));
+assert('WordPress referrer strips non-attribution query params before iframe handoff', wpTemplate.includes('wp_parse_url( $jps_referrer_raw )') && wpTemplate.includes('$jps_referrer_attribution'));
 
 if (process.exitCode) process.exit(process.exitCode);

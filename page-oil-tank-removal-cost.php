@@ -54,7 +54,39 @@ $jps_request_path = isset( $_SERVER['REQUEST_URI'] )
 $jps_attribution_args['landing_page'] = home_url( add_query_arg( $jps_attribution_args, $jps_request_path ) );
 
 if ( isset( $_SERVER['HTTP_REFERER'] ) ) {
-	$jps_referrer = substr( esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ), 0, 700 );
+	$jps_referrer_raw   = esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) );
+	$jps_referrer_parts = wp_parse_url( $jps_referrer_raw );
+	$jps_referrer       = '';
+
+	if ( isset( $jps_referrer_parts['scheme'], $jps_referrer_parts['host'] ) && in_array( $jps_referrer_parts['scheme'], array( 'http', 'https' ), true ) ) {
+		$jps_referrer = $jps_referrer_parts['scheme'] . '://' . $jps_referrer_parts['host'];
+		if ( isset( $jps_referrer_parts['port'] ) ) {
+			$jps_referrer .= ':' . absint( $jps_referrer_parts['port'] );
+		}
+		$jps_referrer .= isset( $jps_referrer_parts['path'] ) ? $jps_referrer_parts['path'] : '/';
+
+		if ( isset( $jps_referrer_parts['query'] ) ) {
+			$jps_referrer_query = array();
+			wp_parse_str( $jps_referrer_parts['query'], $jps_referrer_query );
+
+			$jps_referrer_attribution = array();
+			foreach ( $jps_attribution_keys as $jps_key ) {
+				if ( isset( $jps_referrer_query[ $jps_key ] ) && is_scalar( $jps_referrer_query[ $jps_key ] ) ) {
+					$jps_value = substr( sanitize_text_field( wp_unslash( $jps_referrer_query[ $jps_key ] ) ), 0, 180 );
+					if ( '' !== $jps_value ) {
+						$jps_referrer_attribution[ $jps_key ] = $jps_value;
+					}
+				}
+			}
+
+			if ( ! empty( $jps_referrer_attribution ) ) {
+				$jps_referrer = add_query_arg( $jps_referrer_attribution, $jps_referrer );
+			}
+		}
+
+		$jps_referrer = substr( esc_url_raw( $jps_referrer ), 0, 700 );
+	}
+
 	if ( '' !== $jps_referrer ) {
 		$jps_attribution_args['referrer'] = $jps_referrer;
 	}
