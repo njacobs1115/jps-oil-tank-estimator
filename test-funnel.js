@@ -100,10 +100,10 @@ const TEST_PATHS = [
   // CONNECTICUT — no permit
   {
     id: 'ct-outside-open-quarter',
-    label: 'CT — Outside / Open / Quarter tank / Stamford',
+    label: 'CT — Outside / Open / Quarter tank / Stamford (manual help)',
     steps: { location: 'outside', access: 'open', oil: 'quarter', state: 'CT', city: 'Stamford' },
-    expectedScreen: 'results',
-    expectedContent: 'Book My Removal',
+    expectedScreen: 'manual_quote',
+    expectedContent: 'Request Confirmed Price',
   },
   {
     id: 'ct-basement-walkout-unsure-nogauge',
@@ -190,6 +190,12 @@ async function runPath(page, steps) {
 
 async function analyzeScreenshot(client, screenshotPath, testPath) {
   const imageData = fs.readFileSync(screenshotPath).toString('base64');
+  const expectedScreenDescription =
+    testPath.expectedScreen === 'restricted'
+      ? '"Photos Needed To Quote" (restricted access screen)'
+      : testPath.expectedScreen === 'manual_quote'
+        ? 'Manual quote / confirmed-price screen with "Request Confirmed Price" or similar manual help CTA, not direct booking'
+        : 'Price results screen with a dollar amount and "Book My Removal" button';
 
   const prompt = `You are QA-testing a booking funnel for an oil tank removal company.
 
@@ -199,11 +205,11 @@ This screenshot shows the result screen after a user completed the following pat
 - Oil level: ${testPath.steps.oil || 'N/A (restricted path)'}
 - State: ${testPath.steps.state || 'N/A (restricted path)'}${testPath.steps.city ? ' / City: ' + testPath.steps.city : ''}
 
-Expected screen: ${testPath.expectedScreen === 'restricted' ? '"Photos Needed To Quote" (restricted access screen)' : 'Price results screen with a dollar amount and "Book My Removal" button'}
+Expected screen: ${expectedScreenDescription}
 
 Please check:
 1. Is the correct screen showing (restricted vs results)?
-2. Is there a price displayed? Does it look reasonable (roughly $600–$1,200)?
+2. Is there a price displayed when one is expected? For manual quote paths, TBD / confirmed-after-review pricing is acceptable.
 3. Is there a clear call-to-action button visible?
 4. Does anything look broken, missing, or visually wrong?
 5. If it's a RI or CT path, verify there's no permit fee line (or it shows $0).

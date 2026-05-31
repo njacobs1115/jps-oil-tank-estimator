@@ -1946,7 +1946,7 @@
     <!-- Access warning (conditional — shown when unsure) -->
     <div class="leak-note" id="access-note">
       <span class="leak-note-icon">⚠️</span>
-      <span><strong>Access note:</strong> This price assumes the tank is fully accessible. Since you're unsure, please <a href="sms:+14013893200?body=Hi%2C%20I%20need%20an%20oil%20tank%20removed%20but%20I%27m%20not%20sure%20about%20the%20access.%20Sending%20photos%20now." style="color:inherit;font-weight:600;">text us 1&ndash;2 photos</a> and we&rsquo;ll confirm your price.</span>
+      <span><strong>Access note:</strong> This price assumes the tank is fully accessible. Since you're unsure, please <a href="sms:+14013893200?body=Hi%2C%20I%20need%20an%20oil%20tank%20removed%20but%20I%27m%20not%20sure%20about%20the%20access.%20Sending%20photos%20now." onclick="trackAssistedCtaClick('text','access_note','results')" style="color:inherit;font-weight:600;">text us 1&ndash;2 photos</a> and we&rsquo;ll confirm your price.</span>
     </div>
 
     <!-- Invoice-style breakdown -->
@@ -2049,12 +2049,12 @@
         <div style="font-size:12px;color:var(--text-mid);margin-bottom:10px;">Boilers require a photo to quote. Give us a quick call or text and we&rsquo;ll take care of it.</div>
         <div style="display:flex;gap:8px;">
           <a href="tel:+14013893200"
-             onclick="pushDataLayer({ event: 'funnel_call_clicked', location: 'edge_case_prompt', price: booking.estimatedPrice, city: answers.city || answers.state, state: answers.state })"
+             onclick="trackAssistedCtaClick('call','edge_case_prompt','results')"
              style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;height:40px;border-radius:var(--radius-sm);border:1.5px solid var(--border);color:var(--text-mid);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;background:var(--bg);">
             📞 Call
           </a>
           <a href="sms:+14013893200"
-             onclick="pushDataLayer({ event: 'funnel_text_clicked', location: 'edge_case_prompt', price: booking.estimatedPrice, city: answers.city || answers.state, state: answers.state })"
+             onclick="trackAssistedCtaClick('text','edge_case_prompt','results')"
              style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;height:40px;border-radius:var(--radius-sm);border:1.5px solid var(--border);color:var(--text-mid);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;background:var(--bg);">
             💬 Text
           </a>
@@ -2082,6 +2082,7 @@
     <div class="cta-section">
       <a href="sms:+14013893200?body=Hi%2C%20I%20need%20an%20oil%20tank%20removed%20but%20have%20a%20tight%20access%20situation.%20Sending%20photos%20now."
          class="btn-cta"
+         onclick="trackAssistedCtaClick('text','restricted_access','restricted')"
          style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;">
         📸 Text Us Photos Now &rarr;
       </a>
@@ -2101,7 +2102,7 @@
       <div class="success-body" id="success-body">We're reviewing your details right now. Expect a call or text shortly — we'll confirm access and lock in your removal date.</div>
       <div class="success-detail">
         We confirm access → lock your price → show up on the scheduled day and handle everything. Between now and then, you don't have to do a thing.<br /><br />
-        Questions? Call or text Norman directly: <strong><a href="tel:+14013893200" style="color:var(--brand)">(401) 389-3200</a></strong>
+        Questions? Call or text Norman directly: <strong><a href="tel:+14013893200" onclick="trackAssistedCtaClick('call','booking_confirmed','booking_success')" style="color:var(--brand)">(401) 389-3200</a></strong>
       </div>
     </div>
   </div>
@@ -2221,7 +2222,7 @@
     <div id="dates-error" style="display:none;padding-top:8px;">
       <div class="step-heading">
         <p>Our scheduling system hit a snag, but we’ve saved your info. Kelly will text you shortly to get you booked.</p>
-        <p style="margin-top:12px;font-size:0.9em;color:#666;">Didn’t hear from us within 2 hours? Call <a href="tel:+14013893200" style="color:inherit;font-weight:600;">(401) 389-3200</a> — we’ll get you on the schedule.</p>
+        <p style="margin-top:12px;font-size:0.9em;color:#666;">Didn’t hear from us within 2 hours? Call <a href="tel:+14013893200" onclick="trackAssistedCtaClick('call','dates_error','dates')" style="color:inherit;font-weight:600;">(401) 389-3200</a> — we’ll get you on the schedule.</p>
       </div>
     </div>
   </div>
@@ -2276,7 +2277,7 @@
           We arrive, pump the tank, cut it up, and haul everything away — all in one visit.
           You don’t need to be there, just make sure we have access.<br /><br />
           Questions? Call or text Norman directly:
-          <strong><a href="tel:+14013893200" style="color:var(--brand)">(401) 389-3200</a></strong>
+          <strong><a href="tel:+14013893200" onclick="trackAssistedCtaClick('call','booking_confirmed','booking_success')" style="color:var(--brand)">(401) 389-3200</a></strong>
         </div>
       </div>
     </div>
@@ -2286,6 +2287,7 @@
         <p>Call us and we’ll sort it out in 2 minutes — your date is still available.</p>
       </div>
       <a href="tel:+14013893200" class="btn-cta"
+         onclick="trackAssistedCtaClick('call','booking_failed','booking_success')"
          style="display:block;text-align:center;text-decoration:none;line-height:58px;border-radius:var(--radius-sm);">
         Call (401) 389-3200 →
       </a>
@@ -2370,6 +2372,7 @@
       </div>
       <p style="color:var(--muted);font-size:13px;margin-bottom:24px;">Ready to lock in a date? We&rsquo;re one call away.</p>
       <a href="tel:+14013893200"
+        onclick="trackAssistedCtaClick('call','estimate_sent','estimate_sent')"
         style="display:inline-flex;align-items:center;justify-content:center;height:48px;padding:0 28px;border-radius:var(--radius-sm);background:var(--brand);color:#fff;font-size:15px;font-weight:700;text-decoration:none;">
         Call (401) 389-3200
       </a>
@@ -2533,6 +2536,33 @@ function trackFunnelEvent(eventType, extra) {
       if (timeout) clearTimeout(timeout);
     });
   } catch(e) {}
+}
+
+function trackAssistedCtaClick(ctaType, ctaLocation, screen) {
+  const normalizedType = ctaType === 'call' ? 'call' : 'text';
+  const eventType = normalizedType === 'call' ? 'call_clicked' : 'text_clicked';
+  const gtmEvent = normalizedType === 'call' ? 'funnel_call_clicked' : 'funnel_text_clicked';
+  const city = booking.city || answers.city || answers.state || undefined;
+  const state = booking.state || answers.state || undefined;
+
+  pushDataLayer({
+    event: gtmEvent,
+    location: ctaLocation,
+    screen: screen,
+    price: booking.estimatedPrice || undefined,
+    city: city,
+    state: state,
+  });
+
+  trackFunnelEvent(eventType, {
+    cta_type: normalizedType,
+    cta_location: ctaLocation,
+    screen: screen,
+    price: booking.estimatedPrice || undefined,
+    city: city,
+    state: state,
+    ...quoteTelemetryFields(),
+  });
 }
 
 
@@ -4454,7 +4484,7 @@ function showBookingConfirmed(data) {
     detail.innerHTML =
       'We arrive, pump the tank, cut it up, and haul everything away \u2014 all in one visit. ' +
       'You don\u2019t need to be there, just make sure we have access.<br /><br />' +
-      'Questions? Call or text Norman directly: <strong><a href="tel:+14013893200" style="color:var(--brand)">(401) 389-3200</a></strong>';
+      'Questions? Call or text Norman directly: <strong><a href="tel:+14013893200" onclick="trackAssistedCtaClick(&quot;call&quot;,&quot;booking_confirmed&quot;,&quot;booking_success&quot;)" style="color:var(--brand)">(401) 389-3200</a></strong>';
   }
 
   const summaryEl = document.getElementById('booking-summary-box');
@@ -4496,7 +4526,7 @@ function showManualQuoteSubmitted() {
   if (detail) {
     detail.innerHTML =
       'No appointment has been booked yet, and no price has been locked. We will review the town, permit requirements, and travel before confirming the number.<br /><br />' +
-      'Questions? Call or text Norman directly: <strong><a href="tel:+14013893200" style="color:var(--brand)">(401) 389-3200</a></strong>';
+      'Questions? Call or text Norman directly: <strong><a href="tel:+14013893200" onclick="trackAssistedCtaClick(&quot;call&quot;,&quot;manual_quote_submitted&quot;,&quot;booking_success&quot;)" style="color:var(--brand)">(401) 389-3200</a></strong>';
   }
 }
 
