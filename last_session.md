@@ -1,61 +1,66 @@
-# Last Session - 2026-05-30 ET
+# Last Session - 2026-05-31 ET
 
-## What Changed
-- Implemented the estimator side of assisted-conversion telemetry in a clean worktree:
-  `C:\Users\njaco\.codex\worktrees\assisted-estimator`.
-- Baseline was clean `origin/master` at `c14090ccd5843239ac748af33bddff1f4b35bac1`.
-- Edited `booking-funnel.html`.
-- Updated `test-funnel.js` so Stamford, CT expects the existing manual help / confirmed-price path because Stamford is not listed in Airtable/city data and should not be direct-bookable.
-- Added `trackAssistedCtaClick(ctaType, ctaLocation, screen)`.
-- Preserved existing GA4/GTM event names:
-  - `funnel_text_clicked`
-  - `funnel_call_clicked`
-- Added backend JSONL telemetry calls for assisted CTA clicks:
-  - `text_clicked`
-  - `call_clicked`
-- Tracked all visible `sms:` / `tel:` paths with explicit CTA locations.
+## What Finished
 
-## CTA Locations Added
-- `access_note`
-- `edge_case_prompt`
-- `restricted_access`
-- `dates_error`
-- `booking_confirmed`
-- `booking_failed`
-- `manual_quote_submitted`
-- `estimate_sent`
+The estimator side of assisted-conversion telemetry is merged and deployed.
+
+- PR: https://github.com/njacobs1115/jps-oil-tank-estimator/pull/37
+- Merge commit: `1e32ef1964bda9bbc327711fd3b6de77ea537d6d`
+- GitHub Pages deploy completed successfully on 2026-05-31.
+- WordPress parent page iframe was verified to pass attribution params through to the deployed GitHub Pages funnel.
+
+## What Shipped
+
+- `booking-funnel.html`
+  - Added `trackAssistedCtaClick(ctaType, ctaLocation, screen)`.
+  - Preserved existing GA4/GTM event names:
+    - `funnel_text_clicked`
+    - `funnel_call_clicked`
+  - Added backend JSONL telemetry events:
+    - `text_clicked`
+    - `call_clicked`
+  - Tracked visible `sms:` and `tel:` paths with explicit CTA locations.
+- `test-funnel.js`
+  - Updated Stamford, CT to expect manual help / confirmed-price behavior.
+  - Stamford is not listed in Airtable/city data and should not be direct-bookable.
 
 ## What Did Not Change
+
 - No pricing logic changed.
 - No booking logic changed.
 - No date lookup logic changed.
 - No manual quote logic changed.
 - No rescue behavior changed.
-- No Telegram, GHL, Make, Route Optimizer public booking endpoint, or WordPress wrapper behavior changed.
+- No Telegram, GHL, Make, Route Optimizer booking endpoint, or WordPress wrapper behavior changed.
 - No visible SMS reference code was added.
 - No GHL contact creation was added for anonymous price-reveal users.
-- No code was pushed and nothing was deployed.
 
 ## Verification
-- `npm ci` completed in the clean estimator worktree.
-- `node test-quote-guardrails.js` passed.
-- `git diff --check` passed with only line-ending warnings.
-- `ANTHROPIC_API_KEY` was available locally; no key value was printed or written.
-- `node test-funnel.js` ran against its hardcoded GitHub Pages URL, not the local branch file.
-- `node test-funnel.js` result after harness correction: 12 passed, 0 failed.
-- Corrected path: `ct-outside-open-quarter` / Stamford, CT now expects manual help / confirmed-price behavior.
-- Report generated locally at `test-report/index.html`; the folder is gitignored.
-- A local Playwright smoke loaded `booking-funnel.html` from disk, stubbed `navigator.sendBeacon`, called both text and call assisted CTA tracking paths, and confirmed:
-  - no page errors
-  - GTM event remained `funnel_text_clicked`
-  - GTM event remained `funnel_call_clicked`
-  - backend payload event was `text_clicked`
-  - backend payload event was `call_clicked`
-  - payload included `cta_type`, `cta_location`, and `screen`
-  - no live telemetry request was sent
-- Postflight code-scope scan found no booking, pricing, rescue, GHL, Telegram, Make, webhook, token, or endpoint changes.
 
-## Important Repo State
-- Original project folder `C:\Users\njaco\JPS\projects\jps-oil-tank-estimator` is clean after parking pre-existing local changes in `stash@{0}`.
-- Stash label: `pre-existing dirty state before assisted telemetry clean worktree release pass 2026-05-30`.
-- This work is in the clean worktree only.
+- `npm ci` passed; one existing moderate dependency audit warning remains.
+- `node test-quote-guardrails.js` passed.
+- `node test-funnel.js` passed: 12 passed, 0 failed.
+- Local assisted CTA smoke with `navigator.sendBeacon` stubbed passed.
+- Live GitHub Pages fetch contained the assisted CTA helper and backend event names.
+- Live GitHub Pages assisted CTA smoke passed with `sendBeacon` stubbed.
+- WordPress parent URL browser test confirmed the iframe loaded the deployed funnel and passed UTM/GCLID params.
+- `git diff --check` passed with line-ending warnings only.
+- Gatekeeper approved the release with dependency-audit warnings only.
+
+## Related Route Optimizer State
+
+- Route Optimizer assisted telemetry PR #39 is merged and deployed.
+- Route Optimizer blank `jobDetails: ""` follow-up PR #40 is merged and deployed.
+- Route Optimizer handoff docs were refreshed in PR #41.
+- Live `/health/funnel` returned `FUNNEL_OK calendar=19 timed=19` after deploy.
+
+## E2E Booking Cleanup
+
+- A production-path E2E booking succeeded.
+- Cleanup verification:
+  - Contact deleted / no remaining search match.
+  - Opportunities deleted / no remaining match.
+  - Airtable job record deleted / no remaining appointment-ID match.
+  - Custom objects had no remaining record in checked active or legacy appointment schemas.
+  - GHL direct appointment lookup returns a soft-deleted tombstone with `deleted: true`; active calendar event list shows no matching E2E event.
+- Exact test record IDs are intentionally kept out of committed docs.
