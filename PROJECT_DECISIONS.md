@@ -12,6 +12,21 @@ When adding an entry, include:
 
 ---
 
+## 2026-05-31 - Funnel attribution fields represent acquisition, not job completion
+
+### Decision
+GHL first-touch attribution fields describe how the customer first reached JPS before converting through the website or funnel. `source` and `medium` are acquisition fields. `landing_page` is the parent website landing page that led to conversion, not the embedded funnel app URL. First Touch Conversion Time is the time of the website conversion action, such as call, text, form, estimate request, manual quote request, or funnel booking.
+
+### Why
+The same customer later moves through appointment scheduling, job completion, and offline conversion reporting. Mixing those lifecycle events into first-touch fields makes attribution reporting unreliable. Job completion should be tracked downstream as the actual offline conversion event for Google Ads or other reporting, separate from the first-touch website conversion timestamp.
+
+### Preserve
+Use [`docs/workflows/funnel-attribution-custom-fields.md`](docs/workflows/funnel-attribution-custom-fields.md) before changing funnel attribution writes. Do not overwrite existing first-touch values. Check `First Touch Locked` before changing any first-touch field, and set it to yes whenever any first-touch field is written. Store campaign only when real campaign data exists. Do not store the GitHub Pages iframe URL as the production landing page when the parent `removemyoiltank.com` landing page is available. Keep job completion and offline conversion tracking separate from First Touch Conversion Time.
+
+Public funnel/contact-entry paths may write first-touch attribution through the lock gate. Route Optimizer internal booking tools used by staff/Kelly must not write first-touch fields, because those contacts are already being handled in CRM and internal booking is lifecycle/operations work, not acquisition capture.
+
+---
+
 ## 2026-05-30 - Assisted conversion telemetry should stay invisible and non-PII
 
 ### Decision
