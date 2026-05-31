@@ -1,6 +1,6 @@
 # Booking Funnel - Current State
 > Source of truth for funnel IDs, tracking, and live status.
-> Last updated: 2026-05-20 early AM ET (quote guardrails live after estimator PR #32 and Route Optimizer PR #34)
+> Last updated: 2026-05-30 ET (assisted-conversion telemetry implemented locally, not pushed or deployed)
 > Repo: github.com/njacobs1115/jps-oil-tank-estimator
 
 ---
@@ -60,6 +60,54 @@ Cutover plan, when Norman approves: flip `MAKE_LEAD_WEBHOOK_URL` and `MAKE_ESTIM
 ## Status
 
 **LIVE - TRACKING VERIFIED - QUOTE GUARDRAILS DEPLOYED**
+
+### Assisted Conversion Telemetry - Local Branch, Not Deployed - 2026-05-30 ET
+
+Local worktree:
+`C:\Users\njaco\.codex\worktrees\assisted-estimator`
+
+Branch:
+`codex/assisted-conversion-telemetry`
+
+Baseline:
+`origin/master` at `c14090ccd5843239ac748af33bddff1f4b35bac1`
+
+Modified file:
+- `booking-funnel.html`
+- `test-funnel.js`
+
+What changed locally:
+- Added `trackAssistedCtaClick(ctaType, ctaLocation, screen)`.
+- Preserved existing GA4/GTM events `funnel_text_clicked` and `funnel_call_clicked`.
+- Added backend funnel-event telemetry for assisted CTA clicks using `text_clicked` and `call_clicked`.
+- Tracked visible `sms:` / `tel:` paths with explicit CTA locations.
+- Updated `test-funnel.js` so Stamford, CT expects the existing manual help / confirmed-price path because Stamford is not listed in Airtable/city data and should not be direct-bookable.
+
+What did not change:
+- No booking, date lookup, manual quote, pricing, rescue, Telegram, GHL, Make, or WordPress wrapper behavior changed.
+- No visible SMS reference code was added.
+- No anonymous GHL contact creation was added.
+- No code was pushed or deployed.
+
+Checks passed:
+- `npm ci`
+- `node test-quote-guardrails.js`
+- `node test-funnel.js` with `ANTHROPIC_API_KEY` available locally: 12 passed, 0 failed
+- local Playwright smoke with `navigator.sendBeacon` stubbed; no live telemetry request sent; verified both `text_clicked` and `call_clicked`
+- `git diff --check` passed with line-ending warnings only
+- postflight code-scope scan found no booking, pricing, rescue, GHL, Telegram, Make, webhook, token, or endpoint changes
+
+Broader funnel harness:
+- `ANTHROPIC_API_KEY` was available locally; no key value was printed or written.
+- `node test-funnel.js` ran against its hardcoded GitHub Pages URL, not the local branch file.
+- Result after harness correction: 12 passed, 0 failed.
+- Corrected path: `ct-outside-open-quarter` / Stamford, CT now expects manual help / confirmed-price behavior.
+- Stamford is not listed in Airtable/city data and should not be direct-bookable.
+- Report generated locally at `test-report/index.html`; the folder is gitignored.
+
+Workspace hygiene:
+- Original project folder `C:\Users\njaco\JPS\projects\jps-oil-tank-estimator` is clean after parking pre-existing local changes in `stash@{0}`.
+- Stash label: `pre-existing dirty state before assisted telemetry clean worktree release pass 2026-05-30`.
 
 ### Latest Runtime State - 2026-05-20 Early AM
 

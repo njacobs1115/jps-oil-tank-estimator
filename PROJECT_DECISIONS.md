@@ -12,6 +12,19 @@ When adding an entry, include:
 
 ---
 
+## 2026-05-30 - Assisted conversion telemetry should stay invisible and non-PII
+
+### Decision
+Future tracking for price-aware users who click text/call should extend the existing non-PII funnel-event telemetry lane, not add visible reference codes to SMS prefill and not create GHL contacts before the visitor submits contact info or actually contacts JPS.
+
+### Why
+The goal is actionable assisted-conversion evidence without degrading the customer experience or polluting CRM. A visible reference code in an SMS body feels clunky, and creating contacts at price reveal would create anonymous CRM noise. The better path is to log rich anonymous funnel context, then infer downstream outcomes by matching event time/details against GHL inbound SMS/calls, contacts, opportunities, and appointments.
+
+### Preserve
+Keep anonymous funnel telemetry free of PII. Track assisted CTA events with enough context to support later matching: event time, `funnel_request_id`, CTA location, screen, city/state, price, quote state, tank/access/oil answers, and attribution. Treat matches to GHL as confidence-scored unless a later contact path creates a deterministic link. Preserve existing booking safety, rescue behavior, Step 5 intent persistence, GTM/GA4 tracking, Telegram alerts, timeout handling, and secret boundaries.
+
+---
+
 ## 2026-05-21 - GHL field values must match live CRM options
 
 ### Decision

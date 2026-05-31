@@ -1,53 +1,61 @@
-# Last Session - 2026-05-20 Early AM
+# Last Session - 2026-05-30 ET
 
 ## What Changed
-- Shipped the approved quote-guardrail implementation.
-- Estimator PR `#32` merged/deployed.
-- Matching Route Optimizer PR `#34` merged/deployed.
-- Estimator merge commit: `8d188c030663da0013f455952f13dd72003eb130`.
-- Route Optimizer merge commit: `813b9dd87ce11691c421502552f128fc87bb5be1`.
+- Implemented the estimator side of assisted-conversion telemetry in a clean worktree:
+  `C:\Users\njaco\.codex\worktrees\assisted-estimator`.
+- Baseline was clean `origin/master` at `c14090ccd5843239ac748af33bddff1f4b35bac1`.
+- Edited `booking-funnel.html`.
+- Updated `test-funnel.js` so Stamford, CT expects the existing manual help / confirmed-price path because Stamford is not listed in Airtable/city data and should not be direct-bookable.
+- Added `trackAssistedCtaClick(ctaType, ctaLocation, screen)`.
+- Preserved existing GA4/GTM event names:
+  - `funnel_text_clicked`
+  - `funnel_call_clicked`
+- Added backend JSONL telemetry calls for assisted CTA clicks:
+  - `text_clicked`
+  - `call_clicked`
+- Tracked all visible `sms:` / `tel:` paths with explicit CTA locations.
 
-## Estimator Changes
-- Added canonical quote states: `verified`, `ma_permit_tbd`, `unknown_city_manual_quote`.
-- Removed unknown MA/CT fallback pricing from the customer path.
-- Unknown city shows confirmed-price request copy, not a price.
-- Unknown city submit uses the booking contact fields but calls `/api/public/manual-quote`.
-- Unknown city path does not call date lookup or booking.
-- MA permit-TBD remains bookable and says permit is required, usually `$50-$110`, exact fee confirmed shortly after booking.
-- Normal verified-city booking path remains intact.
-- Lead/contact capture now has an 8-second timeout before slot lookup.
-- Added focused test: `test-quote-guardrails.js`.
-- Codex review found a P1 lead-capture hang risk; fixed before merge.
+## CTA Locations Added
+- `access_note`
+- `edge_case_prompt`
+- `restricted_access`
+- `dates_error`
+- `booking_confirmed`
+- `booking_failed`
+- `manual_quote_submitted`
+- `estimate_sent`
 
-## City Data
-- Added `Malden, MA` at removal fee `$800`, permit TBD.
-- Fixed `Dracut, MA` permit from `NaN` to `null`.
-- Removed duplicate/conflicting `Falmouth, MA`, `Brookline, MA`, and duplicate `Lebanon, CT`.
-- Added validation to `sync-airtable.js` so future syncs fail on NaN fees, duplicate/conflicting city rows, missing removal fees, or unsupported states.
-- `AIRTABLE_API_TOKEN` was not present locally, so live Airtable sync was not run.
-
-## Backend Changes In Route Optimizer
-- `server/public-api.ts`: quote-state schema, manual quote rejection on `/find-slots` and `/book`, `/api/public/manual-quote`, manual quote tag/alert/note, kill switch, and fail-closed booking intent persistence.
-- `server/ghl.ts`: added `addContactNote`.
-- `server/funnel-events.ts`: added quote-state telemetry fields and manual quote events.
-- Added `server/public-api-quote-state.test.ts`.
+## What Did Not Change
+- No pricing logic changed.
+- No booking logic changed.
+- No date lookup logic changed.
+- No manual quote logic changed.
+- No rescue behavior changed.
+- No Telegram, GHL, Make, Route Optimizer public booking endpoint, or WordPress wrapper behavior changed.
+- No visible SMS reference code was added.
+- No GHL contact creation was added for anonymous price-reveal users.
+- No code was pushed and nothing was deployed.
 
 ## Verification
+- `npm ci` completed in the clean estimator worktree.
 - `node test-quote-guardrails.js` passed.
-- `node node_modules\typescript\bin\tsc` passed in Route Optimizer.
-- `node node_modules\tsx\dist\cli.cjs server\funnel-events.test.ts` passed.
-- `node node_modules\tsx\dist\cli.cjs server\public-api-quote-state.test.ts` passed.
-- `git diff --check` passed in both repos.
-- Route Optimizer `/health/funnel` returned `FUNNEL_OK calendar=25 timed=25`.
-- Backend live tests confirmed unknown manual-quote state returns `409 manual_quote_required` on `/find-slots` and `/book`.
-- Browser smoke passed using the live GitHub Pages funnel: unknown `Faketown, MA` called `/manual-quote`, did not call `/find-slots`, and did not call `/book`.
-- Browser smoke confirmed `Malden, MA` shows `$800` and `$50-$110` permit caveat and remains bookable.
-- Live custom page loaded the funnel frame.
-- Direct live date fetch for known-bookable `Malden, MA` returned slots.
-- No real contact or appointment was created during browser smoke; write endpoints were intercepted.
+- `git diff --check` passed with only line-ending warnings.
+- `ANTHROPIC_API_KEY` was available locally; no key value was printed or written.
+- `node test-funnel.js` ran against its hardcoded GitHub Pages URL, not the local branch file.
+- `node test-funnel.js` result after harness correction: 12 passed, 0 failed.
+- Corrected path: `ct-outside-open-quarter` / Stamford, CT now expects manual help / confirmed-price behavior.
+- Report generated locally at `test-report/index.html`; the folder is gitignored.
+- A local Playwright smoke loaded `booking-funnel.html` from disk, stubbed `navigator.sendBeacon`, called both text and call assisted CTA tracking paths, and confirmed:
+  - no page errors
+  - GTM event remained `funnel_text_clicked`
+  - GTM event remained `funnel_call_clicked`
+  - backend payload event was `text_clicked`
+  - backend payload event was `call_clicked`
+  - payload included `cta_type`, `cta_location`, and `screen`
+  - no live telemetry request was sent
+- Postflight code-scope scan found no booking, pricing, rescue, GHL, Telegram, Make, webhook, token, or endpoint changes.
 
-## Still Required
-- Watch the first few live manual-quote and MA permit-TBD leads.
-- Verify Airtable sync/live truth for Malden and cleaned city data when Airtable credentials are available.
-- Address GitHub Actions Node 20 deprecation warning in a maintenance PR.
-- Keep Route Optimizer dependency audit/cleanup separate from this shipped guardrail phase.
+## Important Repo State
+- Original project folder `C:\Users\njaco\JPS\projects\jps-oil-tank-estimator` is clean after parking pre-existing local changes in `stash@{0}`.
+- Stash label: `pre-existing dirty state before assisted telemetry clean worktree release pass 2026-05-30`.
+- This work is in the clean worktree only.
