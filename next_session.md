@@ -1,48 +1,61 @@
 # Next Session - jps-oil-tank-estimator
+> Last updated: 2026-05-31 ET
 
 ## Start Here
-1. This assisted-conversion telemetry work is local only. It has not been pushed or deployed.
-2. Use clean worktree `C:\Users\njaco\.codex\worktrees\assisted-estimator` for this branch.
-3. Original project folder dirt was parked in a recoverable stash; still build/release from the clean worktree.
-4. Route Optimizer backend must ship first because the frontend now emits `text_clicked` and `call_clicked`.
-5. Preserve the north star: improve non-booker tracking without changing the customer experience or weakening booking/rescue behavior.
 
-## Current Local Branch
-- Branch: `codex/assisted-conversion-telemetry`
-- Baseline: `origin/master` at `c14090ccd5843239ac748af33bddff1f4b35bac1`
-- Modified files:
-  - `booking-funnel.html`
-  - `test-funnel.js`
+The assisted-conversion telemetry work is live in both systems. Do not treat the telemetry branches as pending implementation work.
 
-## Implemented Locally
-- Added `trackAssistedCtaClick(ctaType, ctaLocation, screen)`.
-- Existing GA4/GTM names are preserved:
+## Current State
+
+- Estimator PR #37 is merged and deployed.
+- Route Optimizer PR #39 is merged and deployed.
+- Route Optimizer blank `jobDetails: ""` follow-up PR #40 is merged and deployed.
+- Route Optimizer postdeploy handoff PR #41 is merged.
+- GitHub Pages deploy for the estimator completed successfully.
+- Route Optimizer `/health/funnel` returned `FUNNEL_OK calendar=19 timed=19` after deploy.
+
+## What Is Live Now
+
+- Assisted text/call CTA clicks preserve existing GA4/GTM events:
   - `funnel_text_clicked`
   - `funnel_call_clicked`
-- Backend event names now emitted by the funnel:
+- Assisted text/call CTA clicks also emit backend JSONL events:
   - `text_clicked`
   - `call_clicked`
-- All visible `sms:` / `tel:` paths are tracked with explicit CTA locations.
+- Backend telemetry uses strict non-PII fields:
+  - `cta_type`
+  - `cta_location`
+  - `screen`
+- Stamford, CT remains manual-help / confirmed-price and is not direct-bookable unless city data changes.
+- Route Optimizer treats blank optional `jobDetails` as omitted instead of returning HTTP 400.
 
-## Checks Passed
-- `npm ci`
-- `node test-quote-guardrails.js`
-- `node test-funnel.js` with `ANTHROPIC_API_KEY` available locally: 12 passed, 0 failed
-- Local Playwright smoke with `navigator.sendBeacon` stubbed, no live telemetry request sent.
-- `git diff --check` passed with line-ending warnings only.
-- Postflight code-scope scan found no booking, pricing, rescue, GHL, Telegram, Make, webhook, token, or endpoint changes.
+## Checks Already Passed
 
-## Broader Funnel Harness Result
-- `ANTHROPIC_API_KEY` was available locally; no key value was printed or written.
-- `node test-funnel.js` ran against its hardcoded GitHub Pages URL, not the local branch file.
-- Result: 12 passed, 0 failed.
-- Test harness was corrected so `ct-outside-open-quarter` / Stamford, CT expects the existing manual help / confirmed-price path.
-- Stamford is not listed in Airtable/city data and should not be direct-bookable.
-- Report generated locally at `test-report/index.html`; the folder is gitignored.
+- Estimator:
+  - `npm ci`
+  - `node test-quote-guardrails.js`
+  - `node test-funnel.js` passed: 12 passed, 0 failed
+  - Local assisted CTA smoke with `sendBeacon` stubbed
+  - Live GitHub Pages assisted CTA smoke with `sendBeacon` stubbed
+  - WordPress iframe attribution pass-through browser check
+- Route Optimizer:
+  - `node node_modules\typescript\bin\tsc`
+  - `node node_modules\tsx\dist\cli.cjs server\funnel-events.test.ts` passed: 38 passed, 0 failed
+  - `node node_modules\tsx\dist\cli.cjs server\public-api-quote-state.test.ts` passed: 40 passed, 0 failed
+  - `node node_modules\tsx\dist\cli.cjs script\build.ts`
+  - live no-write smoke for `jobDetails: ""`
 
-## Workspace Hygiene
-- Original folder `C:\Users\njaco\JPS\projects\jps-oil-tank-estimator` is clean after parking pre-existing local changes in `stash@{0}`.
-- Stash label: `pre-existing dirty state before assisted telemetry clean worktree release pass 2026-05-30`.
+## Known Follow-Ups
 
-## Next Action
-After Route Optimizer and estimator diffs are reviewed, keep Gatekeeper approval attached to the handoff. Do not push until Norman approves the complete preflight/postflight results.
+- Dependency audit remediation is the next maintenance item:
+  - Estimator: `npm ci` reported one existing moderate dependency warning.
+  - Route Optimizer: `npm ci` reported existing dependency audit warnings.
+  - Keep remediation separate from funnel behavior changes. Run `npm audit`, identify vulnerable packages, choose safe upgrades, run full tests/build, and use PR/review/deploy gates.
+- Continue post-deploy observation of real assisted text/call behavior in analytics and backend JSONL before designing the read-only matching report.
+
+## Recommended First Checks Next Session
+
+- `git status --short --branch`
+- Estimator: `gh pr view 37 --json state,mergedAt,mergeCommit`
+- Route Optimizer: `gh pr view 40 --json state,mergedAt,mergeCommit`
+- Route Optimizer health: `Invoke-WebRequest https://route-optimizer-jps.onrender.com/health/funnel -UseBasicParsing`
