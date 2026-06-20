@@ -2176,7 +2176,7 @@
 
     <div class="form-field">
       <label for="book-oil-gauge">Oil Level (exact gauge reading) *</label>
-      <select id="book-oil-gauge">
+      <select id="book-oil-gauge" onchange="hideOilLevelWarning()">
         <option value="" disabled selected>Select what the gauge reads...</option>
         <option value="Empty">Empty — gauge reads 0</option>
         <option value="1/8">⅛ Full</option>
@@ -2187,6 +2187,14 @@
         <option value="I dont know">I don't know</option>
       </select>
       <div class="field-error" id="err-oil-gauge">Please select the oil level.</div>
+    </div>
+
+    <div class="quote-state-warning" id="oil-level-warning">
+      <div><strong>Please Confirm Oil Level.</strong> If the tank contains more than 1/4, a $150 oil disposal fee will apply.</div>
+      <div class="quote-state-actions">
+        <button type="button" onclick="confirmCheckoutOilFee()">Confirm and update price</button>
+        <button type="button" onclick="focusCheckoutOilGauge()">Change oil level</button>
+      </div>
     </div>
 
     <div class="nav-row">
@@ -3265,6 +3273,7 @@ function selectCard(el, type) {
   screen.querySelectorAll('.cards .card, .oil-tile, .oil-option-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   answers[type] = el.dataset.value;
+  if (type === 'oil') hideOilLevelWarning();
   const stepNum = screen.dataset.step;
   document.getElementById('next-' + stepNum).disabled = false;
   updateEstimateBar();
@@ -3496,6 +3505,7 @@ function showQuoteStateWarning(expectedState, detectedState) {
   const warning = document.getElementById('quote-state-warning');
   const text = document.getElementById('quote-state-warning-text');
   if (!warning || !text) return;
+  hideOilLevelWarning();
   const expectedName = STATE_NAMES[expectedState] || expectedState;
   const detectedName = STATE_NAMES[detectedState] || detectedState || 'a different state';
   text.innerHTML = '<strong>You were quoted for ' + expectedName + '.</strong> This address looks like ' + detectedName + '. Please confirm your address. A different state may affect price.';
@@ -3513,6 +3523,51 @@ function focusCheckoutAddress() {
   const zipEl = document.getElementById('book-zip');
   const target = zipEl && !zipEl.value.trim() ? zipEl : cityEl;
   if (target) target.focus();
+}
+
+function isLowOrUnknownPricingOil(oilAnswer) {
+  return oilAnswer === 'quarter' || oilAnswer === 'no_gauge';
+}
+
+function isAboveQuarterCheckoutOil(oilGauge) {
+  return oilGauge === '1/2' || oilGauge === '3/4' || oilGauge === 'Full';
+}
+
+function isCheckoutOilMismatch(oilAnswer, oilGauge) {
+  return isLowOrUnknownPricingOil(oilAnswer) && isAboveQuarterCheckoutOil(oilGauge);
+}
+
+function showOilLevelWarning() {
+  const warning = document.getElementById('oil-level-warning');
+  if (warning) warning.classList.add('visible');
+}
+
+function hideOilLevelWarning() {
+  const warning = document.getElementById('oil-level-warning');
+  if (warning) warning.classList.remove('visible');
+}
+
+function focusCheckoutOilGauge() {
+  hideOilLevelWarning();
+  const oilEl = document.getElementById('book-oil-gauge');
+  if (oilEl) oilEl.focus();
+}
+
+function setPricingOilAnswer(oilAnswer) {
+  answers.oil = oilAnswer;
+  document.querySelectorAll('#oil-cards .oil-option-card').forEach(card => {
+    card.classList.toggle('selected', card.dataset.value === oilAnswer);
+  });
+  const nextBtn = document.getElementById('next-3');
+  if (nextBtn) nextBtn.disabled = !oilAnswer;
+  updateEstimateBar();
+  computePricing();
+}
+
+function confirmCheckoutOilFee() {
+  setPricingOilAnswer('half_plus');
+  hideOilLevelWarning();
+  submitCheckout();
 }
 
 // ──────────────────────────────────────────────
@@ -3937,6 +3992,7 @@ function goToCheckout() {
   }
   booking.state = answers.state || '';
   hideQuoteStateWarning();
+  hideOilLevelWarning();
 
   // Mirror the locked price into checkout heading
   const headingEl = document.getElementById('checkout-heading');
@@ -4014,6 +4070,12 @@ function submitCheckout() {
     return;
   }
   hideQuoteStateWarning();
+
+  if (!isManualQuoteRequired() && isCheckoutOilMismatch(answers.oil, oilGauge)) {
+    showOilLevelWarning();
+    return;
+  }
+  hideOilLevelWarning();
 
   // Save booking state
   Object.assign(booking, { firstName, lastName, phone, email, address, city, zip, oilGauge,
