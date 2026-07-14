@@ -67,6 +67,14 @@ Before date lookup, `submitCheckout()` compares the checkout city/ZIP against th
 
 The customer can correct city/ZIP in place or return to step 4 to update the quote state. This protects pricing accuracy without changing routing logic, Maps/API behavior, slot ranking, booking confirmation, webhook URLs, GHL payload fields, Telegram/rescue logic, pricing formula, or tracking events.
 
+### Checkout Oil-Level Fee Protection
+
+Before date lookup, `submitCheckout()` also compares the Step 3 oil pricing answer with the exact oil level selected at checkout. If the customer was priced as `Less than 1/4` or `I don't know` but selects `1/2`, `3/4`, or `Full` at checkout, the funnel stays on checkout and shows:
+
+> Please Confirm Oil Level. If the tank contains more than 1/4, a $150 oil disposal fee will apply.
+
+`Confirm and update price` changes the pricing answer to `More than 1/4`, recomputes the quote with the $150 fee, and only then proceeds to date lookup. This keeps the displayed price, booking payloads, and customer acknowledgement consistent.
+
 ### UX Principles Baked In
 - **No scroll required on any quiz step** — each screen fits the viewport. Results screen can scroll.
 - **Desktop:** larger fonts (17px card labels, 30px headings) for older readers
@@ -91,15 +99,20 @@ City pricing is hardcoded into `cityData` in `booking-funnel.html` for instant l
 
 The live booking funnel uses Route Optimizer public endpoints for lead capture, date lookup, and booking. Do not expose secrets or webhook URLs in frontend changes. Keep booking confirmation, rescue behavior, Telegram alerts, and GHL payload fields intact unless explicitly approved.
 
+Anonymous funnel behavior telemetry is emitted from this repo and collected by Route Optimizer. Route Optimizer PR #44 added a protected server-to-server export feed. The export feed is data egress only; downstream city/drop-off reporting, spreadsheet sync, dashboards, and CRM joins should be built outside Render. Keep export tokens, webhook URLs, and internal endpoint details out of frontend code and public estimator docs.
+
 ---
 
 ## Open Items — Pick Up Here Next Session
 
-1. **GHL workflow** — Norman to build trigger on `funnel-error` tag -> SMS/email Norman with contact name + phone + price.
-2. **End-to-end rescue test** — after GHL workflow exists, intentionally break Make or use an approved safe test path and confirm `funnel-error` contact lands in GHL with all required fields.
-3. **Internal links** — add links from relevant site pages to `/oil-tank-removal-cost`.
-4. **Ads destination** — point ads to new URL only after rescue path is proven.
-5. **Airtable pricing sync** — add/verify `AIRTABLE_API_TOKEN`, run sync workflow, and confirm stale prices are repaired.
+1. **Funnel-event export verification** — Route Optimizer PR #44 shipped the protected export feed, but the first authenticated pull returned only 4 rows over an 89-day window. Verify GitHub Pages event emission -> public telemetry POST -> Render JSONL persistence -> protected export before building downstream reporting.
+2. **Downstream report layer** — after the production data path is proven, build the server-side pull/reporting layer that uses the export token to load city/drop-off patterns into a dashboard, spreadsheet, or reporting store.
+3. **Legacy Make cleanup** — Norman confirmed Make is retired. Do not test by breaking Make or build new Make paths. Verify live Route Optimizer env no longer depends on legacy `MAKE_*` values, then remove/neutralize retired Make-era code through PR/review gates.
+4. **GHL workflow** — Norman to build or verify trigger on `funnel-error` tag -> SMS/email Norman with contact name + phone + price.
+5. **End-to-end rescue test** — after the rescue workflow is verified, use an approved safe test path to confirm `funnel-error` contact handling and failure rescue without touching retired Make hooks.
+6. **Internal links** — add links from relevant site pages to `/oil-tank-removal-cost`.
+7. **Ads destination** — point ads to new URL only after rescue path is proven.
+8. **Airtable pricing sync** — add/verify `AIRTABLE_API_TOKEN`, run sync workflow, and confirm stale prices are repaired.
 
 ---
 
@@ -107,27 +120,33 @@ The live booking funnel uses Route Optimizer public endpoints for lead capture, 
 
 ### Architecture — Important, Read Before Building
 
-**Do NOT redirect after the webhook.** Fire-and-forget webhook -> redirect = race condition. GHL may not have created the contact yet when the Route Optimizer tries to load it. Breaks intermittently, hard to debug.
+**Do NOT redirect after a fire-and-forget lead webhook.** Fire-and-forget webhook -> redirect = race condition. GHL may not have created the contact yet when Route Optimizer tries to book. Breaks intermittently, hard to debug.
 
-**The right approach: single POST to Route Optimizer backend.**
+**The current approach: Route Optimizer owns the server-side booking work.**
 
 ```
 Customer submits CTA form
     ↓
-Estimator POSTs all job variables + contact info to Route Optimizer backend
+Estimator sends contact/job details to Route Optimizer lead capture and requests slots
     ↓
-Route Optimizer backend (server-side):
-  1. Creates GHL contact → gets contact ID back
+Route Optimizer backend:
+  1. Captures/preserves the GHL lead when possible
   2. Runs slot logic with oil constraints applied
     ↓
 Returns: { contact_id, available_slots: [date1, date2, date3] }
     ↓
 Estimator shows date picker — customer picks one
     ↓
-Booking confirmed in GHL. Confirmation screen.
+Estimator POSTs the selected date/time to Route Optimizer `/api/public/book`
+    ↓
+Route Optimizer persists booking intent to the GHL contact before appointment creation
+    ↓
+Booking succeeds in GHL. Confirmation screen.
 ```
 
-No API keys in the browser. No race conditions. One round trip.
+No API keys in the browser. No public webhook URLs in the frontend.
+
+The code still has separate lead/date/booking calls, and `submitEstimate()` remains separate from `submitCheckout()`. Do not collapse these paths without a fresh cross-repo review.
 
 ### Oil Constraints Needed in Route Optimizer
 | Estimator variable | Constraint to apply |
@@ -151,8 +170,9 @@ These values are already part of the booking flow. Do not change Route Optimizer
 |---|---|---|
 | Estimator | Single HTML file | GitHub Pages (this repo) |
 | City pricing | Hardcoded array in `booking-funnel.html` | Rebuilt from Airtable with `sync-airtable.js` |
-| Lead capture | GHL webhook | GHL location `3bkvnPQV7Lj7BZp5dbjr` |
+| Lead capture | Route Optimizer public API -> GHL | No public webhook URL in frontend |
 | Booking engine | Route Optimizer backend | Render — `route-optimizer-jps.onrender.com` |
+| Funnel event export | Protected Route Optimizer endpoint | Server-to-server only; downstream reporting still separate |
 | CRM + automations | GoHighLevel | GHL |
 | Pricing data source | Airtable | Base `appUscw3WgCDWkRt9` |
 
@@ -168,7 +188,7 @@ These values are already part of the booking flow. Do not change Route Optimizer
 | `CURRENT_STATE.md` | Current live status, IDs, pending work, and latest deployed change |
 | `BRAND.md` | Visual identity and customer-facing design rules |
 | `booking-funnel.html` | The live booking funnel — HTML, CSS, JS in one file |
-| `index.html` | Older estimator/static entry kept for reference |
+| `index.html` | Older estimator/static entry kept for reference; contains retired Make-era code and is not the live funnel |
 | `sync-airtable.js` | Node script to refresh `cityData` from Airtable |
 | `last_session.md` | Most recent session closeout |
 | `next_session.md` | Next-session starting point and open items |
@@ -177,11 +197,11 @@ These values are already part of the booking flow. Do not change Route Optimizer
 
 ## Deployment
 
-GitHub Pages auto-deploys from `master`. Push → live in ~1 minute.
+GitHub Pages auto-deploys from `master` after approved merge. This is a critical approval repo: use branch -> PR -> `codex-review` + `adversarial-review`, then wait for approval before merge. Do not push directly to `master`.
 
 ```bash
 export PATH="$PATH:/c/Program Files/GitHub CLI"
 git add booking-funnel.html
 git commit -m "description"
-git push origin master
+git push origin <branch-name>
 ```

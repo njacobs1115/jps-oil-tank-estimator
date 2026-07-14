@@ -66,4 +66,37 @@ assert('WordPress iframe src carries allowlisted attribution params', wpTemplate
 assert('WordPress iframe src includes parent landing page', wpTemplate.includes("$jps_attribution_args['landing_page']"));
 assert('WordPress referrer strips non-attribution query params before iframe handoff', wpTemplate.includes('wp_parse_url( $jps_referrer_raw )') && wpTemplate.includes('$jps_referrer_attribution'));
 
+assert('oil mismatch warning copy is customer-safe and fee-specific',
+  html.includes('Please Confirm Oil Level.') &&
+  html.includes('If the tank contains more than 1/4, a $150 oil disposal fee will apply.'));
+assert('oil mismatch helper checks only low-or-unknown pricing answers against above-quarter checkout gauges',
+  html.includes("function isCheckoutOilMismatch(oilAnswer, oilGauge)") &&
+  html.includes("oilAnswer === 'quarter' || oilAnswer === 'no_gauge'") &&
+  html.includes("oilGauge === '1/2' || oilGauge === '3/4' || oilGauge === 'Full'"));
+assert('oil warning confirmation updates pricing answer before continuing',
+  html.includes("function confirmCheckoutOilFee()") &&
+  html.includes("setPricingOilAnswer('half_plus');") &&
+  html.includes("submitCheckout();"));
+assert('oil pricing answer sync updates selected Step 3 card and recomputes pricing',
+  html.includes("function setPricingOilAnswer(oilAnswer)") &&
+  html.includes("card.classList.toggle('selected', card.dataset.value === oilAnswer)") &&
+  html.includes("computePricing();"));
+
+const quoteStateGuardIndex = html.indexOf('const checkoutAddressState = getCheckoutAddressState(city, zip);');
+const oilMismatchGuardIndex = html.indexOf("if (!isManualQuoteRequired() && isCheckoutOilMismatch(answers.oil, oilGauge))");
+const bookingStateSaveIndex = html.indexOf('Object.assign(booking, { firstName, lastName, phone, email, address, city, zip, oilGauge,');
+const infoSubmittedIndex = html.indexOf("event:          'funnel_info_submitted'");
+const leadDateCallIndex = html.indexOf('fireLeadWebhook().finally(fetchSlots);');
+assert('oil mismatch guard runs after quote-state guard and before booking state save',
+  quoteStateGuardIndex !== -1 &&
+  oilMismatchGuardIndex > quoteStateGuardIndex &&
+  bookingStateSaveIndex > oilMismatchGuardIndex);
+assert('oil mismatch guard runs before tracking and lead/date side effects',
+  oilMismatchGuardIndex !== -1 &&
+  infoSubmittedIndex > oilMismatchGuardIndex &&
+  leadDateCallIndex > oilMismatchGuardIndex);
+assert('oil mismatch guard is not a dismiss-only continue path',
+  !html.includes('Confirm and continue') &&
+  !html.includes('Confirm and find dates'));
+
 if (process.exitCode) process.exit(process.exitCode);

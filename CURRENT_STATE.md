@@ -1,6 +1,6 @@
 # Booking Funnel - Current State
 > Source of truth for funnel IDs, tracking, and live status.
-> Last updated: 2026-05-30 ET (assisted-conversion telemetry implemented locally, not pushed or deployed)
+> Last updated: 2026-06-21 ET (oil-level checkout fee guard deployed)
 > Repo: github.com/njacobs1115/jps-oil-tank-estimator
 
 ---
@@ -26,16 +26,20 @@
 
 ---
 
-## Make Webhooks
+## Legacy Make References - Retired
 
-Make is still live for the original funnel proxy paths. Do not expose webhook URLs in frontend or docs.
+Norman confirmed on 2026-06-12 that JPS no longer uses Make. Do not design, test, or troubleshoot the booking funnel as if Make is an active dependency.
 
-| Webhook | Make Scenario | Status |
-|---|---|---|
-| Booking confirmed | 4603576 | LIVE - awaiting approved Command Center cutover |
-| Estimate email | 4629605 | LIVE - awaiting approved Command Center cutover |
+Current repo/code reality:
+- The live `booking-funnel.html` sends customer traffic to Route Optimizer public endpoints.
+- Route Optimizer still contains legacy proxy endpoint names for lead and estimate capture. Treat those as decommission/cleanup surfaces unless live Render env verification proves otherwise.
+- Legacy `index.html` still contains retired Make-era webhook code. It is not the live funnel entrypoint and must not be used for future funnel work.
+- Do not POST to old Make hooks, do not "break Make" as a test strategy, and do not add Make back into new workflow design.
 
-Cutover plan, when Norman approves: flip `MAKE_LEAD_WEBHOOK_URL` and `MAKE_ESTIMATE_WEBHOOK_URL` on Route Optimizer Render, then kill Make scenarios after 48 hours clean.
+Remaining cleanup:
+- Verify live Render env no longer depends on legacy `MAKE_*` values before deleting Route Optimizer proxy code.
+- Remove or neutralize the legacy Make-era code in `index.html` through the normal branch -> PR -> review lane.
+- Update Route Optimizer docs when that repo is not under active concurrent editing.
 
 ---
 
@@ -59,9 +63,73 @@ Cutover plan, when Norman approves: flip `MAKE_LEAD_WEBHOOK_URL` and `MAKE_ESTIM
 
 ## Status
 
-**LIVE - TRACKING VERIFIED - QUOTE GUARDRAILS DEPLOYED**
+**LIVE - TRACKING VERIFIED - QUOTE/OIL GUARDRAILS DEPLOYED - ROUTE OPTIMIZER EXPORT FEED DEPLOYED**
 
-### Assisted Conversion Telemetry - Local Branch, Not Deployed - 2026-05-30 ET
+### Checkout Oil-Level Fee Guard - Live - 2026-06-21 ET
+
+Estimator PR `#40` is merged and deployed.
+- PR: https://github.com/njacobs1115/jps-oil-tank-estimator/pull/40
+- Merge commit: `80574a1ab53327f48721c0cb650863851139f19a`
+- GitHub Pages deploy run: `27919233143`
+
+Live behavior:
+- If the Step 3 pricing oil answer is `Less than 1/4` or `I don't know`, but checkout exact oil level is `1/2`, `3/4`, or `Full`, checkout shows an inline oil warning before date lookup.
+- Warning copy:
+  - `Please Confirm Oil Level.`
+  - `If the tank contains more than 1/4, a $150 oil disposal fee will apply.`
+- `Confirm and update price` changes the pricing answer to `More than 1/4`, recomputes the quote with the $150 fee, and then proceeds.
+- The guard blocks before booking state save, `funnel_info_submitted`, lead capture, date lookup, manual quote, or booking calls.
+- Existing checkout city/state mismatch guard remains first and separate.
+
+Verification:
+- `node test-quote-guardrails.js` passed.
+- Local, clean-branch, and live GitHub Pages browser smokes passed with Route Optimizer calls intercepted.
+- Live GitHub Pages fetch returned `200` and contained the new oil-warning copy and helper.
+- WordPress wrapper direct shell fetch returned `403 Forbidden`, so deployed verification used the GitHub Pages funnel directly.
+
+What did not change:
+- No Route Optimizer code changed.
+- No GHL, Telegram, ACK handling, orphan sweeper, rescue behavior, endpoint URLs, webhook URLs, or secrets changed.
+- No `submitEstimate()` behavior changed.
+
+### Funnel Behavior Tracking and Export - Live Cross-Repo State - 2026-06-12 ET
+
+This estimator repo is the frontend event emitter. Route Optimizer is the backend collection/export layer on Render.
+
+Estimator state:
+- Estimator PR `#37` is merged and deployed.
+- `booking-funnel.html` preserves existing GA4/GTM events `funnel_text_clicked` and `funnel_call_clicked`.
+- It also sends anonymous backend telemetry events such as `text_clicked` and `call_clicked`.
+- Anonymous telemetry must remain PII-free. Do not add names, phone numbers, email, address, tokens, webhook URLs, or internal endpoint details to frontend telemetry payloads.
+
+Route Optimizer state:
+- Route Optimizer PR `#39` added assisted CTA funnel telemetry.
+- Route Optimizer PR `#44` added the protected funnel-event export feed and is merged/deployed.
+- PR #44 merge commit: `140961d384a01fd8fd0b5f0c36fb1f379ccee7bf`.
+- The protected export feed exports allowlisted anonymous funnel-event rows only. It is not a Render-hosted analytics/reporting layer.
+- Keep exact endpoint/header/env-var details in Route Optimizer operational docs or the approved secret/runbook lane, not in public estimator docs.
+
+Live checks on 2026-06-12:
+- `https://route-optimizer-jps.onrender.com/health` returned `200 OK`.
+- `https://route-optimizer-jps.onrender.com/health/funnel` returned `200 FUNNEL_OK calendar=30 timed=30`.
+- The protected export feed rejected an unauthenticated request with `401 Unauthorized`.
+
+Current concern:
+- The first authenticated export pull after PR #44 returned only 4 rows over an 89-day window: 3 `funnel_started`, 1 `text_clicked`, and no booking/date/slot signals.
+- That is too sparse/test-like for real production funnel activity.
+- Before building the downstream dashboard/spreadsheet/reporting layer, verify the full production path: GitHub Pages event emission -> public telemetry POST -> Render JSONL persistence -> protected export.
+
+What did not change in PR #44:
+- No booking logic changed.
+- No GHL write logic changed.
+- No Telegram alerting changed.
+- No pricing logic changed.
+- No frontend/customer-facing copy changed.
+- No rescue behavior changed.
+- No ACK handling changed.
+- No orphan sweeper behavior changed.
+
+### Assisted Conversion Telemetry - Historical Implementation Note - 2026-05-30 ET
 
 Local worktree:
 `C:\Users\njaco\.codex\worktrees\assisted-estimator`
@@ -87,7 +155,7 @@ What did not change:
 - No booking, date lookup, manual quote, pricing, rescue, Telegram, GHL, Make, or WordPress wrapper behavior changed.
 - No visible SMS reference code was added.
 - No anonymous GHL contact creation was added.
-- No code was pushed or deployed.
+- This work later shipped through estimator PR #37 and matching Route Optimizer telemetry work.
 
 Checks passed:
 - `npm ci`
@@ -106,7 +174,7 @@ Broader funnel harness:
 - Report generated locally at `test-report/index.html`; the folder is gitignored.
 
 Workspace hygiene:
-- Original project folder `C:\Users\njaco\JPS\projects\jps-oil-tank-estimator` is clean after parking pre-existing local changes in `stash@{0}`.
+- Current canonical local folder is `C:\AI Workspaces\JPS\repos\jps-oil-tank-estimator`; older notes may refer to the pre-migration path under `C:\Users\njaco\JPS\projects`.
 - Stash label: `pre-existing dirty state before assisted telemetry clean worktree release pass 2026-05-30`.
 
 ### Latest Runtime State - 2026-05-20 Early AM
@@ -172,11 +240,13 @@ PR `#30` cleaned repo state without changing live funnel runtime behavior.
 
 ## Pending Work
 
+- [ ] Verify the live funnel-event data-production path before assuming reporting is the only missing layer.
+- [ ] Build the downstream pull/reporting layer that uses the Route Optimizer export token server-side to load city/drop-off patterns into dashboards, spreadsheets, or a reporting store.
 - [ ] Post-deploy observation - watch the first few `ma_permit_tbd` and `unknown_city_manual_quote` leads for copy/CRM accuracy.
 - [ ] Live Airtable sync verification - `AIRTABLE_API_TOKEN` was not present locally, so confirm Airtable remains aligned with shipped city data when credentials are available.
 - [ ] Workflow maintenance - address GitHub Pages Node 20 deprecation warning / Node 24 compatibility.
 - [ ] GHL workflow - trigger on `funnel-error` tag (Norman to build).
-- [ ] End-to-end test - break Make, confirm funnel-error contact lands in GHL.
+- [ ] End-to-end rescue test - use an approved safe test path, not Make, to confirm failure rescue and `funnel-error` handling.
 - [ ] Internal links - add links from relevant pages to `/oil-tank-removal-cost`.
 - [ ] Point ads to new URL if still pointing to `/oil-tank-removal-ri-promotion/`.
-- [ ] Funnel cutover - flip 2 env vars, kill Make 4603576 and 4629605 after approved clean window.
+- [ ] Legacy Make cleanup - verify no live Render dependency remains, then remove or neutralize retired Make-era code and docs through PR/review gates.

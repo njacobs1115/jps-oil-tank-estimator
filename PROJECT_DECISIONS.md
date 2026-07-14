@@ -75,13 +75,26 @@ Keep the warning plain and customer-safe. Do not alter routing, Maps/API behavio
 ## 2026-05-21 - Lead capture is bounded before slot lookup
 
 ### Decision
-Lead capture before slot lookup must stay bounded by timeout behavior so a slow Make/GHL lead path cannot hang the customer-facing date lookup flow.
+Lead capture before slot lookup must stay bounded by timeout behavior so a slow CRM/contact-preservation path cannot hang the customer-facing date lookup flow.
 
 ### Why
 The funnel needs enough time to capture intent, but the booking experience cannot stall indefinitely while a CRM/webhook dependency is slow.
 
 ### Preserve
 Do not remove the lead-capture timeout without explicit approval and a replacement safety mechanism.
+
+---
+
+## 2026-06-12 - Make is retired and must not be treated as a live dependency
+
+### Decision
+Make is no longer used for the booking funnel. Future docs, tests, and implementation plans must not describe Make as live, use Make as a rescue-test target, or add new Make-based workflow paths.
+
+### Why
+Stale Make language creates operational risk: a future agent could test or design against a retired dependency, miss the real Route Optimizer/GHL path, or preserve legacy webhook surfaces longer than needed.
+
+### Preserve
+Treat remaining Make references as legacy cleanup surfaces only. Verify live Route Optimizer environment state before deleting backend proxy code, but do not build new work around Make. Do not POST to old hooks. Keep active customer flow documentation centered on GitHub Pages `booking-funnel.html`, Route Optimizer public APIs, GHL contact/appointment writes, Telegram alerts, GTM/GA4/Ads events, and the protected funnel-event export.
 
 ---
 
@@ -95,3 +108,16 @@ If the appointment-created automation fires without the full job context, the cu
 
 ### Preserve
 Required persisted context includes requested date, requested time, service, address, name, phone, email, and `funnel_request_id`.
+
+---
+
+## 2026-06-21 - Checkout oil level must not preserve an underpriced quote
+
+### Decision
+If the customer was priced from Step 3 as `Less than 1/4` or `I don't know`, but chooses checkout exact oil level `1/2`, `3/4`, or `Full`, checkout must stop before date lookup and require acknowledgement that tanks containing more than 1/4 carry the $150 oil disposal fee.
+
+### Why
+The booking flow collects a rough oil answer for pricing and a more exact oil level at checkout. Allowing a higher checkout oil level to proceed under the earlier lower quote creates a false price expectation and makes the $150 fee harder to defend later.
+
+### Preserve
+Keep this guard before booking state save, tracking submit events, lead capture, date lookup, manual quote, and final booking calls. Confirming the warning must update the pricing answer to `More than 1/4` and recompute the quote before proceeding. Do not turn this into a dismiss-only acknowledgement, and do not weaken the existing city/state mismatch guard.
