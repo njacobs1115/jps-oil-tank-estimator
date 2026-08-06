@@ -1,0 +1,17 @@
+﻿repository_risk: critical
+default_branch: master
+release_authority: github_pages_source_branch
+deployment_target: github_pages
+requires_sysflow: true
+requires_gauntlet: true
+requires_gatekeeper: true
+requires_human_deploy_approval: true
+functional_checks:
+  - tests
+protected_paths:
+  - .github/
+  - deploy/
+  - scripts/
+  - systemd/
+  - cron/
+exceptions: []

@@ -1,0 +1,75 @@
+name: JPS Hygiene
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  hygiene:
+    name: JPS hygiene
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate branch name
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="${GITHUB_HEAD_REF}"
+          if [[ ! "$branch" =~ ^(fix|feat|ops|docs|hotfix|cleanup)/[A-Za-z]+-[0-9]+-[a-z0-9][a-z0-9-]*$ ]]; then
+            echo "Branch name does not follow JPS format: $branch"
+            exit 1
+          fi
+
+      - name: Block obvious generated or secret files
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="${GITHUB_BASE_REF}"
+          git fetch origin "$base"
+          diff_range="origin/$base...HEAD"
+          if ! git merge-base "origin/$base" HEAD >/dev/null 2>&1; then
+            diff_range="origin/$base..HEAD"
+          fi
+          changed="$(git diff --name-only "$diff_range")"
+          echo "$changed"
+          if echo "$changed" | grep -E '(^|/)(\.env|\.env\..*|.*\.log|node_modules/|\.venv/|__pycache__/|runtime-output/)' ; then
+            echo "Forbidden generated, runtime, log, or environment file in PR."
+            exit 1
+          fi
+          secret_pattern='(BEGIN (RSA|OPENSSH|PRIVATE) KEY|Authorization:[[:space:]]*Bearer[[:space:]]+[A-Za-z0-9._-]+|SUPABASE_SERVICE_ROLE_KE[Y][[:space:]]*=|API_KE[Y][[:space:]]*=|SECRE[T][[:space:]]*=|TOKE[N][[:space:]]*=)'
+          if git diff "$diff_range" | grep -Ei "$secret_pattern" ; then
+            echo "Potential secret detected in diff."
+            exit 1
+          fi
+
+      - name: Validate PR body sections
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body || "";
+            const required = [
+              "# Ticket",
+              "# Purpose",
+              "# Allowed Scope",
+              "# Files Changed",
+              "# Risk Lane",
+              "# SysFlow Result",
+              "# GateKeeper Result",
+              "# Tests And Checks",
+              "# Deployment Method",
+              "# Rollback Method",
+              "# Required Norman Approval Point"
+            ];
+            const missing = required.filter((section) => !body.includes(section));
+            if (missing.length) {
+              core.setFailed(`PR body missing required JPS sections: ${missing.join(", ")}`);
+            }
