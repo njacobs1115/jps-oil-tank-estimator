@@ -1,4 +1,4 @@
-# Booking Funnel — Agent Guide
+﻿# Booking Funnel â€” Agent Guide
 
 ## What This Repo Is
 Public-facing JPS oil tank estimator and booking funnel. This is live customer-facing infrastructure and must be treated as such.
@@ -115,3 +115,19 @@ The PR must explicitly ask Codex to review for:
 - secret, token, webhook, or internal endpoint exposure
 - regressions in ACK handling
 - regressions in orphan sweeper scoping
+
+# JPS Engineering System Agent Instructions
+
+For JPS repository work, this protocol is mandatory.
+
+Before editing code, docs, config, automation, workflows, deployment files, or live-system behavior:
+
+1. Use `C:\AI Workspaces\JPS\repo-hygiene\jps-engineering-system\jps-change.ps1 start` to create a registered branch and dedicated worktree.
+2. Work only inside the printed worktree path.
+3. Follow SysFlow, Agent Gauntlet, GateKeeper, PR review, merge, deployment, and cleanup requirements for the selected risk lane.
+4. Stage only explicit paths. Never run `git add .` or `git add -A`.
+5. Run `jps-preflight.ps1` before PR, push, merge handoff, or deployment handoff.
+6. Production deploys require separate Norman approval and `jps-deploy-record.ps1`.
+7. Cleanup requires `jps-cleanup.ps1`; do not delete branches or worktrees manually.
+
+If any check fails, stop and fix the cause or record an approved exception. Do not route around the system.
