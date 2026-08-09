@@ -45,11 +45,40 @@ jobs:
             echo "Forbidden generated, runtime, log, or environment file in PR."
             exit 1
           fi
-          secret_pattern='(BEGIN (RSA|OPENSSH|PRIVATE) KEY|Authorization:[[:space:]]*Bearer[[:space:]]+[A-Za-z0-9._-]+|SUPABASE_SERVICE_ROLE_KE[Y][[:space:]]*=|API_KE[Y][[:space:]]*=|SECRE[T][[:space:]]*=|TOKE[N][[:space:]]*=)'
-          if git diff "$diff_range" | grep -Ei "$secret_pattern" ; then
-            echo "Potential secret detected in diff."
-            exit 1
-          fi
+          git diff --unified=0 "$diff_range" > pr.patch
+          python3 <<'PY'
+          import re
+          import sys
+
+          added = []
+          with open("pr.patch", "r", encoding="utf-8", errors="replace") as fh:
+              for line in fh:
+                  if line.startswith("+") and not line.startswith("+++"):
+                      added.append(line[1:].rstrip("\n"))
+
+          private_key = re.compile(r"BEGIN (RSA|OPENSSH|PRIVATE) KEY", re.I)
+          bearer = re.compile(r"Authorization:\s*Bearer\s+[A-Za-z0-9._~+/\-]+=*", re.I)
+          assignment = re.compile(
+              r"\b(API[_-]?KEY|SECRET|TOKEN|CLIENT[_-]?SECRET|SERVICE[_-]?ROLE[_-]?KEY)\b"
+              r"\s*[:=]\s*['\"]?([A-Za-z0-9_./+=~:-]{20,})['\"]?",
+              re.I,
+          )
+          safe_reference = re.compile(
+              r"(secrets\.|vars\.|process\.env|os\.environ|getenv|env\[|env\.|from_secret|placeholder|example|changeme|redacted)",
+              re.I,
+          )
+
+          for line in added:
+              if private_key.search(line) or bearer.search(line):
+                  print("Potential secret detected in added diff line.")
+                  print(line)
+                  sys.exit(1)
+              match = assignment.search(line)
+              if match and not safe_reference.search(line):
+                  print("Potential hardcoded secret assignment detected in added diff line.")
+                  print(line)
+                  sys.exit(1)
+          PY
 
       - name: Validate PR body sections
         uses: actions/github-script@v7
@@ -63,6 +92,7 @@ jobs:
               "# Files Changed",
               "# Risk Lane",
               "# SysFlow Result",
+              "# Gauntlet Result",
               "# GateKeeper Result",
               "# Tests And Checks",
               "# Deployment Method",
@@ -72,4 +102,23 @@ jobs:
             const missing = required.filter((section) => !body.includes(section));
             if (missing.length) {
               core.setFailed(`PR body missing required JPS sections: ${missing.join(", ")}`);
+            }
+            const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            const stripComments = (value) => value.replace(/<!--[\s\S]*?-->/g, "").trim();
+            const placeholders = /^(n\/a|none|todo|tbd|pending|\[.*\]|_.*_|-?\s*)$/i;
+            const empty = [];
+            for (let i = 0; i < required.length; i++) {
+              const current = required[i];
+              const next = required[i + 1];
+              const pattern = next
+                ? new RegExp(`${escapeRegex(current)}\\s*([\\s\\S]*?)\\s*${escapeRegex(next)}`)
+                : new RegExp(`${escapeRegex(current)}\\s*([\\s\\S]*)$`);
+              const match = body.match(pattern);
+              const content = stripComments(match ? match[1] : "");
+              if (!content || placeholders.test(content)) {
+                empty.push(current);
+              }
+            }
+            if (empty.length) {
+              core.setFailed(`PR body sections need real evidence, not blank template text: ${empty.join(", ")}`);
             }
