@@ -116,6 +116,8 @@ jobs:
           JPS-43
           # Purpose
           Propose the validated monthly Airtable city-pricing data for human review.
+          # Why It Changed
+          Keep the estimator's proposed city pricing synchronized with validated Airtable records without changing live pricing automatically.
           # Allowed Scope
           Only the generated cityData block in booking-funnel.html.
           # Files Changed
@@ -130,6 +132,12 @@ jobs:
           Required before merge.
           # Tests And Checks
           Deterministic sync tests and existing quote guardrails passed in run ${GITHUB_RUN_ID}.
+          # Check Results
+          Airtable validation, deterministic generation, changed-path enforcement, and quote guardrails passed before this draft was created.
+          # Known Risks Or Follow-Up Items
+          Pricing remains unchanged until Norman reviews this exact data diff and separately approves its merge. A failed or abandoned proposal must be closed without merging.
+          # Required Codex Review
+          Please explicitly review this proposal for customer-facing false confirmations, Step 3 rescue behavior, Step 5 intent preservation before the booking webhook, rescue-path independence from GHL alone, secret/token/webhook/internal-endpoint exposure, regressions in ACK handling, and regressions in orphan-sweeper scoping.
           # Deployment Method
           No automatic deployment. GitHub Pages changes only after separate human-approved merge.
           # Rollback Method

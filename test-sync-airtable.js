@@ -30,6 +30,21 @@ function record(table, id, city, removal, permit) {
 function expectThrow(fn, pattern) { assert.throws(fn, pattern); }
 
 async function run() {
+  const workflow = fs.readFileSync(path.join(__dirname, '.github', 'workflows', 'sync-airtable.yml'), 'utf8');
+  for (const required of [
+    '# Why It Changed',
+    '# Check Results',
+    '# Known Risks Or Follow-Up Items',
+    '# Required Codex Review',
+    'customer-facing false confirmations',
+    'Step 3 rescue behavior',
+    'Step 5 intent preservation before the booking webhook',
+    'rescue-path independence from GHL alone',
+    'secret/token/webhook/internal-endpoint exposure',
+    'regressions in ACK handling',
+    'regressions in orphan-sweeper scoping',
+  ]) assert.ok(workflow.includes(required), `generated PR review brief missing: ${required}`);
+
   assert.deepEqual(recordToEntry(record(ma, 'ma1', ' Boston ', 900, 50), ma), { city: 'Boston', state: 'MA', removal_fee: 900, permit_fee: 50 });
   assert.deepEqual(recordToEntry(record(ct, 'ct1', 'Groton', 800), ct), { city: 'Groton', state: 'CT', removal_fee: 800 });
   assert.equal(recordToEntry(record(ma, 'ma2', 'Acton', 700), ma).permit_fee, null);
