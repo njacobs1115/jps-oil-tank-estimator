@@ -1,176 +1,122 @@
 #!/usr/bin/env node
-/**
- * sync-airtable.js
- * Pulls city pricing from Airtable (Massachusetts + Connecticut tables)
- * and updates the hardcoded cityData array in booking-funnel.html.
- *
- * Requires env var: AIRTABLE_API_TOKEN (personal access token)
- *
- * Usage:  AIRTABLE_API_TOKEN=pat... node sync-airtable.js
- */
 
 const fs = require('fs');
 const path = require('path');
 
-const AIRTABLE_TOKEN = process.env.AIRTABLE_API_TOKEN;
-if (!AIRTABLE_TOKEN) {
-  console.error('Missing AIRTABLE_API_TOKEN env var');
-  process.exit(1);
-}
-
 const BASE_ID = 'appUscw3WgCDWkRt9';
 const TABLES = [
-  { name: 'Massachusetts Pricing', state: 'MA', hasPermitFee: true },
-  { name: 'Connecticut Pricing',   state: 'CT', hasPermitFee: false },
+  { tableId: 'tblJFQSsGfEuLmZc5', state: 'MA', cityFieldId: 'fldklfOcr9OvmsYs4', removalFieldId: 'fldH4bVc8wHWZbCEx', permitFieldId: 'fldT5bsqPegN0f8kU' },
+  { tableId: 'tblXgn86E0R7hAZqz', state: 'CT', cityFieldId: 'fldXY0M6pwfZHGJxU', removalFieldId: 'fldcyu3jwx8bOIe8k' },
 ];
-
 const HTML_FILE = path.join(__dirname, 'booking-funnel.html');
+const CITY_DATA_PATTERN = /^let cityData = \[\r?\n[\s\S]*?^\];$/gm;
 
-// Airtable list-records endpoint (max 100 per page, paginate with offset)
-async function fetchTable(tableName) {
+async function fetchTable(table, options = {}) {
+  const credential = options.token || process.env.AIRTABLE_API_TOKEN;
+  const fetchImpl = options.fetchImpl || fetch;
+  if (!credential) throw new Error('Missing AIRTABLE_API_TOKEN env var');
   const records = [];
-  let offset = null;
-
+  let offset;
   do {
-    const url = new URL(`https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(tableName)}`);
+    const url = new URL(`https://api.airtable.com/v0/${BASE_ID}/${table.tableId}`);
     url.searchParams.set('pageSize', '100');
+    url.searchParams.set('returnFieldsByFieldId', 'true');
+    for (const fieldId of [table.cityFieldId, table.removalFieldId, table.permitFieldId].filter(Boolean)) url.searchParams.append('fields[]', fieldId);
     if (offset) url.searchParams.set('offset', offset);
-
-    const resp = await fetch(url.toString(), {
-      headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` },
-    });
-
-    if (!resp.ok) {
-      const body = await resp.text();
-      throw new Error(`Airtable ${tableName}: HTTP ${resp.status} — ${body}`);
-    }
-
-    const data = await resp.json();
+    const response = await fetchImpl(url, { headers: { Authorization: `Bearer ${credential}` }, signal: AbortSignal.timeout(15000) });
+    if (!response.ok) throw new Error(`Airtable ${table.state} request failed with HTTP ${response.status}`);
+    const data = await response.json();
+    if (!data || !Array.isArray(data.records) || (data.offset != null && typeof data.offset !== 'string')) throw new Error(`Airtable ${table.state} returned an unexpected response shape`);
     records.push(...data.records);
-    offset = data.offset || null;
+    offset = data.offset;
   } while (offset);
-
+  if (records.length === 0) throw new Error(`Airtable ${table.state} returned zero records`);
   return records;
 }
 
-function normalizeFieldName(name) {
-  return name.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
+function validateCity(value, recordId, state) {
+  if (typeof value !== 'string') throw new Error(`${state} record ${recordId}: city must be text`);
+  const city = value.trim();
+  if (!city) throw new Error(`${state} record ${recordId}: city is blank`);
+  if (city.length > 100) throw new Error(`${state} record ${recordId}: city is too long`);
+  if (/[\u0000-\u001f\u007f]/.test(city)) throw new Error(`${state} record ${recordId}: city contains control characters`);
+  return city;
 }
 
-function findField(fields, ...candidates) {
-  for (const key of Object.keys(fields)) {
-    const norm = normalizeFieldName(key);
-    if (candidates.some(c => norm.includes(c))) return fields[key];
-  }
-  return undefined;
+function validateNumber(value, label, recordId, state, allowZero = false) {
+  if (typeof value !== 'number' || !Number.isFinite(value) || (allowZero ? value < 0 : value <= 0)) throw new Error(`${state} record ${recordId}: ${label} is invalid`);
+  return value;
 }
 
-function recordToEntry(record, state, hasPermitFee) {
-  const f = record.fields;
-  const city = findField(f, 'city', 'town', 'name');
-  const removalFee = findField(f, 'removal', 'price', 'fee', 'cost');
-  const permitFee = hasPermitFee ? findField(f, 'permit') : undefined;
-
-  if (!city || removalFee == null) {
-    console.warn(`  Skipping record ${record.id} — missing city or removal fee`, f);
-    return null;
-  }
-
+function recordToEntry(record, table) {
+  if (!record || typeof record.id !== 'string' || !record.fields || typeof record.fields !== 'object' || Array.isArray(record.fields)) throw new Error(`Airtable ${table.state} returned an invalid record`);
   const entry = {
-    city: String(city).trim(),
-    state,
-    removal_fee: Number(removalFee),
+    city: validateCity(record.fields[table.cityFieldId], record.id, table.state),
+    state: table.state,
+    removal_fee: validateNumber(record.fields[table.removalFieldId], 'removal fee', record.id, table.state),
   };
-
-  if (hasPermitFee) {
-    entry.permit_fee = permitFee != null ? Number(permitFee) : null;
+  if (table.permitFieldId) {
+    const permit = record.fields[table.permitFieldId];
+    entry.permit_fee = permit == null || permit === '' ? null : validateNumber(permit, 'permit fee', record.id, table.state, true);
   }
-
   return entry;
 }
 
-function formatEntry(e) {
-  const permitPart = 'permit_fee' in e
-    ? `,permit_fee:${e.permit_fee === null ? 'null' : e.permit_fee}`
-    : '';
-  return `  {city:${JSON.stringify(e.city)},state:"${e.state}",removal_fee:${e.removal_fee}${permitPart}}`;
+function compareCodePoints(a, b) { return a < b ? -1 : a > b ? 1 : 0; }
+
+function validateAndSortEntries(entries) {
+  if (!Array.isArray(entries) || entries.length === 0) throw new Error('No city pricing entries were produced');
+  const seen = new Set();
+  for (const entry of entries) {
+    if (!TABLES.some(table => table.state === entry.state)) throw new Error(`${entry.city}: unsupported state ${entry.state}`);
+    const key = `${entry.state}:${entry.city.trim().toLowerCase()}`;
+    if (seen.has(key)) throw new Error(`${entry.city}, ${entry.state}: duplicate city row`);
+    seen.add(key);
+  }
+  return [...entries].sort((a, b) => compareCodePoints(a.state, b.state) || compareCodePoints(a.city.toLowerCase(), b.city.toLowerCase()));
 }
 
-function validateEntries(entries) {
-  const seen = new Map();
-  const errors = [];
+function safeJsonString(value) {
+  return JSON.stringify(value).replace(/[<>&\u2028\u2029]/g, character => `\\u${character.charCodeAt(0).toString(16).padStart(4, '0')}`);
+}
 
-  for (const entry of entries) {
-    const key = `${entry.state}:${entry.city.trim().toLowerCase()}`;
-    if (!['MA', 'CT'].includes(entry.state)) {
-      errors.push(`${entry.city}: unsupported state ${entry.state}`);
-    }
-    if (!Number.isFinite(entry.removal_fee) || entry.removal_fee <= 0) {
-      errors.push(`${entry.city}, ${entry.state}: invalid removal_fee ${entry.removal_fee}`);
-    }
-    if ('permit_fee' in entry && entry.permit_fee !== null && (!Number.isFinite(entry.permit_fee) || entry.permit_fee < 0)) {
-      errors.push(`${entry.city}, ${entry.state}: invalid permit_fee ${entry.permit_fee}`);
-    }
+function formatEntry(entry) {
+  const permitPart = Object.hasOwn(entry, 'permit_fee') ? `,permit_fee:${entry.permit_fee === null ? 'null' : entry.permit_fee}` : '';
+  return `  {city:${safeJsonString(entry.city)},state:"${entry.state}",removal_fee:${entry.removal_fee}${permitPart}}`;
+}
 
-    const prior = seen.get(key);
-    if (prior) {
-      const priorPermit = 'permit_fee' in prior ? prior.permit_fee : null;
-      const permit = 'permit_fee' in entry ? entry.permit_fee : null;
-      if (prior.removal_fee !== entry.removal_fee || priorPermit !== permit) {
-        errors.push(`${entry.city}, ${entry.state}: duplicate conflicting pricing`);
-      } else {
-        errors.push(`${entry.city}, ${entry.state}: duplicate row`);
-      }
-    }
-    seen.set(key, entry);
+function buildCityDataBlock(entries) { return `let cityData = [\n${entries.map(formatEntry).join(',\n')}\n];`; }
+
+function replaceCityData(html, newBlock) {
+  const matches = [...html.matchAll(CITY_DATA_PATTERN)];
+  if (matches.length !== 1) throw new Error(`Expected exactly one cityData block; found ${matches.length}`);
+  const match = matches[0];
+  return html.slice(0, match.index) + newBlock + html.slice(match.index + match[0].length);
+}
+
+async function collectEntries(options = {}) {
+  const entries = [];
+  for (const table of TABLES) {
+    const records = await fetchTable(table, options);
+    for (const record of records) entries.push(recordToEntry(record, table));
   }
+  return validateAndSortEntries(entries);
+}
 
-  if (errors.length) {
-    console.error('Airtable pricing validation failed:');
-    errors.slice(0, 25).forEach(err => console.error(`  - ${err}`));
-    if (errors.length > 25) console.error(`  ...and ${errors.length - 25} more`);
-    process.exit(1);
-  }
+async function sync(options = {}) {
+  const htmlFile = options.htmlFile || HTML_FILE;
+  const entries = await collectEntries(options);
+  const original = fs.readFileSync(htmlFile, 'utf8');
+  const updated = replaceCityData(original, buildCityDataBlock(entries));
+  if (updated !== original) fs.writeFileSync(htmlFile, updated, 'utf8');
+  return { changed: updated !== original, count: entries.length };
 }
 
 async function main() {
-  console.log('Fetching city data from Airtable...');
-
-  const allEntries = [];
-  for (const table of TABLES) {
-    console.log(`  Table: ${table.name}`);
-    const records = await fetchTable(table.name);
-    console.log(`    ${records.length} records`);
-
-    for (const rec of records) {
-      const entry = recordToEntry(rec, table.state, table.hasPermitFee);
-      if (entry) allEntries.push(entry);
-    }
-  }
-
-  console.log(`Total: ${allEntries.length} cities`);
-  validateEntries(allEntries);
-
-  // Build the new cityData block
-  const lines = allEntries.map(formatEntry);
-  const newBlock = 'let cityData = [\n' + lines.join(',\n') + '\n];';
-
-  // Read the HTML and replace
-  let html = fs.readFileSync(HTML_FILE, 'utf8');
-
-  const pattern = /let cityData = \[[\s\S]*?\];/;
-  if (!pattern.test(html)) {
-    console.error('Could not find cityData array in booking-funnel.html');
-    process.exit(1);
-  }
-
-  html = html.replace(pattern, newBlock);
-  fs.writeFileSync(HTML_FILE, html, 'utf8');
-
-  console.log(`Updated booking-funnel.html with ${allEntries.length} cities.`);
+  const result = await sync();
+  console.log(result.changed ? `Prepared booking-funnel.html with ${result.count} validated cities.` : `Validated ${result.count} cities; booking-funnel.html is unchanged.`);
 }
 
-main().catch(err => {
-  console.error(err);
-  process.exit(1);
-});
+if (require.main === module) main().catch(error => { console.error(error.message); process.exitCode = 1; });
+
+module.exports = { TABLES, buildCityDataBlock, collectEntries, fetchTable, formatEntry, recordToEntry, replaceCityData, safeJsonString, sync, validateAndSortEntries };
