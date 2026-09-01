@@ -2,38 +2,219 @@ name: Sync Airtable City Pricing
 
 on:
   schedule:
-    # 1st of every month at 8am ET (12:00 UTC)
+    # GitHub cron is UTC. Keep the existing 12:00 UTC monthly run time unchanged.
     - cron: '0 12 1 * *'
-  workflow_dispatch: # allow manual trigger from GitHub UI
+  workflow_dispatch:
+    inputs:
+      notification_test:
+        description: Send TEST failure and recovery Telegram messages only
+        required: false
+        default: false
+        type: boolean
 
 permissions:
-  contents: write
+  contents: read
+  actions: read
+
+concurrency:
+  group: airtable-city-pricing-sync
+  cancel-in-progress: false
 
 jobs:
   sync:
+    name: Sync pricing and prepare draft PR
+    if: ${{ github.event_name == 'schedule' || inputs.notification_test != true }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: city-pricing-sync-production
+    outputs:
+      outcome: ${{ steps.result.outputs.outcome }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Require trusted default-branch execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "njacobs1115/jps-oil-tank-estimator"
+          test "$GITHUB_REF" = "refs/heads/master"
 
-      - uses: actions/setup-node@v4
+      - name: Check out protected master
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '20'
 
-      - name: Sync city data from Airtable
+      - name: Run deterministic tests
+        run: |
+          node test-quote-guardrails.js
+          node test-sync-airtable.js
+
+      - name: Read and validate Airtable pricing
         env:
           AIRTABLE_API_TOKEN: ${{ secrets.AIRTABLE_API_TOKEN }}
         run: node sync-airtable.js
 
-      - name: Check for changes
+      - name: Refuse unexpected workspace changes
         id: diff
+        shell: bash
         run: |
-          git diff --quiet booking-funnel.html && echo "changed=false" >> "$GITHUB_OUTPUT" || echo "changed=true" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          changed="$(git status --porcelain)"
+          if [ -z "$changed" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$changed" != " M booking-funnel.html" ]; then
+            echo "Unexpected changed paths:" >&2
+            printf '%s\n' "$changed" >&2
+            exit 1
+          fi
+          echo "changed=true" >> "$GITHUB_OUTPUT"
 
-      - name: Commit and push
+      - name: Refuse a second open pricing proposal
         if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_PR_TOKEN }}
+        shell: bash
         run: |
-          git config user.name "github-actions[bot]"
+          set -euo pipefail
+          open_count="$(gh api "repos/$GITHUB_REPOSITORY/pulls?state=open&per_page=100" --jq '[.[] | select(.head.ref | startswith("ops/JPS-43-airtable-pricing-"))] | length')"
+          if [ "$open_count" != "0" ]; then
+            echo "An unresolved Airtable city-pricing proposal already exists." >&2
+            exit 1
+          fi
+
+      - name: Create unique branch and draft pricing PR
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_PR_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="ops/JPS-43-airtable-pricing-$(date -u +%Y-%m-%d)-${GITHUB_RUN_ID}"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+            echo "The unique automation branch already exists; refusing to overwrite it." >&2
+            exit 1
+          fi
+          git switch -c "$branch"
+          git config user.name "jps-city-pricing-sync"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add booking-funnel.html
-          git commit -m "Auto-sync city pricing from Airtable [$(date +%Y-%m-%d)]"
-          git push
+          git add -- booking-funnel.html
+          git diff --cached --quiet && { echo "Expected pricing change was not staged." >&2; exit 1; }
+          git commit -m "ops: propose validated Airtable city pricing"
+          gh auth setup-git
+          git push origin "$branch"
+          body_file="$(mktemp)"
+          trap 'rm -f "$body_file"' EXIT
+          cat > "$body_file" <<EOF
+          # Ticket
+          JPS-43
+          # Purpose
+          Propose the validated monthly Airtable city-pricing data for human review.
+          # Why It Changed
+          Keep the estimator's proposed city pricing synchronized with validated Airtable records without changing live pricing automatically.
+          # Allowed Scope
+          Only the generated cityData block in booking-funnel.html.
+          # Files Changed
+          booking-funnel.html
+          # Risk Lane
+          Critical customer-facing pricing data; draft only and never auto-merged.
+          # SysFlow Result
+          Generated by the approved JPS-43 sync repair workflow.
+          # Gauntlet Result
+          Conditional go approved by Norman; generated data still requires human review.
+          # GateKeeper Result
+          Required before merge.
+          # Tests And Checks
+          Deterministic sync tests and existing quote guardrails passed in run ${GITHUB_RUN_ID}.
+          # Check Results
+          Airtable validation, deterministic generation, changed-path enforcement, and quote guardrails passed before this draft was created.
+          # Known Risks Or Follow-Up Items
+          Pricing remains unchanged until Norman reviews this exact data diff and separately approves its merge. A failed or abandoned proposal must be closed without merging.
+          # Required Codex Review
+          Please explicitly review this proposal for customer-facing false confirmations, Step 3 rescue behavior, Step 5 intent preservation before the booking webhook, rescue-path independence from GHL alone, secret/token/webhook/internal-endpoint exposure, regressions in ACK handling, and regressions in orphan-sweeper scoping.
+          # Deployment Method
+          No automatic deployment. GitHub Pages changes only after separate human-approved merge.
+          # Rollback Method
+          Close this draft PR; live pricing remains unchanged.
+          # Required Norman Approval Point
+          Norman must review the data diff and approve before merge.
+          EOF
+          gh pr create --draft --base master --head "$branch" --title "JPS-43: Review Airtable city pricing ($(date -u +%Y-%m-%d))" --body-file "$body_file"
+
+      - name: Record no-change result
+        id: nochange
+        if: steps.diff.outputs.changed == 'false'
+        run: echo "outcome=no pricing changes" >> "$GITHUB_OUTPUT"
+
+      - name: Record sync outcome
+        id: result
+        if: always() && steps.diff.conclusion == 'success'
+        env:
+          CHANGED: ${{ steps.diff.outputs.changed }}
+        run: |
+          if [ "$CHANGED" = "true" ]; then
+            echo "outcome=draft pricing PR created" >> "$GITHUB_OUTPUT"
+          else
+            echo "outcome=no pricing changes" >> "$GITHUB_OUTPUT"
+          fi
+
+  notify:
+    name: Send real failure or recovery alert
+    needs: sync
+    if: ${{ always() && needs.sync.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: city-pricing-sync-production
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: master
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '20'
+      - name: Notify Telegram when required
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SYNC_RESULT: ${{ needs.sync.result }}
+          SYNC_OUTCOME: ${{ needs.sync.outputs.outcome }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node scripts/notify-sync-telegram.js
+
+  notification_test:
+    name: Test Telegram notifications
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.notification_test == true }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: city-pricing-sync-production
+    steps:
+      - name: Require trusted default-branch execution
+        run: |
+          test "$GITHUB_REPOSITORY" = "njacobs1115/jps-oil-tank-estimator"
+          test "$GITHUB_REF" = "refs/heads/master"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: master
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '20'
+      - name: Send controlled TEST failure alert
+        env:
+          NOTIFICATION_MODE: test-failure
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node scripts/notify-sync-telegram.js
+      - name: Send controlled TEST recovery alert
+        env:
+          NOTIFICATION_MODE: test-recovery
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node scripts/notify-sync-telegram.js
