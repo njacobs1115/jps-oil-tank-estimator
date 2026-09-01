@@ -146,7 +146,7 @@ jobs:
 
       - name: Record sync outcome
         id: result
-        if: always() && steps.diff.outcome == 'success'
+        if: always() && steps.diff.conclusion == 'success'
         env:
           CHANGED: ${{ steps.diff.outputs.changed }}
         run: |
