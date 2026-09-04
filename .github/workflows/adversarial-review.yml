@@ -199,6 +199,14 @@ jobs:
               body = review.get("body") or ""
               return any(match.group(1).lower() == head_sha for match in PROTECTED_REVIEW_MARKER_RE.finditer(body))
 
+          def comment_approves_head(comment, head_sha):
+              if comment.get("author_association") not in APPROVAL_AUTHOR_ASSOCIATIONS:
+                  return False
+              if (comment.get("user") or {}).get("type") == "Bot":
+                  return False
+              body = comment.get("body") or ""
+              return any(match.group(1).lower() == head_sha for match in PROTECTED_REVIEW_MARKER_RE.finditer(body))
+
           def protected_path_approval_status(head_sha):
               if PROTECTED_REVIEW_LABEL not in pr_labels():
                   return False, "required label is missing"
@@ -222,6 +230,12 @@ jobs:
                       actor = (review.get("user") or {}).get("login", "unknown")
                       submitted = review.get("submitted_at", "unknown time")
                       return True, f"approved for {head_sha} by {actor} at {submitted}"
+              comments = github_api_json(f"/repos/{required('REPO')}/issues/{required('PR_NUMBER')}/comments?per_page=100")
+              for comment in reversed(comments):
+                  if comment_approves_head(comment, head_sha):
+                      actor = (comment.get("user") or {}).get("login", "unknown")
+                      created = comment.get("created_at", "unknown time")
+                      return True, f"owner-authorized approval marker for {head_sha} by {actor} at {created}"
               return False, f"no repository-authorized protected-path review approval found for current head SHA {head_sha}"
 
           def post_comment(body):
