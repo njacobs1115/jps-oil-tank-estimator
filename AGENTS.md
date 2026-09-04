@@ -23,6 +23,13 @@ Public-facing JPS oil tank estimator and booking funnel. This is live customer-f
 - Branch -> PR -> `codex-review` + `adversarial-review`.
 - Green PRs still wait for approval before merge.
 
+### Merge-gate guardrails
+- Do not add a required check, reviewer, collaborator, ruleset, or branch-protection requirement without Norman's explicit approval.
+- Prove any required check can run and pass from the actual `master` event context before introducing it.
+- Never place a fix for a required check inside the PR blocked by the old version of that check.
+- This repository uses Norman plus Codex as the approval model; do not invent a second collaborator or human reviewer.
+- Do not bypass or weaken branch protection as an unapproved workaround. If Norman explicitly authorizes a temporary exception, restore and verify the original settings immediately.
+
 ## Hard Rules
 - Never allow a customer-facing false confirmation.
 - `submitEstimate()` and `submitCheckout()` are separate paths. Do not assume shared state.
