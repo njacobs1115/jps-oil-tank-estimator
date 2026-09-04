@@ -186,7 +186,7 @@ jobs:
               payload = pull_request_payload()
               return {
                   item.get("name", "")
-                  for item in payload.get("pull_request", {}).get("labels", [])
+                  for item in payload.get("labels", [])
               }
 
           def github_api_json(path):
