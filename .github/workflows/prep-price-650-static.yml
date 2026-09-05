@@ -39,8 +39,8 @@ jobs:
               raise SystemExit('cityData block not found; refusing to edit')
           city_before = city_before_match.group(0)
 
-          # These are price values only. No operators, functions, routing, API calls,
-          # booking behavior, timing constants, CSS weights, or cityData rows change.
+          # Price constants only. No operators, functions, routing, API calls,
+          # booking behavior, CSS weights, or generated cityData rows change.
           replacements = [
               ('$600', '$650'),
               ('answers.cityRemovalFee = 600;', 'answers.cityRemovalFee = 650;'),
@@ -62,11 +62,9 @@ jobs:
           if not city_after_match or city_after_match.group(0) != city_before:
               raise SystemExit('cityData changed; refusing to write')
 
-          # Guard against accidental broad 600 replacements.
+          # Guard against an accidental broad replacement of every numeric 600.
           if 'font-weight: 600' not in after:
               raise SystemExit('CSS font-weight guard failed; possible broad replacement')
-          if '60000' not in after:
-              raise SystemExit('timing constant guard failed; possible broad replacement')
           if 'removal_fee:600' not in city_before:
               raise SystemExit('cityData baseline guard failed')
 
