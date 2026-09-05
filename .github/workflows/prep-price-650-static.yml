@@ -1,0 +1,99 @@
+name: Prep $650 static price cutover
+
+on:
+  push:
+    branches:
+      - prep/price-650-static-copy-2026-09-04
+
+permissions:
+  contents: write
+
+jobs:
+  patch-price-values:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out prep branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: prep/price-650-static-copy-2026-09-04
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Change only hard-coded base-price values
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('booking-funnel.html')
+          before = path.read_text(encoding='utf-8')
+
+          # Protect the generated Airtable city-pricing block byte-for-byte.
+          city_re = re.compile(r'let cityData = \[\n[\s\S]*?\n\];')
+          city_before_match = city_re.search(before)
+          if not city_before_match:
+              raise SystemExit('cityData block not found; refusing to edit')
+          city_before = city_before_match.group(0)
+
+          # These are price values only. No operators, functions, routing, API calls,
+          # booking behavior, timing constants, CSS weights, or cityData rows change.
+          replacements = [
+              ('$600', '$650'),
+              ('answers.cityRemovalFee = 600;', 'answers.cityRemovalFee = 650;'),
+              ('answers.cityRemovalFee || 600', 'answers.cityRemovalFee || 650'),
+              ('c.removal_fee || 600', 'c.removal_fee || 650'),
+              ('removalFee || 600', 'removalFee || 650'),
+          ]
+
+          after = before
+          counts = []
+          for old, new in replacements:
+              count = after.count(old)
+              if count == 0:
+                  raise SystemExit(f'Expected base-price token not found: {old!r}')
+              after = after.replace(old, new)
+              counts.append((old, new, count))
+
+          city_after_match = city_re.search(after)
+          if not city_after_match or city_after_match.group(0) != city_before:
+              raise SystemExit('cityData changed; refusing to write')
+
+          # Guard against accidental broad 600 replacements.
+          if 'font-weight: 600' not in after:
+              raise SystemExit('CSS font-weight guard failed; possible broad replacement')
+          if '60000' not in after:
+              raise SystemExit('timing constant guard failed; possible broad replacement')
+          if 'removal_fee:600' not in city_before:
+              raise SystemExit('cityData baseline guard failed')
+
+          if after == before:
+              raise SystemExit('No changes produced')
+
+          path.write_text(after, encoding='utf-8')
+          print('Applied price-only replacements:')
+          for old, new, count in counts:
+              print(f'  {old!r} -> {new!r}: {count}')
+          PY
+
+      - name: Verify scope and existing guardrails
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          test "$(git diff --name-only)" = "booking-funnel.html"
+          node test-quote-guardrails.js
+
+      - name: Commit prepared funnel price change
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "jps-price-cutover-prep"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -- booking-funnel.html
+          git diff --cached --quiet && { echo 'No staged price changes'; exit 1; }
+          git commit -m "prep: update hard-coded base price to 650"
+          git push origin HEAD:prep/price-650-static-copy-2026-09-04
