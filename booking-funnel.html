@@ -1930,7 +1930,7 @@
     <!-- Hero total -->
     <div class="results-hero">
       <div class="total-label" id="results-total-label">YOUR FLAT-RATE REMOVAL PRICE</div>
-      <div class="total-amount" id="results-total-display">$600</div>
+      <div class="total-amount" id="results-total-display">$650</div>
       <div class="total-range" id="results-range-display"></div>
       <div class="hero-badge">
         <span>✓</span> You pay nothing until the job is complete
@@ -1961,7 +1961,7 @@
           <div class="invoice-row-name">Base Removal Fee</div>
           <div class="invoice-row-sub" id="base-sub">Cutting, safe removal &amp; disposal</div>
         </div>
-        <div class="invoice-row-amount" id="base-fee-display">$600</div>
+        <div class="invoice-row-amount" id="base-fee-display">$650</div>
       </div>
 
       <div class="invoice-row">
@@ -1990,7 +1990,7 @@
 
       <div class="invoice-total-row">
         <div class="invoice-total-label">Your Total</div>
-        <div class="invoice-total-amount" id="total-display">$600</div>
+        <div class="invoice-total-amount" id="total-display">$650</div>
       </div>
     </div>
 
@@ -2395,7 +2395,7 @@
     <div class="estimate-bar-label">Your price so far</div>
     <div class="estimate-bar-note" id="estimate-bar-note">Updates as you answer</div>
   </div>
-  <div class="estimate-bar-amount" id="estimate-bar-amount">from $600</div>
+  <div class="estimate-bar-amount" id="estimate-bar-amount">from $650</div>
 </div>
 
 <script>
@@ -2657,7 +2657,7 @@ function ghlJobDetails() {
 
 function quotePriceLabel() {
   if (isManualQuoteRequired()) return 'Confirmed price needed';
-  if (isPermitTbdQuote()) return '$' + ((answers.cityRemovalFee || 600) + (answers.oil === 'half_plus' ? 150 : 0)).toLocaleString() + ' + permit';
+  if (isPermitTbdQuote()) return '$' + ((answers.cityRemovalFee || 650) + (answers.oil === 'half_plus' ? 150 : 0)).toLocaleString() + ' + permit';
   return '$' + (booking.estimatedPrice || 0).toLocaleString();
 }
 
@@ -3312,7 +3312,7 @@ function selectState(el) {
     answers.permitFee = 0;
     answers.permitSource = 'none';
     answers.city = 'Rhode Island';
-    answers.cityRemovalFee = 600;
+    answers.cityRemovalFee = 650;
     answers.quoteConfidence = 'verified';
     answers.cityMatchSource = 'state_default';
     answers.permitStatus = 'none_required';
@@ -3380,9 +3380,9 @@ function onCityInput(input) {
   }
 
   list.innerHTML = filtered.map(c => `
-    <div class="autocomplete-item" onclick="selectCity('${c.city.replace(/'/g,"\\'")}', ${c.permit_fee !== undefined ? c.permit_fee : 'null'}, ${c.removal_fee || 600})">
+    <div class="autocomplete-item" onclick="selectCity('${c.city.replace(/'/g,"\\'")}', ${c.permit_fee !== undefined ? c.permit_fee : 'null'}, ${c.removal_fee || 650})">
       <span>${c.city}, ${c.state}</span>
-      <span class="fee-hint">${c.state === 'CT' ? '$' + (c.removal_fee || 600) + ' flat rate' : (c.permit_fee !== null && c.permit_fee > 0 ? '$' + (c.removal_fee || 600) + ' · Permit: $' + c.permit_fee : '$' + (c.removal_fee || 600) + ' · No permit fee')}</span>
+      <span class="fee-hint">${c.state === 'CT' ? '$' + (c.removal_fee || 650) + ' flat rate' : (c.permit_fee !== null && c.permit_fee > 0 ? '$' + (c.removal_fee || 650) + ' · Permit: $' + c.permit_fee : '$' + (c.removal_fee || 650) + ' · No permit fee')}</span>
     </div>
   `).join('');
   list.classList.add('open');
@@ -3402,7 +3402,7 @@ function trackCitySearch(city) {
 function selectCity(city, fee, removalFee) {
   answers.city = city;
   answers.permitFee = (fee === null || fee === undefined || fee === 'null') ? null : fee;
-  answers.cityRemovalFee = removalFee || 600;
+  answers.cityRemovalFee = removalFee || 650;
   answers.permitSource = 'airtable';
   answers.quoteConfidence = (answers.state === 'MA' && answers.permitFee === null) ? 'ma_permit_tbd' : 'verified';
   answers.cityMatchSource = 'airtable';
@@ -3581,7 +3581,7 @@ function updateEstimateBar() {
   if (!answers.location) { bar.classList.remove('visible'); return; }
   bar.classList.add('visible');
 
-  const BASE = answers.cityRemovalFee || 600;
+  const BASE = answers.cityRemovalFee || 650;
   const oilFee = answers.oil === 'half_plus' ? 150 : 0;
   // CT and RI have no permit fee
   const permitFee = (answers.state === 'CT' || answers.state === 'RI') ? 0 : (answers.permitFee ?? 0);
@@ -3594,7 +3594,7 @@ function updateEstimateBar() {
     amountEl.textContent = 'needs confirmation';
     noteEl.textContent = (answers.city || 'This city') + ' requires a confirmed price';
   } else if (answers.state === 'MA' && !answers.city) {
-    amountEl.textContent = 'from $600+';
+    amountEl.textContent = 'from $650+';
     noteEl.textContent = 'Select your city for exact price';
   } else if (isPermitTbdQuote()) {
     amountEl.textContent = 'from $' + low.toLocaleString() + ' + permit';
@@ -3609,7 +3609,7 @@ function updateEstimateBar() {
 // PRICING LOGIC
 // ──────────────────────────────────────────────
 function computePricing() {
-  const BASE = answers.cityRemovalFee || 600;
+  const BASE = answers.cityRemovalFee || 650;
   const hasExcessOil = answers.oil === 'half_plus';
   const oilFee = hasExcessOil ? 150 : 0;
   const permitFee = (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee ?? null);
@@ -3773,7 +3773,7 @@ function submitCTA() {
   if (!valid) return;
 
   // Compute totals for payload
-  const BASE = answers.cityRemovalFee || 600;
+  const BASE = answers.cityRemovalFee || 650;
   const oilFee = answers.oil === 'half_plus' ? 150 : 0;
   const permitFee = (answers.state === 'RI' || answers.state === 'CT') ? 0 : answers.permitFee;
   const lowTotal = BASE + oilFee + (permitFee ?? 0);
@@ -4085,7 +4085,7 @@ function submitCheckout() {
     state: answers.state || '' });
 
   // Compute price from quiz answers
-  const BASE      = answers.cityRemovalFee || 600;
+  const BASE      = answers.cityRemovalFee || 650;
   const oilFee    = answers.oil === 'half_plus' ? 150 : 0;
   const permitFee = (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee ?? 0);
   booking.estimatedPrice = isManualQuoteRequired() ? 0 : BASE + oilFee + (permitFee || 0);
@@ -4200,7 +4200,7 @@ async function fireLeadWebhook() {
     job_details:          ghlJobDetails(),
     restricted_access:    answers.access === 'restricted' ? 'true' : 'false',
     stair_removal:        answers.exit === 'stairs' ? 'true' : 'false',
-    base_removal_fee:     answers.cityRemovalFee || 600,
+    base_removal_fee:     answers.cityRemovalFee || 650,
     estimated_total:      booking.estimatedPrice,
     permit_fee:           (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee ?? 'TBD'),
     quote_confidence:     answers.quoteConfidence || 'verified',
@@ -4265,7 +4265,7 @@ async function captureLeadFallback() {
         tankAccess:     ghlTankAccess(),
         jobDetails:     ghlJobDetails(),
         estimatedPrice: booking.estimatedPrice,
-        basePrice:      answers.cityRemovalFee || 600,
+        basePrice:      answers.cityRemovalFee || 650,
         ...(answers.permitFee > 0 ? { permitFee: answers.permitFee } : {}),
         ...(answers.oil === 'half_plus' ? { oilSurcharge: 150 } : {}),
         serviceType:    'OT',
@@ -4477,7 +4477,7 @@ async function confirmBooking() {
         ghlOilLevel:    booking.oilGauge || undefined,
         serviceType:    'OT',
         estimatedPrice: booking.estimatedPrice,
-        basePrice:      answers.cityRemovalFee || 600,
+        basePrice:      answers.cityRemovalFee || 650,
         ...(answers.permitFee > 0 ? { permitFee: answers.permitFee } : {}),
         ...(answers.oil === 'half_plus' ? { oilSurcharge: 150 } : {}),
         tankLocation:   ghlTankLocation()   || '',
@@ -4615,7 +4615,7 @@ function showBookingFailed(msg) {
 // ── ESTIMATE PATH ─────────────────────────────────────────────────────────
 // Build the HTML email body for the estimate; all customer-facing formatting logic lives here.
 function buildEstimateEmail(firstName, address, city, state, zip) {
-  var basePrice   = answers.cityRemovalFee || 600;
+  var basePrice   = answers.cityRemovalFee || 650;
   var oilFee      = answers.oil === 'half_plus' ? 150 : 0;
   var permitFee   = (answers.state === 'RI' || answers.state === 'CT') ? 0 : answers.permitFee;
   var total       = isManualQuoteRequired() ? 0 : basePrice + oilFee + (permitFee || 0);
@@ -4750,7 +4750,7 @@ async function submitEstimate() {
       job_details:          ghlJobDetails(),
       restricted_access:    answers.access === 'restricted' ? 'true' : 'false',
       stair_removal:        answers.exit === 'stairs' ? 'true' : 'false',
-      base_removal_fee:     answers.cityRemovalFee || 600,
+      base_removal_fee:     answers.cityRemovalFee || 650,
       estimated_total:      estimateEmail.total,
       permit_fee:           (answers.state === 'RI' || answers.state === 'CT') ? 0 : (answers.permitFee ?? 'TBD'),
       quote_confidence:     answers.quoteConfidence || 'verified',
