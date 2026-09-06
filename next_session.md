@@ -5,6 +5,8 @@
 
 The assisted-conversion telemetry work is live in both systems. Do not treat the telemetry branches as pending implementation work.
 
+Critical attribution decision: first-touch attribution fields are acquisition fields only. Public funnel/contact-entry paths may write them through the `First Touch Locked` gate, but Route Optimizer internal booking tools used by staff/Kelly must not write or lock first-touch fields. Read `PROJECT_DECISIONS.md` and `docs/workflows/funnel-attribution-custom-fields.md` before changing attribution behavior.
+
 ## Current State
 
 - Estimator PR #37 is merged and deployed.

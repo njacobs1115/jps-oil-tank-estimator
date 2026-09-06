@@ -91,6 +91,8 @@ City pricing is hardcoded into `cityData` in `booking-funnel.html` for instant l
 
 The live booking funnel uses Route Optimizer public endpoints for lead capture, date lookup, and booking. Do not expose secrets or webhook URLs in frontend changes. Keep booking confirmation, rescue behavior, Telegram alerts, and GHL payload fields intact unless explicitly approved.
 
+Attribution custom-field semantics are documented in [`docs/workflows/funnel-attribution-custom-fields.md`](docs/workflows/funnel-attribution-custom-fields.md). In short: source and medium describe how the customer first reached JPS, campaign is written only when real campaign data exists, landing page means the parent website landing page rather than the embedded funnel URL, `First Touch Locked` is the write-once gate, and First Touch Conversion Time means the website conversion time rather than job completion.
+
 ---
 
 ## Open Items — Pick Up Here Next Session
