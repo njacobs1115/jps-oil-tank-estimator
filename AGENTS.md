@@ -96,7 +96,7 @@ Require tests or validation for:
 All funnel-related tags use funnel- prefix:
 - funnel-date-failure
 - funnel-booking-failure
-- funnel-booking-success
+- funnel-booking
 - funnel-test
 
 

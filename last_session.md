@@ -1,66 +1,71 @@
-# Last Session - 2026-05-31 ET
+# Last Session - 2026-06-21 ET
 
 ## What Finished
 
-The estimator side of assisted-conversion telemetry is merged and deployed.
+Shipped the checkout oil-level fee guard for the live booking funnel.
 
-- PR: https://github.com/njacobs1115/jps-oil-tank-estimator/pull/37
-- Merge commit: `1e32ef1964bda9bbc327711fd3b6de77ea537d6d`
-- GitHub Pages deploy completed successfully on 2026-05-31.
-- WordPress parent page iframe was verified to pass attribution params through to the deployed GitHub Pages funnel.
+- PR: https://github.com/njacobs1115/jps-oil-tank-estimator/pull/40
+- Merge commit: `80574a1ab53327f48721c0cb650863851139f19a`
+- GitHub Pages deploy run: `27919233143`
+- Deploy completed successfully on 2026-06-21.
 
-## What Shipped
+## What Changed
 
 - `booking-funnel.html`
-  - Added `trackAssistedCtaClick(ctaType, ctaLocation, screen)`.
-  - Preserved existing GA4/GTM event names:
-    - `funnel_text_clicked`
-    - `funnel_call_clicked`
-  - Added backend JSONL telemetry events:
-    - `text_clicked`
-    - `call_clicked`
-  - Tracked visible `sms:` and `tel:` paths with explicit CTA locations.
-- `test-funnel.js`
-  - Updated Stamford, CT to expect manual help / confirmed-price behavior.
-  - Stamford is not listed in Airtable/city data and should not be direct-bookable.
+  - Added an inline checkout warning when Step 3 pricing oil answer is `Less than 1/4` or `I don't know`, but checkout exact oil level is `1/2`, `3/4`, or `Full`.
+  - Warning copy:
+    - `Please Confirm Oil Level.`
+    - `If the tank contains more than 1/4, a $150 oil disposal fee will apply.`
+  - Blocks before booking state save, `funnel_info_submitted`, lead capture, date lookup, manual quote, or booking side effects.
+  - `Confirm and update price` sets the pricing answer to `More than 1/4`, recomputes the quote with the $150 fee, and then proceeds.
+  - `Change oil level` focuses the checkout oil dropdown.
+  - Existing checkout city/state mismatch guard remains first and separate.
+
+- `test-quote-guardrails.js`
+  - Added assertions for oil guard copy, helper logic, execution order, price-update behavior, and no dismiss-only continue path.
 
 ## What Did Not Change
 
-- No pricing logic changed.
-- No booking logic changed.
-- No date lookup logic changed.
-- No manual quote logic changed.
-- No rescue behavior changed.
-- No Telegram, GHL, Make, Route Optimizer booking endpoint, or WordPress wrapper behavior changed.
-- No visible SMS reference code was added.
-- No GHL contact creation was added for anonymous price-reveal users.
+- No Route Optimizer code changed.
+- No GHL, Telegram, ACK handling, orphan sweeper, rescue behavior, endpoint URLs, webhook URLs, or secrets changed.
+- No `submitEstimate()` behavior changed.
+- No customer-visible booking success/failure copy changed.
+- No live CRM/contact/appointment write was made during testing.
+
+## Review / Gate Results
+
+- SysFlow/Agent Gauntlet review completed and saved:
+  - `C:\AI Workspaces\JPS\archives\gauntlet\reviews\2026-06-20_jps-oil-tank-estimator_oil-level-mismatch-guard\summary_report.md`
+- GateKeeper approved the clean PR scope with warnings only.
+- PR checks passed:
+  - `codex-review`: success
+  - `adversarial-review`: success
 
 ## Verification
 
-- `npm ci` passed; one existing moderate dependency audit warning remains.
 - `node test-quote-guardrails.js` passed.
-- `node test-funnel.js` passed: 12 passed, 0 failed.
-- Local assisted CTA smoke with `navigator.sendBeacon` stubbed passed.
-- Live GitHub Pages fetch contained the assisted CTA helper and backend event names.
-- Live GitHub Pages assisted CTA smoke passed with `sendBeacon` stubbed.
-- WordPress parent URL browser test confirmed the iframe loaded the deployed funnel and passed UTM/GCLID params.
-- `git diff --check` passed with line-ending warnings only.
-- Gatekeeper approved the release with dependency-audit warnings only.
+- Local Playwright smoke passed with Route Optimizer calls stubbed.
+- Clean-branch Playwright smoke passed with Route Optimizer calls stubbed.
+- Live GitHub Pages fetch returned `200` and contained the new oil-warning copy and helper.
+- Live GitHub Pages browser smoke passed with Route Optimizer calls intercepted:
+  - warning appeared
+  - zero side-effect requests fired before confirmation
+  - confirmation changed `answers.oil` to `half_plus`
+  - RI test price became `$750`
+  - date lookup proceeded only after confirmation
+- WordPress wrapper direct shell fetch returned `403 Forbidden`; live verification was against the GitHub Pages funnel file directly.
 
-## Related Route Optimizer State
+## Current Repo / Workspace Notes
 
-- Route Optimizer assisted telemetry PR #39 is merged and deployed.
-- Route Optimizer blank `jobDetails: ""` follow-up PR #40 is merged and deployed.
-- Route Optimizer handoff docs were refreshed in PR #41.
-- Live `/health/funnel` returned `FUNNEL_OK calendar=19 timed=19` after deploy.
+- `origin/master` is current at `80574a1`.
+- The active local folder `C:\AI Workspaces\JPS\repos\jps-oil-tank-estimator` is still on `codex/sync-funnel-export-docs`, behind `origin/master` by the PR #40 merge commits, and has pre-existing dirty docs plus local copies of the oil-fix files.
+- The clean release worktree used for PR #40 was removed during the workspace migration; the branch remains available locally.
+- Do not assume the active local dirty worktree is clean. Before new implementation, start from fresh `origin/master` or reconcile deliberately.
+- Untracked `SECURITY_AUDIT_2026-06-03.md` remains unrelated and untouched.
 
-## E2E Booking Cleanup
+## Remaining Work
 
-- A production-path E2E booking succeeded.
-- Cleanup verification:
-  - Contact deleted / no remaining search match.
-  - Opportunities deleted / no remaining match.
-  - Airtable job record deleted / no remaining appointment-ID match.
-  - Custom objects had no remaining record in checked active or legacy appointment schemas.
-  - GHL direct appointment lookup returns a soft-deleted tombstone with `deleted: true`; active calendar event list shows no matching E2E event.
-- Exact test record IDs are intentionally kept out of committed docs.
+1. Continue the previously planned funnel-event data-production verification before building downstream reporting.
+2. Keep dependency audit remediation separate.
+3. Keep legacy Make cleanup separate.
+4. Consider a separate future UX/pricing pass for the reverse oil mismatch: Step 3 `More than 1/4` but checkout gauge `Empty`, `1/8`, or `1/4`.
