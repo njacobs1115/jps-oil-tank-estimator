@@ -203,11 +203,11 @@ body {
 		<p class="jps-section-lead">One flat rate covers everything — removal, disposal, and full cleanup. No add-ons. No surprises. You know the exact price before we show up.</p>
 		<div class="jps-cost-card">
 			<div class="jps-cost-left">
-				<div class="jps-cost-eyebrow">Flat Rate</div>
-				<div class="jps-cost-price">$600</div>
+				<div class="jps-cost-eyebrow">Flat Rate Pricing Starts At</div>
+				<div class="jps-cost-price">$650</div>
 			</div>
 			<div class="jps-cost-right">
-				<div class="jps-cost-desc">Above-ground residential oil tank removal anywhere in Rhode Island, Massachusetts, or Connecticut. Every job. Every time.</div>
+				<div class="jps-cost-desc">Above-ground residential oil tank removal in Rhode Island, Massachusetts, or Connecticut. Your exact flat rate varies by location.</div>
 				<div class="jps-cost-note">Price includes all labor, certified disposal, remaining oil removal &amp; full site cleanup.</div>
 			</div>
 		</div>
@@ -225,17 +225,17 @@ body {
 
 			<details class="jps-faq-item">
 				<summary>How much does oil tank removal cost in Rhode Island?<span class="jps-faq-toggle">+</span></summary>
-				<div class="jps-faq-answer">Most above-ground residential oil tank removals in Rhode Island start at $600. No permit required in Rhode Island. Use the calculator above for your exact price.</div>
+				<div class="jps-faq-answer">Most above-ground residential oil tank removals in Rhode Island start at $650. No permit required in Rhode Island. Use the calculator above for your exact price.</div>
 			</details>
 
 			<details class="jps-faq-item">
 				<summary>How much does oil tank removal cost in Massachusetts?<span class="jps-faq-toggle">+</span></summary>
-				<div class="jps-faq-answer">Most above-ground residential oil tank removals in Massachusetts start at $600. We serve eastern and central MA — Boston, Worcester, New Bedford, Fall River, Plymouth, and surrounding communities. Massachusetts requires a permit for this work — we handle the entire filing process. Use the calculator above for your exact price.</div>
+				<div class="jps-faq-answer">Most above-ground residential oil tank removals in Massachusetts start at $650. We serve eastern and central MA — Boston, Worcester, New Bedford, Fall River, Plymouth, and surrounding communities. Massachusetts requires a permit for this work — we handle the entire filing process. Use the calculator above for your exact price.</div>
 			</details>
 
 			<details class="jps-faq-item">
 				<summary>How much does oil tank removal cost in Connecticut?<span class="jps-faq-toggle">+</span></summary>
-				<div class="jps-faq-answer">Most above-ground residential oil tank removals in Connecticut start at $600. No permit required in Connecticut. We serve northeastern CT communities near the Rhode Island border. Use the calculator above for your exact price.</div>
+				<div class="jps-faq-answer">Most above-ground residential oil tank removals in Connecticut start at $650. No permit required in Connecticut. We serve northeastern CT communities near the Rhode Island border. Use the calculator above for your exact price.</div>
 			</details>
 
 			<details class="jps-faq-item">
@@ -250,7 +250,7 @@ body {
 
 			<details class="jps-faq-item">
 				<summary>Do I need a permit for oil tank removal in Massachusetts, Rhode Island, or Connecticut?<span class="jps-faq-toggle">+</span></summary>
-				<div class="jps-faq-answer">Massachusetts requires a permit for above-ground residential oil tank removal — we handle the entire process, and it's included in your $600 price. Rhode Island and Connecticut do not require a permit.</div>
+				<div class="jps-faq-answer">Massachusetts requires a permit for above-ground residential oil tank removal — we handle the entire process, and the permit fee is added separately to your removal quote. Rhode Island and Connecticut do not require a permit.</div>
 			</details>
 
 			<details class="jps-faq-item">
