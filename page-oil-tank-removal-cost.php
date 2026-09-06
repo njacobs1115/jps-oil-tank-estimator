@@ -207,7 +207,7 @@ body {
 				<div class="jps-cost-price">$650</div>
 			</div>
 			<div class="jps-cost-right">
-				<div class="jps-cost-desc">Above-ground residential oil tank removal in Rhode Island, Massachusetts, or Connecticut. Your exact flat rate varies by location.</div>
+				<div class="jps-cost-desc">Above-ground oil tank removal across RI, MA, and CT. Get your exact flat rate in 30 seconds.</div>
 				<div class="jps-cost-note">Price includes all labor, certified disposal, remaining oil removal &amp; full site cleanup.</div>
 			</div>
 		</div>
