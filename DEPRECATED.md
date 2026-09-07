@@ -1,6 +1,6 @@
 # DEPRECATED — ROLLBACK ONLY
 
-This legacy repository is not the active JPS Booking Funnel source.
+This legacy repository is not the active JPS Booking Funnel source of truth.
 
 Canonical production repository: `njacobs1115/JPS-Booking-Funnel`
 
