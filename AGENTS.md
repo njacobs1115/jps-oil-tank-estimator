@@ -1,3 +1,13 @@
+# ⚠️ LEGACY REPOSITORY — ROLLBACK ONLY
+
+**STOP. Do not use this repository for new JPS Booking Funnel work.**
+
+Canonical production repository: `njacobs1115/JPS-Booking-Funnel`
+
+This repository is retained only for rollback/reference. Do not modify, deploy, modernize, fix, or continue feature work here unless Norman explicitly authorizes a rollback/recovery operation in this legacy repo.
+
+---
+
 ﻿# Booking Funnel â€” Agent Guide
 
 ## What This Repo Is
