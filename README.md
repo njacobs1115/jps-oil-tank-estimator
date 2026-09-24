@@ -1,5 +1,8 @@
 # JPS Oil Tank Removal — Cost Estimator & Booking System
 
+> [!WARNING]
+> **Deprecated — no longer used by the current JPS booking funnel.** This repository is retained only for historical and rollback reference. [JPS-Booking-Funnel](https://github.com/njacobs1115/JPS-Booking-Funnel) is the sole current source for booking-funnel work.
+
 **Live URL:** https://njacobs1115.github.io/jps-oil-tank-estimator/booking-funnel.html
 **Repo:** https://github.com/njacobs1115/jps-oil-tank-estimator (branch: master)
 **Owner:** Norman Jacobs — Jacobs Property Solutions / RemoveMyOilTank.com
